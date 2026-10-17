@@ -1,0 +1,10 @@
+assumption,value,sq_within7,ladder_within7,sq_median_days,ladder_median_days,gap_within7
+P_ACT,0.5,25.3,40.7,7.0,4.0,15.4
+P_ACT,0.7,35.2,59.3,7.5,3.0,24.2
+P_ACT,0.9,45.1,82.4,7.0,2.0,37.4
+SQ_MEAN_DELAY,6.0,50.0,59.3,4.0,3.0,9.3
+SQ_MEAN_DELAY,12.0,35.2,59.3,7.5,3.0,24.2
+SQ_MEAN_DELAY,18.0,29.7,59.3,9.0,3.0,29.7
+LADDER_LAG,0.0,35.2,59.3,7.5,2.0,24.2
+LADDER_LAG,2.0,35.2,59.3,7.5,3.0,24.2
+LADDER_LAG,4.0,35.2,53.8,7.5,4.0,18.7

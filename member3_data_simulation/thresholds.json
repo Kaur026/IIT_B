@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "note": "DRAFT. Verify every number against the official source. SYNTHETIC prototype.",
+  "rules": [
+    {"id":"C1","who":"child","name":"Weight-for-height below -3 SD","value":-3,"unit":"SD","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C2","who":"child","name":"MUAC below 115 mm (6-59 months, if recorded)","value":115,"unit":"mm","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C3","who":"child","name":"Swelling of both feet (oedema)","value":"present","unit":"","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C4","who":"child","name":"Any danger sign ticked","value":"any","unit":"","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C5","who":"child","name":"Weight-for-height from -3 up to -2 SD","value":-2,"unit":"SD","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C6","who":"child","name":"Weight-for-age below -3 SD","value":-3,"unit":"SD","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C7","who":"child","name":"Weight loss or no gain for 2 consecutive weeks (enrolled child)","value":2,"unit":"weeks","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C8","who":"child","name":"No valid measurement for more than 35 days","value":35,"unit":"days","flag":"AMBER","source":"PROPOSED","locked":false,"verify":false},
+    {"id":"C9","who":"child","name":"Home visit overdue (weekly in month 1, then every 2 weeks)","value":"schedule","unit":"","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"C10","who":"child","name":"Referral issued but not attended within 7 days","value":7,"unit":"days","flag":"RED","source":"PROPOSED","locked":false,"verify":false},
+    {"id":"M1","who":"pregnant","name":"Haemoglobin below 7 g/dL","value":7,"unit":"g/dL","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"M2","who":"pregnant","name":"Hb below the normal cutoff but 7.0 or above","value":7,"unit":"g/dL","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"M3","who":"lactating","name":"Haemoglobin below 8 g/dL","value":8,"unit":"g/dL","flag":"RED","source":"GUIDELINE","locked":true,"verify":false},
+    {"id":"M4","who":"mother","name":"BMI below 18.5 (RED if below 16)","value":18.5,"unit":"kg/m2","flag":"AMBER","source":"RESEARCH","locked":false,"verify":false},
+    {"id":"M5","who":"pregnant","name":"Height below 140 cm","value":140,"unit":"cm","flag":"AMBER","source":"GUIDELINE","locked":true,"verify":true},
+    {"id":"M6","who":"pregnant","name":"Weight gain under 1 kg or over 3 kg a month from 2nd trimester","value":"1 to 3","unit":"kg/month","flag":"AMBER","source":"PROGRAMME PRACTICE","locked":false,"verify":true}
+  ]
+}

@@ -1,0 +1,6 @@
+child_id,sex,age_months,measurement_date,weight_kg,height_cm,muac_mm,oedema,measurement_valid,referral_status,assigned_worker_id,task_status
+T0001,M,10,2026-10-15,6.4,70.0,110,no,True,none,W01,new
+T0002,M,11,2026-10-15,6.9,70.0,118,no,True,none,W01,new
+T0003,M,12,2026-10-15,8.5,70.0,140,no,True,none,W02,new
+T0004,F,18,2026-10-15,8.0,78.0,,yes,True,none,W02,new
+T0005,F,15,2026-10-15,91.0,74.0,,no,False,none,W03,new
