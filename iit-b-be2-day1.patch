@@ -1,0 +1,600 @@
+diff --git a/B2/README_BE2.md b/B2/README_BE2.md
+new file mode 100644
+index 0000000..a30f42c
+--- /dev/null
++++ b/B2/README_BE2.md
+@@ -0,0 +1,48 @@
++# BE2 workflow handoff (prototype; synthetic data only)
++
++## Current files
++
++- `demo_clock.py`: deterministic demo date; defaults to BE1's 2026-10-15 reference date.
++- `tasks.py`: F4 task creation, acknowledgement, reassignment, due escalation, completion outcomes, and event history.
++- `test_tasks.py`: standard-library unit tests for today's F4 work.
++
++## Shared handoff contract used
++
++BE1's `B1/README_BE1.md` and `B1/children.csv` provide:
++
++- Child identifier: `child_id` (Child A is `C0001`).
++- Initial worker: `assigned_worker_id` (Child A is `W07`).
++- BE1 decision: `evaluate_child(row)` returns `colour` (`RED`, `AMBER`, `GREEN`, `GREY`) and `reasons`.
++- BE1's file may contain `task_status` (`new` for Child A and `none` for some other rows); BE2's workflow API currently creates a separate task object and does not rewrite BE1's CSV.
++
++`create_task(child_row, evaluation, created_on=None, task_id=None)` returns:
++
++- `None` for GREEN cases.
++- A JSON-serializable task dictionary for RED/AMBER/GREY cases, with `task_id`, `child_id`, `alert_level`, `colour`, `status`, `owner_id`, `owner_role`, `created_on`, `due_on`, `escalation_level`, `outcome`, `reasons`, `events`, and a visible prototype-policy label.
++
++Main action functions return a **new dictionary** and leave the input task unchanged:
++
++- `acknowledge_task(task, actor_id, on)`
++- `reassign_task(task, actor_id, new_owner_id, on, reason)`
++- `get_escalation_due(task, on)`
++- `escalate_task(task, actor_id, target_owner_id, on, reason)`
++- `complete_task(task, actor_id, outcome, on, notes="")`
++- `task_is_overdue(task, on)`
++- `list_due_escalations(tasks, on)`
++
++## Prototype assumptions that need FE/team confirmation
++
++- The day-0 worker, day-2 supervisor, day-5 ANM/block, day-10 district ladder is copied from `member3_data_simulation/handoff/README.txt`, which explicitly calls the timings placeholders pending field interviews.
++- The outcome list (`reached`, `not_reached`, `referred`, `recheck_required`, `no_action_needed`, `other`) is an initial UI contract proposal, not a final clinical or program policy. `other` requires a note.
++- Escalation requires a caller-supplied target user ID. BE2 F7 role/user mapping will be added separately; this module never invents an account ID.
++- All outputs are labelled synthetic/proposed. They are not a clinical decision-support system and must not be used for real patient care.
++
++## Run today's tests
++
++From the repository root, with Python 3.9 or newer:
++
++```bat
++python -m unittest discover -s B2 -p "test_*.py" -v
++```
++
++No third-party dependencies are needed for these BE2 tests.
+diff --git a/B2/__init__.py b/B2/__init__.py
+new file mode 100644
+index 0000000..49d0910
+--- /dev/null
++++ b/B2/__init__.py
+@@ -0,0 +1,5 @@
++"""BE2 workflow and safety prototype modules.
++
++All records in this prototype are synthetic. The escalation timings are
++placeholder workflow assumptions, not clinical guidance.
++"""
+diff --git a/B2/demo_clock.py b/B2/demo_clock.py
+new file mode 100644
+index 0000000..d081fcd
+--- /dev/null
++++ b/B2/demo_clock.py
+@@ -0,0 +1,67 @@
++"""Deterministic demo clock shared by BE2 workflows.
++
++The initial date matches the BE1 prototype's documented reference date. The
++clock is deliberately in-memory and suitable only for the synthetic demo;
++F9 persistence/sync is a separate implementation step.
++"""
++
++from dataclasses import dataclass
++from datetime import date, datetime, timedelta
++from typing import Union
++
++
++DEFAULT_DEMO_DATE = date(2026, 10, 15)
++DateLike = Union[date, datetime, str]
++
++
++class DemoClockError(ValueError):
++    """Raised when a supplied demo date or time shift is invalid."""
++
++
++def parse_date(value: DateLike) -> date:
++    """Parse a date or ISO-8601 date string (YYYY-MM-DD)."""
++    if isinstance(value, datetime):
++        return value.date()
++    if isinstance(value, date):
++        return value
++    if not isinstance(value, str):
++        raise DemoClockError("Date must be a date object or YYYY-MM-DD string.")
++    try:
++        return date.fromisoformat(value)
++    except ValueError as exc:
++        raise DemoClockError("Date must use YYYY-MM-DD format.") from exc
++
++
++@dataclass
++class DemoClock:
++    """Small manually advanced clock for predictable prototype scenarios."""
++
++    today: date = DEFAULT_DEMO_DATE
++
++    def __post_init__(self):
++        self.today = parse_date(self.today)
++
++    def advance(self, days: int = 1) -> date:
++        """Advance the demo date by a non-negative whole number of days."""
++        if isinstance(days, bool) or not isinstance(days, int) or days < 0:
++            raise DemoClockError("days must be a non-negative integer.")
++        self.today += timedelta(days=days)
++        return self.today
++
++    def set_date(self, value: DateLike) -> date:
++        """Set the demo date explicitly, for a controlled demonstration."""
++        self.today = parse_date(value)
++        return self.today
++
++    def reset(self) -> date:
++        """Return to the shared BE1 reference date."""
++        self.today = DEFAULT_DEMO_DATE
++        return self.today
++
++    def as_dict(self) -> dict:
++        """JSON-friendly clock state for a frontend adapter."""
++        return {
++            "today": self.today.isoformat(),
++            "label": "SYNTHETIC DEMO DATE",
++            "is_prototype": True,
++        }
+diff --git a/B2/tasks.py b/B2/tasks.py
+new file mode 100644
+index 0000000..85d5687
+--- /dev/null
++++ b/B2/tasks.py
+@@ -0,0 +1,285 @@
++"""BE2 F4 task and escalation workflow (synthetic prototype only).
++
++This module is framework-independent and uses dictionaries so FE1 can consume
++its results without a database or web framework. Persistence, role mapping,
++referrals, audit/consent storage, and offline sync are separate BE2 steps.
++
++The day-0/2/5/10 escalation ladder comes from Member 3's handoff and is marked
++as a placeholder to be replaced after field validation. It is not clinical
++advice and must not be represented as an approved service policy.
++"""
++
++from copy import deepcopy
++from datetime import timedelta
++from typing import Optional
++from uuid import uuid4
++
++from B2.demo_clock import DEFAULT_DEMO_DATE, DateLike, parse_date
++
++
++TASK_STATUSES = ("open", "acknowledged", "escalated", "closed")
++OUTCOME_OPTIONS = (
++    "reached",
++    "not_reached",
++    "referred",
++    "recheck_required",
++    "no_action_needed",
++    "other",
++)
++
++# PROPOSED / SYNTHETIC workflow placeholders from the Member 3 handoff.
++# Offsets are relative to task creation, not claims about real-world standards.
++ESCALATION_LADDER = (
++    {"level": 0, "role": "worker", "after_days": 0},
++    {"level": 1, "role": "supervisor", "after_days": 2},
++    {"level": 2, "role": "anm_block", "after_days": 5},
++    {"level": 3, "role": "district", "after_days": 10},
++)
++
++
++class TaskActionError(ValueError):
++    """Raised when a task action violates the prototype state machine."""
++
++
++def _required_text(value, name):
++    if not isinstance(value, str) or not value.strip():
++        raise TaskActionError(f"{name} is required.")
++    return value.strip()
++
++
++def _copy_task(task):
++    if not isinstance(task, dict):
++        raise TaskActionError("task must be a dictionary.")
++    copied = deepcopy(task)
++    if copied.get("status") not in TASK_STATUSES:
++        raise TaskActionError("task has an unknown status.")
++    if not isinstance(copied.get("events"), list):
++        raise TaskActionError("task events must be a list.")
++    return copied
++
++
++def _record(task, event, actor_id, on, details=None):
++    task["events"].append({
++        "event": event,
++        "actor_id": actor_id,
++        "at": parse_date(on).isoformat(),
++        "details": details or {},
++    })
++
++
++def create_task(
++    child_row: dict,
++    evaluation: dict,
++    created_on: Optional[DateLike] = None,
++    task_id: Optional[str] = None,
++):
++    """Create an open task from a BE1 evaluation.
++
++    GREEN cases do not create an action task and return None. RED, AMBER, and
++    GREY cases do. GREY creates a recheck task; it is not treated as a clinical
++    finding. Child A (C0001) is the shared BE1 handoff case.
++    """
++    if not isinstance(child_row, dict) or not isinstance(evaluation, dict):
++        raise TaskActionError("child_row and evaluation must be dictionaries.")
++
++    child_id = _required_text(child_row.get("child_id"), "child_id")
++    colour = str(evaluation.get("colour", "")).strip().upper()
++    if colour not in {"RED", "AMBER", "GREEN", "GREY"}:
++        raise TaskActionError("evaluation colour must be RED, AMBER, GREEN, or GREY.")
++    if colour == "GREEN":
++        return None
++
++    created = parse_date(created_on) if created_on is not None else DEFAULT_DEMO_DATE
++    raw_worker = child_row.get("assigned_worker_id")
++    worker_id = str(raw_worker).strip() if raw_worker is not None else ""
++    owner_id = worker_id or None
++    owner_role = "worker" if owner_id else "unassigned"
++
++    alert_level = {"RED": "urgent", "AMBER": "watch", "GREY": "recheck"}[colour]
++    first_escalation_date = created + timedelta(days=ESCALATION_LADDER[1]["after_days"])
++    reasons = evaluation.get("reasons", [])
++    if not isinstance(reasons, list):
++        reasons = []
++
++    task = {
++        "task_id": task_id or str(uuid4()),
++        "child_id": child_id,
++        "alert_level": alert_level,
++        "colour": colour,
++        "status": "open",
++        "owner_id": owner_id,
++        "owner_role": owner_role,
++        "created_on": created.isoformat(),
++        "due_on": first_escalation_date.isoformat(),
++        "escalation_level": 0,
++        "outcome": None,
++        "outcome_notes": "",
++        "reasons": deepcopy(reasons),
++        "events": [],
++        "policy_label": "PROPOSED PLACEHOLDER — synthetic demo only",
++    }
++    _record(
++        task,
++        "created",
++        "system",
++        created,
++        {"colour": colour, "owner_id": owner_id, "alert_level": alert_level},
++    )
++    return task
++
++
++def acknowledge_task(task: dict, actor_id: str, on: DateLike):
++    """Acknowledge a task that is open or has been escalated."""
++    updated = _copy_task(task)
++    actor = _required_text(actor_id, "actor_id")
++    if updated["status"] not in {"open", "escalated"}:
++        raise TaskActionError("Only open or escalated tasks can be acknowledged.")
++    previous = updated["status"]
++    updated["status"] = "acknowledged"
++    _record(updated, "acknowledged", actor, on, {"previous_status": previous})
++    return updated
++
++
++def reassign_task(task: dict, actor_id: str, new_owner_id: str, on: DateLike, reason: str):
++    """Reassign a non-closed task and retain who changed ownership and why."""
++    updated = _copy_task(task)
++    actor = _required_text(actor_id, "actor_id")
++    target = _required_text(new_owner_id, "new_owner_id")
++    reason_text = _required_text(reason, "reason")
++    if updated["status"] == "closed":
++        raise TaskActionError("Closed tasks cannot be reassigned.")
++    old_owner = updated.get("owner_id")
++    updated["owner_id"] = target
++    # Role mapping is supplied by the separate F7 module; do not guess a role here.
++    _record(
++        updated,
++        "reassigned",
++        actor,
++        on,
++        {"from_owner_id": old_owner, "to_owner_id": target, "reason": reason_text},
++    )
++    return updated
++
++
++def get_escalation_due(task: dict, on: DateLike):
++    """Return the next due escalation descriptor, or None if not due/closed."""
++    updated = _copy_task(task)
++    if updated["status"] == "closed":
++        return None
++    try:
++        level = int(updated.get("escalation_level", 0))
++        created = parse_date(updated["created_on"])
++    except (TypeError, KeyError, ValueError) as exc:
++        raise TaskActionError("task has invalid escalation metadata.") from exc
++    if level < 0 or level >= len(ESCALATION_LADDER):
++        raise TaskActionError("task has invalid escalation level.")
++    next_level = level + 1
++    if next_level >= len(ESCALATION_LADDER):
++        return None
++
++    step = ESCALATION_LADDER[next_level]
++    due_date = created + timedelta(days=step["after_days"])
++    today = parse_date(on)
++    if today < due_date:
++        return None
++    return {
++        "level": step["level"],
++        "role": step["role"],
++        "due_on": due_date.isoformat(),
++        "days_overdue": (today - due_date).days,
++        "policy_label": "PROPOSED PLACEHOLDER — synthetic demo only",
++    }
++
++
++def escalate_task(task: dict, actor_id: str, target_owner_id: str, on: DateLike, reason: str):
++    """Escalate to the next scheduled role, requiring a real target ID.
++
++    A target user cannot be guessed: FE/team integration must provide it. This
++    protects against silently assigning a case to a made-up account.
++    """
++    updated = _copy_task(task)
++    actor = _required_text(actor_id, "actor_id")
++    target = _required_text(target_owner_id, "target_owner_id")
++    reason_text = _required_text(reason, "reason")
++    due = get_escalation_due(updated, on)
++    if due is None:
++        raise TaskActionError("No escalation is due for this task today.")
++
++    previous_owner = updated.get("owner_id")
++    previous_status = updated["status"]
++    updated["owner_id"] = target
++    updated["owner_role"] = due["role"]
++    updated["escalation_level"] = due["level"]
++    updated["status"] = "escalated"
++
++    next_level = due["level"] + 1
++    if next_level < len(ESCALATION_LADDER):
++        due_on = parse_date(updated["created_on"]) + timedelta(
++            days=ESCALATION_LADDER[next_level]["after_days"]
++        )
++        updated["due_on"] = due_on.isoformat()
++
++    _record(
++        updated,
++        "escalated",
++        actor,
++        on,
++        {
++            "from_owner_id": previous_owner,
++            "to_owner_id": target,
++            "to_role": due["role"],
++            "reason": reason_text,
++            "previous_status": previous_status,
++        },
++    )
++    return updated
++
++
++def complete_task(task: dict, actor_id: str, outcome: str, on: DateLike, notes: str = ""):
++    """Close a task only with a listed outcome; 'other' requires a note."""
++    updated = _copy_task(task)
++    actor = _required_text(actor_id, "actor_id")
++    outcome_value = str(outcome).strip().lower()
++    if outcome_value not in OUTCOME_OPTIONS:
++        raise TaskActionError("Choose a valid outcome from OUTCOME_OPTIONS.")
++    if updated["status"] == "closed":
++        raise TaskActionError("Task is already closed.")
++    notes_value = str(notes or "").strip()
++    if outcome_value == "other" and not notes_value:
++        raise TaskActionError("A note is required when outcome is 'other'.")
++
++    updated["status"] = "closed"
++    updated["outcome"] = outcome_value
++    updated["outcome_notes"] = notes_value
++    _record(
++        updated,
++        "closed",
++        actor,
++        on,
++        {"outcome": outcome_value, "notes": notes_value},
++    )
++    return updated
++
++
++def task_is_overdue(task: dict, on: DateLike) -> bool:
++    """Whether an unclosed task has reached its current proposed due date."""
++    updated = _copy_task(task)
++    if updated["status"] == "closed":
++        return False
++    try:
++        due_on = parse_date(updated["due_on"])
++    except (KeyError, ValueError) as exc:
++        raise TaskActionError("task has an invalid due_on date.") from exc
++    return parse_date(on) >= due_on
++
++
++def list_due_escalations(tasks: list, on: DateLike) -> list:
++    """Return task IDs and next escalation targets due on a selected demo date."""
++    if not isinstance(tasks, list):
++        raise TaskActionError("tasks must be a list.")
++    due = []
++    for task in tasks:
++        descriptor = get_escalation_due(task, on)
++        if descriptor is not None:
++            due.append({"task_id": task["task_id"], "child_id": task["child_id"], **descriptor})
++    return due
+diff --git a/B2/test_tasks.py b/B2/test_tasks.py
+new file mode 100644
+index 0000000..c2c5f94
+--- /dev/null
++++ b/B2/test_tasks.py
+@@ -0,0 +1,165 @@
++"""Unit tests for the BE2 F4 workflow and demo clock."""
++
++import unittest
++from datetime import date
++
++from B2.demo_clock import DemoClock, DemoClockError
++from B2.tasks import (
++    OUTCOME_OPTIONS,
++    TaskActionError,
++    acknowledge_task,
++    complete_task,
++    create_task,
++    escalate_task,
++    get_escalation_due,
++    list_due_escalations,
++    reassign_task,
++    task_is_overdue,
++)
++
++
++class DemoClockTests(unittest.TestCase):
++    def test_default_date_matches_be1_reference(self):
++        clock = DemoClock()
++        self.assertEqual(clock.today, date(2026, 10, 15))
++        self.assertEqual(clock.as_dict()["label"], "SYNTHETIC DEMO DATE")
++
++    def test_advance_and_reset(self):
++        clock = DemoClock()
++        self.assertEqual(clock.advance(2), date(2026, 10, 17))
++        self.assertEqual(clock.reset(), date(2026, 10, 15))
++
++    def test_invalid_advance_is_rejected(self):
++        with self.assertRaises(DemoClockError):
++            DemoClock().advance(-1)
++        with self.assertRaises(DemoClockError):
++            DemoClock().advance(True)
++
++    def test_bad_date_string_is_rejected(self):
++        with self.assertRaises(DemoClockError):
++            DemoClock("15/10/2026")
++
++
++class TaskWorkflowTests(unittest.TestCase):
++    def setUp(self):
++        self.child = {
++            "child_id": "C0001",
++            "assigned_worker_id": "W07",
++            "task_status": "new",
++        }
++        self.red_eval = {
++            "colour": "RED",
++            "reasons": [{"rule_id": "C2", "text": "Synthetic test reason."}],
++        }
++        self.task = create_task(
++            self.child,
++            self.red_eval,
++            created_on="2026-10-15",
++            task_id="TASK-C0001-1",
++        )
++
++    def test_child_a_creates_open_urgent_task_for_assigned_worker(self):
++        self.assertEqual(self.task["child_id"], "C0001")
++        self.assertEqual(self.task["owner_id"], "W07")
++        self.assertEqual(self.task["alert_level"], "urgent")
++        self.assertEqual(self.task["status"], "open")
++        self.assertEqual(self.task["due_on"], "2026-10-17")
++        self.assertIn("PROPOSED", self.task["policy_label"])
++        self.assertEqual(self.task["events"][0]["event"], "created")
++
++    def test_green_case_creates_no_task(self):
++        self.assertIsNone(create_task(self.child, {"colour": "GREEN"}, "2026-10-15"))
++
++    def test_unknown_colour_rejected(self):
++        with self.assertRaises(TaskActionError):
++            create_task(self.child, {"colour": "PURPLE"}, "2026-10-15")
++
++    def test_acknowledge_is_copy_on_write(self):
++        changed = acknowledge_task(self.task, "W07", "2026-10-15")
++        self.assertEqual(changed["status"], "acknowledged")
++        self.assertEqual(self.task["status"], "open")
++        self.assertEqual(changed["events"][-1]["event"], "acknowledged")
++
++    def test_escalation_schedule_and_target_assignment(self):
++        self.assertIsNone(get_escalation_due(self.task, "2026-10-16"))
++        due = get_escalation_due(self.task, "2026-10-17")
++        self.assertEqual(due["role"], "supervisor")
++        self.assertEqual(due["days_overdue"], 0)
++
++        changed = escalate_task(
++            self.task,
++            actor_id="W07",
++            target_owner_id="SUP01",
++            on="2026-10-17",
++            reason="No acknowledgement by proposed day-two checkpoint.",
++        )
++        self.assertEqual(changed["status"], "escalated")
++        self.assertEqual(changed["owner_id"], "SUP01")
++        self.assertEqual(changed["owner_role"], "supervisor")
++        self.assertEqual(changed["due_on"], "2026-10-20")
++        self.assertEqual(self.task["escalation_level"], 0)
++
++    def test_full_proposed_escalation_ladder_uses_demo_clock(self):
++        task = self.task
++        cases = [
++            ("2026-10-17", "SUP01", "supervisor", "2026-10-20"),
++            ("2026-10-20", "ANM01", "anm_block", "2026-10-25"),
++            ("2026-10-25", "DIST01", "district", "2026-10-25"),
++        ]
++        for day, owner, role, expected_due in cases:
++            task = escalate_task(task, "ACTOR", owner, day, "Synthetic demo escalation")
++            self.assertEqual(task["owner_role"], role)
++            self.assertEqual(task["owner_id"], owner)
++            self.assertEqual(task["due_on"], expected_due)
++        self.assertIsNone(get_escalation_due(task, "2026-11-01"))
++
++    def test_escalation_requires_due_date_and_target(self):
++        with self.assertRaises(TaskActionError):
++            escalate_task(self.task, "W07", "SUP01", "2026-10-16", "test")
++        with self.assertRaises(TaskActionError):
++            escalate_task(self.task, "W07", "", "2026-10-17", "test")
++
++    def test_reassignment_requires_reason_and_does_not_change_status(self):
++        changed = reassign_task(self.task, "SUP01", "W08", "2026-10-16", "Worker unavailable")
++        self.assertEqual(changed["owner_id"], "W08")
++        self.assertEqual(changed["status"], "open")
++        self.assertEqual(changed["events"][-1]["details"]["reason"], "Worker unavailable")
++        with self.assertRaises(TaskActionError):
++            reassign_task(self.task, "SUP01", "W08", "2026-10-16", " ")
++
++    def test_close_requires_a_valid_outcome_and_other_requires_notes(self):
++        self.assertIn("referred", OUTCOME_OPTIONS)
++        with self.assertRaises(TaskActionError):
++            complete_task(self.task, "W07", "unknown", "2026-10-16")
++        with self.assertRaises(TaskActionError):
++            complete_task(self.task, "W07", "other", "2026-10-16")
++
++        closed = complete_task(
++            self.task,
++            "W07",
++            "recheck_required",
++            "2026-10-16",
++            notes="Synthetic test outcome.",
++        )
++        self.assertEqual(closed["status"], "closed")
++        self.assertEqual(closed["outcome"], "recheck_required")
++        self.assertFalse(task_is_overdue(closed, "2026-10-20"))
++        with self.assertRaises(TaskActionError):
++            complete_task(closed, "W07", "reached", "2026-10-17")
++
++    def test_due_list_and_overdue_use_demo_clock_date(self):
++        self.assertFalse(task_is_overdue(self.task, "2026-10-16"))
++        self.assertTrue(task_is_overdue(self.task, "2026-10-17"))
++        due = list_due_escalations([self.task], "2026-10-17")
++        self.assertEqual(due[0]["task_id"], "TASK-C0001-1")
++        self.assertEqual(due[0]["role"], "supervisor")
++
++    def test_closed_task_cannot_be_escalated_or_reassigned(self):
++        closed = complete_task(self.task, "W07", "reached", "2026-10-16")
++        self.assertIsNone(get_escalation_due(closed, "2026-10-20"))
++        with self.assertRaises(TaskActionError):
++            reassign_task(closed, "SUP01", "W08", "2026-10-17", "test")
++
++
++if __name__ == "__main__":
++    unittest.main()
