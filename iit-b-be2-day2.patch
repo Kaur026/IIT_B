@@ -1,0 +1,1138 @@
+diff --git a/B2/README_BE2.md b/B2/README_BE2.md
+index a30f42c..43a1ef1 100644
+--- a/B2/README_BE2.md
++++ b/B2/README_BE2.md
+@@ -1,48 +1,56 @@
+ # BE2 workflow handoff (prototype; synthetic data only)
+ 
+-## Current files
++## BE2 files
+ 
+-- `demo_clock.py`: deterministic demo date; defaults to BE1's 2026-10-15 reference date.
+-- `tasks.py`: F4 task creation, acknowledgement, reassignment, due escalation, completion outcomes, and event history.
+-- `test_tasks.py`: standard-library unit tests for today's F4 work.
++- `demo_clock.py` — deterministic demo date; defaults to BE1's 2026-10-15 reference date.
++- `tasks.py` — F4 task creation, acknowledgement, reassignment, due escalation, completion outcomes, and event history.
++- `referrals.py` — F5 referral issuance, contact attempts, outcome logging, next-step suggestions, and summary counts.
++- `fallback.py` — F6 manual/offline fallback records. Authentication failures never grant access to protected records.
++- `roles.py` — F7 prototype role permissions, task visibility, worker-capacity guard, and ISO-week workload grouping.
++- `audit.py` — F10 append-only audit-event model and consent history.
++- `sync.py` — F9 atomic local JSON queue and version/conflict-aware synchronization primitives. No remote server connection is implemented.
++- `test_tasks.py`, `test_day2.py` — standard-library unit tests.
+ 
+-## Shared handoff contract used
++## Shared BE1 contract
+ 
+ BE1's `B1/README_BE1.md` and `B1/children.csv` provide:
+ 
+ - Child identifier: `child_id` (Child A is `C0001`).
+ - Initial worker: `assigned_worker_id` (Child A is `W07`).
+ - BE1 decision: `evaluate_child(row)` returns `colour` (`RED`, `AMBER`, `GREEN`, `GREY`) and `reasons`.
+-- BE1's file may contain `task_status` (`new` for Child A and `none` for some other rows); BE2's workflow API currently creates a separate task object and does not rewrite BE1's CSV.
++- `GREY` means the measurement is not trusted and needs rechecking; it is not a confirmed clinical finding.
++- BE1's CSV may contain `task_status` values such as `new` or `none`; BE2 creates a separate workflow task and does not rewrite BE1's CSV.
+ 
+ `create_task(child_row, evaluation, created_on=None, task_id=None)` returns:
+ 
+ - `None` for GREEN cases.
+-- A JSON-serializable task dictionary for RED/AMBER/GREY cases, with `task_id`, `child_id`, `alert_level`, `colour`, `status`, `owner_id`, `owner_role`, `created_on`, `due_on`, `escalation_level`, `outcome`, `reasons`, `events`, and a visible prototype-policy label.
++- A JSON-compatible task dictionary for RED, AMBER, or GREY cases. The task includes an owner, status, created/due dates, escalation level, reasons, and event history.
+ 
+-Main action functions return a **new dictionary** and leave the input task unchanged:
++## UI/backend contracts and prototype assumptions
+ 
+-- `acknowledge_task(task, actor_id, on)`
+-- `reassign_task(task, actor_id, new_owner_id, on, reason)`
+-- `get_escalation_due(task, on)`
+-- `escalate_task(task, actor_id, target_owner_id, on, reason)`
+-- `complete_task(task, actor_id, outcome, on, notes="")`
+-- `task_is_overdue(task, on)`
+-- `list_due_escalations(tasks, on)`
++- `OUTCOME_OPTIONS` and the referral reason/outcome constants are initial interface proposals. BE1/BE2/FE1/FE2 must agree on them before integration.
++- The day-0 worker, day-2 supervisor, day-5 ANM/block, day-10 district escalation ladder comes from Member 3's handoff, which explicitly labels it a placeholder pending field validation. It is not clinical guidance.
++- `roles.py` has a proposed role/permission matrix. It is suitable for a demo only; a UI role switch is not authentication or production authorization.
++- The workload guard takes `max_active_tasks` as an input; BE2 does not invent a capacity limit.
++- `audit.py` and task/referral timelines are in-memory Python dictionaries. They are not a durable audit database and do not establish legal consent.
++- `sync.py` saves synthetic operations locally and detects version conflicts. It does not connect to a remote API or provide encryption, authentication, or conflict resolution UI.
++- F6 fallback offers an approved manual-process path; it never bypasses authorization or enables protected-data access after authentication failure.
++- Referral suggestions are neutral workflow prompts, not medical advice or treatment decisions.
+ 
+-## Prototype assumptions that need FE/team confirmation
++## Run BE2 tests
+ 
+-- The day-0 worker, day-2 supervisor, day-5 ANM/block, day-10 district ladder is copied from `member3_data_simulation/handoff/README.txt`, which explicitly calls the timings placeholders pending field interviews.
+-- The outcome list (`reached`, `not_reached`, `referred`, `recheck_required`, `no_action_needed`, `other`) is an initial UI contract proposal, not a final clinical or program policy. `other` requires a note.
+-- Escalation requires a caller-supplied target user ID. BE2 F7 role/user mapping will be added separately; this module never invents an account ID.
+-- All outputs are labelled synthetic/proposed. They are not a clinical decision-support system and must not be used for real patient care.
++From the repository root with Python 3.9 or newer:
+ 
+-## Run today's tests
++```bat
++python -m unittest discover -s B2 -p "test_*.py" -v
++```
+ 
+-From the repository root, with Python 3.9 or newer:
++No third-party packages are needed for B2 tests. BE1's rule engine uses pandas; install it separately if it is not already available:
+ 
+ ```bat
+-python -m unittest discover -s B2 -p "test_*.py" -v
++python -m pip install pandas
+ ```
+ 
+-No third-party dependencies are needed for these BE2 tests.
++## Not production-ready yet
++
++Before any use with real people or data: get team/field approval for workflow timings and outcomes; add authenticated identity and server-side authorization; persist audit, consent, referral, and task data in a reviewed database; encrypt/protect local and remote data; connect sync to an authenticated server with retry/monitoring; define retention and recovery; and complete privacy, clinical-safety, and operational review. All repository data is synthetic and every integration is proposed.
+diff --git a/B2/audit.py b/B2/audit.py
+new file mode 100644
+index 0000000..c361c3e
+--- /dev/null
++++ b/B2/audit.py
+@@ -0,0 +1,158 @@
++"""BE2 F10 append-only audit and consent records for synthetic prototype data.
++
++This is an in-memory JSON-compatible model, not durable or compliant storage.
++Do not store real patient information, credentials, access tokens, or free-text
++clinical narratives here. Production requires a reviewed database, access
++controls, retention policy, and locally applicable consent/privacy review.
++"""
++
++from copy import deepcopy
++from uuid import uuid4
++
++from B2.demo_clock import DateLike, parse_date
++
++
++CONSENT_STATUSES = ("granted", "declined", "withdrawn", "not_obtained")
++CONSENT_METHODS = ("in_person", "phone", "written", "other", "unknown")
++
++
++class AuditRecordError(ValueError):
++    """Raised for invalid audit or consent records."""
++
++
++def _required(value, field):
++    if not isinstance(value, str) or not value.strip():
++        raise AuditRecordError(f"{field} is required.")
++    return value.strip()
++
++
++def append_event(
++    log: list,
++    actor_id: str,
++    action: str,
++    entity_type: str,
++    entity_id: str,
++    on: DateLike,
++    details: dict = None,
++    event_id: str = "",
++):
++    """Return a new event list with one event appended; never mutate input."""
++    if not isinstance(log, list):
++        raise AuditRecordError("log must be a list.")
++    actor = _required(actor_id, "actor_id")
++    action_value = _required(action, "action")
++    kind = _required(entity_type, "entity_type")
++    entity = _required(entity_id, "entity_id")
++    if details is not None and not isinstance(details, dict):
++        raise AuditRecordError("details must be a dictionary.")
++    new_log = deepcopy(log)
++    identifier = event_id.strip() if isinstance(event_id, str) else ""
++    if identifier and any(item.get("event_id") == identifier for item in new_log if isinstance(item, dict)):
++        raise AuditRecordError("event_id already exists in the audit log.")
++    new_log.append({
++        "event_id": identifier or str(uuid4()),
++        "actor_id": actor,
++        "action": action_value,
++        "entity_type": kind,
++        "entity_id": entity,
++        "at": parse_date(on).isoformat(),
++        "details": deepcopy(details or {}),
++        "label": "SYNTHETIC / PROPOSED INTEGRATION",
++    })
++    return new_log
++
++
++def create_consent_record(
++    subject_id: str,
++    recorded_by: str,
++    purpose: str,
++    status: str,
++    on: DateLike,
++    method: str = "unknown",
++    notes: str = "",
++    consent_id: str = "",
++):
++    """Create a consent record; this records a choice but does not certify legality."""
++    subject = _required(subject_id, "subject_id")
++    actor = _required(recorded_by, "recorded_by")
++    purpose_value = _required(purpose, "purpose")
++    status_value = str(status or "").strip().lower()
++    if status_value not in CONSENT_STATUSES:
++        raise AuditRecordError("status must be one of CONSENT_STATUSES.")
++    method_value = str(method or "unknown").strip().lower()
++    if method_value not in CONSENT_METHODS:
++        raise AuditRecordError("method must be one of CONSENT_METHODS.")
++    note_value = str(notes or "").strip()
++    if method_value == "other" and not note_value:
++        raise AuditRecordError("notes are required when method is 'other'.")
++    identifier = consent_id.strip() if isinstance(consent_id, str) else ""
++    recorded_at = parse_date(on).isoformat()
++    event = {
++        "event_id": str(uuid4()),
++        "action": "consent_recorded",
++        "actor_id": actor,
++        "at": recorded_at,
++        "from_status": None,
++        "to_status": status_value,
++        "method": method_value,
++        "purpose": purpose_value,
++        "notes": note_value,
++    }
++    return {
++        "consent_id": identifier or str(uuid4()),
++        "subject_id": subject,
++        "current_status": status_value,
++        "purpose": purpose_value,
++        "events": [event],
++        "label": "SYNTHETIC / PROPOSED INTEGRATION",
++    }
++
++
++def change_consent_status(record: dict, recorded_by: str, new_status: str, on: DateLike, reason: str):
++    """Append a consent status change; prior events are preserved unchanged."""
++    if not isinstance(record, dict):
++        raise AuditRecordError("consent record must be a dictionary.")
++    updated = deepcopy(record)
++    if not isinstance(updated.get("events"), list):
++        raise AuditRecordError("consent events must be a list.")
++    actor = _required(recorded_by, "recorded_by")
++    reason_value = _required(reason, "reason")
++    status_value = str(new_status or "").strip().lower()
++    if status_value not in CONSENT_STATUSES:
++        raise AuditRecordError("new_status must be one of CONSENT_STATUSES.")
++    old_status = updated.get("current_status")
++    if old_status not in CONSENT_STATUSES:
++        raise AuditRecordError("consent record has an invalid current_status.")
++    if status_value == old_status:
++        raise AuditRecordError("new_status must differ from current_status.")
++    updated["events"].append({
++        "event_id": str(uuid4()),
++        "action": "consent_status_changed",
++        "actor_id": actor,
++        "at": parse_date(on).isoformat(),
++        "from_status": old_status,
++        "to_status": status_value,
++        "reason": reason_value,
++    })
++    updated["current_status"] = status_value
++    return updated
++
++
++def audit_consent_change(log: list, consent_record: dict, on: DateLike):
++    """Append the latest consent event to the generic audit stream."""
++    if not isinstance(consent_record, dict) or not consent_record.get("events"):
++        raise AuditRecordError("consent_record must contain at least one event.")
++    event = consent_record["events"][-1]
++    return append_event(
++        log,
++        actor_id=event["actor_id"],
++        action=event["action"],
++        entity_type="consent",
++        entity_id=consent_record["consent_id"],
++        on=on,
++        details={
++            "subject_id": consent_record["subject_id"],
++            "from_status": event.get("from_status"),
++            "to_status": event.get("to_status"),
++        },
++    )
+diff --git a/B2/fallback.py b/B2/fallback.py
+new file mode 100644
+index 0000000..c95fe8b
+--- /dev/null
++++ b/B2/fallback.py
+@@ -0,0 +1,105 @@
++"""BE2 F6 never-blocked workflow fallback for synthetic demos.
++
++A fallback must not bypass authentication or silently change clinical state.
++It records a safe handoff to an approved manual process while preserving the
++fact that the automated workflow is unavailable.
++"""
++
++from uuid import uuid4
++
++from B2.demo_clock import DateLike, parse_date
++
++
++class FallbackError(ValueError):
++    """Raised when a fallback record cannot be safely constructed."""
++
++
++SAFE_NEXT_ACTIONS = {
++    "authentication_failed": (
++        "Protected records remain unavailable. Use the approved manual process "
++        "and notify the responsible supervisor; do not share credentials."
++    ),
++    "offline": (
++        "Keep the synthetic task in the local pending queue and use the approved "
++        "manual process until synchronization is available."
++    ),
++    "service_unavailable": (
++        "Record the pending action locally and notify the responsible supervisor "
++        "through the approved channel."
++    ),
++    "unknown": (
++        "Do not discard the task. Use the approved manual process and ask a "
++        "supervisor to review the failure."
++    ),
++}
++
++
++def create_fallback_record(
++    child_id: str,
++    source_stage: str,
++    reason_code: str,
++    on: DateLike,
++    assigned_worker_id: str = "",
++    task_id: str = "",
++    error_reference: str = "",
++    fallback_id: str = "",
++):
++    """Create a JSON-safe manual/offline fallback record without PHI or secrets."""
++    if not isinstance(child_id, str) or not child_id.strip():
++        raise FallbackError("child_id is required.")
++    if not isinstance(source_stage, str) or not source_stage.strip():
++        raise FallbackError("source_stage is required.")
++    code = str(reason_code or "unknown").strip().lower()
++    if code not in SAFE_NEXT_ACTIONS:
++        code = "unknown"
++    worker = assigned_worker_id.strip() if isinstance(assigned_worker_id, str) else ""
++    task = task_id.strip() if isinstance(task_id, str) else ""
++    # Store a short opaque reference only. Never put stack traces, tokens, or
++    # uploaded sensitive content into a fallback record.
++    ref = error_reference.strip()[:80] if isinstance(error_reference, str) else ""
++
++    identifier = fallback_id.strip() if isinstance(fallback_id, str) else ""
++    return {
++        "fallback_id": identifier or str(uuid4()),
++        "child_id": child_id.strip(),
++        "task_id": task,
++        "assigned_worker_id": worker or None,
++        "source_stage": source_stage.strip(),
++        "reason_code": code,
++        "created_at": parse_date(on).isoformat(),
++        "state": "manual_action_pending",
++        "automated_action_allowed": False,
++        "protected_data_access_allowed": False,
++        "next_action": SAFE_NEXT_ACTIONS[code],
++        "error_reference": ref,
++        "label": "SYNTHETIC / PROPOSED INTEGRATION",
++    }
++
++
++def can_continue_safely(record: dict) -> bool:
++    """True means a manual fallback is offered, not that protected access is granted."""
++    if not isinstance(record, dict):
++        raise FallbackError("fallback record must be a dictionary.")
++    return (
++        record.get("state") == "manual_action_pending"
++        and record.get("automated_action_allowed") is False
++        and record.get("protected_data_access_allowed") is False
++    )
++
++
++def mark_fallback_action(record: dict, actor_id: str, on: DateLike, action: str):
++    """Record that a manual fallback was acknowledged; no protected action occurs."""
++    if not isinstance(record, dict):
++        raise FallbackError("fallback record must be a dictionary.")
++    if not isinstance(actor_id, str) or not actor_id.strip():
++        raise FallbackError("actor_id is required.")
++    if record.get("state") != "manual_action_pending":
++        raise FallbackError("fallback record is not pending manual action.")
++    if not isinstance(action, str) or not action.strip():
++        raise FallbackError("action description is required.")
++    updated = dict(record)
++    updated["state"] = "manual_action_recorded"
++    updated["manual_action"] = action.strip()
++    updated["acted_by"] = actor_id.strip()
++    updated["acted_at"] = parse_date(on).isoformat()
++    return updated
+diff --git a/B2/referrals.py b/B2/referrals.py
+new file mode 100644
+index 0000000..f2fde0d
+--- /dev/null
++++ b/B2/referrals.py
+@@ -0,0 +1,228 @@
++"""BE2 F5 referral-loop prototype for synthetic cases.
++
++Keeps referral issuance, outreach attempts, and service outcomes distinct.
++It records whether contact was reached (and why not), supports a timeline and
++reason counts, and offers non-clinical next-step suggestions. It does not make
++clinical decisions or assert that a real referral service has been completed.
++"""
++
++from copy import deepcopy
++from uuid import uuid4
++
++from B2.demo_clock import DateLike, parse_date
++
++
++REFERRAL_STATUSES = ("none", "issued", "outcome_logged", "not_needed")
++NO_CONTACT_REASONS = (
++    "no_answer",
++    "wrong_contact",
++    "facility_closed",
++    "transport_barrier",
++    "declined",
++    "other",
++)
++REFERRAL_OUTCOMES = (
++    "attended",
++    "not_attended",
++    "facility_unavailable",
++    "unknown",
++    "other",
++)
++
++
++class ReferralError(ValueError):
++    """Raised for invalid referral transitions or malformed referral data."""
++
++
++def _required(value, field):
++    if not isinstance(value, str) or not value.strip():
++        raise ReferralError(f"{field} is required.")
++    return value.strip()
++
++
++def _copy(referral):
++    if not isinstance(referral, dict):
++        raise ReferralError("referral must be a dictionary.")
++    result = deepcopy(referral)
++    if result.get("status") not in REFERRAL_STATUSES:
++        raise ReferralError("referral has an unknown status.")
++    if not isinstance(result.get("timeline"), list):
++        raise ReferralError("referral timeline must be a list.")
++    return result
++
++
++def _event(referral, event, actor_id, on, details=None):
++    referral["timeline"].append({
++        "event": event,
++        "actor_id": actor_id,
++        "at": parse_date(on).isoformat(),
++        "details": details or {},
++    })
++
++
++def issue_referral(
++    child_id: str,
++    issued_by: str,
++    destination: str,
++    reason: str,
++    on: DateLike,
++    task_id: str = "",
++    referral_id: str = "",
++):
++    """Create an issued referral record with a traceable initial event."""
++    child = _required(child_id, "child_id")
++    actor = _required(issued_by, "issued_by")
++    place = _required(destination, "destination")
++    why = _required(reason, "reason")
++    issued_on = parse_date(on).isoformat()
++    record = {
++        "referral_id": referral_id.strip() or str(uuid4()),
++        "child_id": child,
++        "task_id": task_id.strip() if isinstance(task_id, str) else "",
++        "status": "issued",
++        "destination": place,
++        "reason": why,
++        "issued_by": actor,
++        "issued_on": issued_on,
++        "reached": None,
++        "last_contact_reason": None,
++        "outcome": None,
++        "outcome_notes": "",
++        "timeline": [],
++        "label": "SYNTHETIC / PROPOSED INTEGRATION",
++    }
++    _event(record, "referral_issued", actor, on, {"destination": place, "reason": why})
++    return record
++
++
++def record_contact_attempt(
++    referral: dict,
++    actor_id: str,
++    on: DateLike,
++    reached: bool,
++    reason: str = "",
++    notes: str = "",
++):
++    """Append a contact attempt; `reached` must be an explicit yes/no boolean."""
++    updated = _copy(referral)
++    actor = _required(actor_id, "actor_id")
++    if updated["status"] != "issued":
++        raise ReferralError("Contact attempts require an issued referral.")
++    if not isinstance(reached, bool):
++        raise ReferralError("reached must be True or False.")
++
++    reason_value = str(reason or "").strip().lower()
++    if reached is False and reason_value not in NO_CONTACT_REASONS:
++        raise ReferralError("A valid reason is required when contact was not reached.")
++    if reached is True and reason_value and reason_value not in NO_CONTACT_REASONS:
++        raise ReferralError("Unknown contact reason.")
++
++    note_value = str(notes or "").strip()
++    if reason_value == "other" and not note_value:
++        raise ReferralError("A note is required when the reason is 'other'.")
++
++    updated["reached"] = reached
++    updated["last_contact_reason"] = reason_value or None
++    _event(
++        updated,
++        "contact_attempt",
++        actor,
++        on,
++        {
++            "reached": reached,
++            "reason": reason_value or None,
++            "notes": note_value,
++        },
++    )
++    return updated
++
++
++def log_referral_outcome(
++    referral: dict,
++    actor_id: str,
++    outcome: str,
++    on: DateLike,
++    notes: str = "",
++):
++    """Record a service outcome after issue; never infer it from a contact call."""
++    updated = _copy(referral)
++    actor = _required(actor_id, "actor_id")
++    value = str(outcome or "").strip().lower()
++    if updated["status"] != "issued":
++        raise ReferralError("Only issued referrals can receive an outcome.")
++    if value not in REFERRAL_OUTCOMES:
++        raise ReferralError("Choose a valid referral outcome.")
++    note_value = str(notes or "").strip()
++    if value == "other" and not note_value:
++        raise ReferralError("A note is required for the 'other' outcome.")
++
++    updated["status"] = "outcome_logged"
++    updated["outcome"] = value
++    updated["outcome_notes"] = note_value
++    _event(updated, "outcome_logged", actor, on, {"outcome": value, "notes": note_value})
++    return updated
++
++
++def mark_not_needed(child_id: str, actor_id: str, on: DateLike, reason: str):
++    """Record an explicit decision that referral is not needed, with a reason."""
++    child = _required(child_id, "child_id")
++    actor = _required(actor_id, "actor_id")
++    why = _required(reason, "reason")
++    record = {
++        "referral_id": str(uuid4()),
++        "child_id": child,
++        "task_id": "",
++        "status": "not_needed",
++        "destination": "",
++        "reason": why,
++        "issued_by": actor,
++        "issued_on": parse_date(on).isoformat(),
++        "reached": None,
++        "last_contact_reason": None,
++        "outcome": None,
++        "outcome_notes": "",
++        "timeline": [],
++        "label": "SYNTHETIC / PROPOSED INTEGRATION",
++    }
++    _event(record, "referral_not_needed", actor, on, {"reason": why})
++    return record
++
++
++def suggested_next_step(referral: dict) -> dict:
++    """Return a neutral workflow suggestion; this is not clinical advice."""
++    record = _copy(referral)
++    if record["status"] == "outcome_logged":
++        return {"code": "review_outcome", "text": "Review and record the next workflow action."}
++    if record["status"] == "not_needed":
++        return {"code": "no_referral_pending", "text": "No referral is pending; retain the documented reason."}
++    if record["status"] == "none":
++        return {"code": "confirm_referral_decision", "text": "Record whether a referral is needed under the approved workflow."}
++    reason = record.get("last_contact_reason")
++    if record.get("reached") is False:
++        messages = {
++            "no_answer": "Try the next approved contact method or record another attempt.",
++            "wrong_contact": "Check the contact details through the approved process.",
++            "facility_closed": "Confirm operating hours and arrange an approved follow-up.",
++            "transport_barrier": "Record the barrier and notify the responsible supervisor.",
++            "declined": "Record the response respectfully and follow the approved escalation process.",
++            "other": "Review the recorded note and choose the next approved workflow step.",
++        }
++        return {"code": reason or "contact_not_reached", "text": messages.get(reason, "Record the contact result and follow the approved process.")}
++    if record.get("reached") is True:
++        return {"code": "follow_up_outcome", "text": "Record the referral service outcome when it is known."}
++    return {"code": "contact_pending", "text": "Record a contact attempt or follow the approved workflow."}
++
++
++def referral_summary(referrals: list) -> dict:
++    """Count referrals by status and no-contact reason for a synthetic overview."""
++    if not isinstance(referrals, list):
++        raise ReferralError("referrals must be a list.")
++    statuses = {status: 0 for status in REFERRAL_STATUSES}
++    reasons = {}
++    for referral in referrals:
++        record = _copy(referral)
++        statuses[record["status"]] += 1
++        reason = record.get("last_contact_reason")
++        if reason:
++            reasons[reason] = reasons.get(reason, 0) + 1
++    return {"total": len(referrals), "by_status": statuses, "by_contact_reason": reasons}
+diff --git a/B2/roles.py b/B2/roles.py
+new file mode 100644
+index 0000000..7c2d8ea
+--- /dev/null
++++ b/B2/roles.py
+@@ -0,0 +1,114 @@
++"""BE2 F7 role and workload helpers for a synthetic UI prototype.
++
++These helpers enforce prototype actions only. A UI role switch is not
++authentication; production authorization must derive a verified user and role
++from a trusted identity provider/server session.
++"""
++
++from collections import defaultdict
++
++from B2.demo_clock import parse_date
++
++
++ROLE_PERMISSIONS = {
++    "worker": frozenset({"view_own_tasks", "acknowledge_task", "complete_task", "record_contact_attempt"}),
++    "supervisor": frozenset({"view_all_tasks", "acknowledge_task", "complete_task", "reassign_task", "escalate_task", "view_workload", "record_contact_attempt", "log_referral_outcome"}),
++    "anm_block": frozenset({"view_all_tasks", "acknowledge_task", "complete_task", "reassign_task", "escalate_task", "view_workload", "record_contact_attempt", "log_referral_outcome"}),
++    "district": frozenset({"view_all_tasks", "view_workload", "view_referral_summary"}),
++    "admin": frozenset({"view_all_tasks", "view_workload", "manage_demo_roles"}),
++}
++ACTIVE_TASK_STATUSES = frozenset({"open", "acknowledged", "escalated"})
++
++
++class RolePermissionError(PermissionError):
++    """Raised when a prototype role cannot perform an action."""
++
++
++def has_permission(role: str, permission: str) -> bool:
++    """Return whether the named prototype role has an action permission."""
++    role_value = str(role or "").strip().lower()
++    permission_value = str(permission or "").strip()
++    return permission_value in ROLE_PERMISSIONS.get(role_value, frozenset())
++
++
++def require_permission(role: str, permission: str) -> None:
++    """Raise a readable error if the prototype role lacks a permission."""
++    if not has_permission(role, permission):
++        raise RolePermissionError(f"Role {role!r} cannot perform {permission!r}.")
++
++
++def visible_tasks(tasks: list, actor_id: str, role: str) -> list:
++    """Filter tasks by prototype role; workers only see tasks assigned to them."""
++    if not isinstance(tasks, list):
++        raise ValueError("tasks must be a list.")
++    role_value = str(role or "").strip().lower()
++    if role_value not in ROLE_PERMISSIONS:
++        raise RolePermissionError("Unknown role.")
++    if role_value == "worker":
++        if not isinstance(actor_id, str) or not actor_id.strip():
++            raise RolePermissionError("Worker identity is required.")
++        return [t for t in tasks if isinstance(t, dict) and t.get("owner_id") == actor_id.strip()]
++    require_permission(role_value, "view_all_tasks")
++    return [t for t in tasks if isinstance(t, dict)]
++
++
++def tasks_per_worker(tasks: list) -> dict:
++    """Count active tasks by owner, including status breakdowns."""
++    if not isinstance(tasks, list):
++        raise ValueError("tasks must be a list.")
++    result = {}
++    for task in tasks:
++        if not isinstance(task, dict) or task.get("status") not in ACTIVE_TASK_STATUSES:
++            continue
++        owner = task.get("owner_id") or "unassigned"
++        row = result.setdefault(owner, {"total_active": 0, "by_status": {s: 0 for s in sorted(ACTIVE_TASK_STATUSES)}})
++        row["total_active"] += 1
++        row["by_status"][task["status"]] += 1
++    return result
++
++
++def worker_capacity(tasks: list, worker_id: str, max_active_tasks: int) -> dict:
++    """Return a transparent workload guard; cap is caller-supplied, not invented."""
++    if not isinstance(worker_id, str) or not worker_id.strip():
++        raise ValueError("worker_id is required.")
++    if isinstance(max_active_tasks, bool) or not isinstance(max_active_tasks, int) or max_active_tasks < 0:
++        raise ValueError("max_active_tasks must be a non-negative integer.")
++    counts = tasks_per_worker(tasks)
++    active = counts.get(worker_id.strip(), {}).get("total_active", 0)
++    return {
++        "worker_id": worker_id.strip(),
++        "active_tasks": active,
++        "max_active_tasks": max_active_tasks,
++        "can_assign": active < max_active_tasks,
++        "label": "PROPOSED WORKLOAD CAP — confirm with the team",
++    }
++
++
++def require_capacity(tasks: list, worker_id: str, max_active_tasks: int) -> None:
++    """Raise before assignment when a worker has reached the configured cap."""
++    result = worker_capacity(tasks, worker_id, max_active_tasks)
++    if not result["can_assign"]:
++        raise RolePermissionError(
++            f"Worker {worker_id} has reached the configured active-task limit "
++            f"({result['active_tasks']}/{result['max_active_tasks']})."
++        )
++
++
++def weekly_grouping(tasks: list) -> dict:
++    """Group tasks by ISO week of creation and current owner for a prototype chart."""
++    if not isinstance(tasks, list):
++        raise ValueError("tasks must be a list.")
++    groups = defaultdict(lambda: {"total": 0, "by_status": {}, "by_worker": {}})
++    for task in tasks:
++        if not isinstance(task, dict) or not task.get("created_on"):
++            continue
++        created = parse_date(task["created_on"])
++        iso = created.isocalendar()
++        week_key = f"{iso.year}-W{iso.week:02d}"
++        row = groups[week_key]
++        row["total"] += 1
++        status = str(task.get("status", "unknown"))
++        row["by_status"][status] = row["by_status"].get(status, 0) + 1
++        worker = task.get("owner_id") or "unassigned"
++        row["by_worker"][worker] = row["by_worker"].get(worker, 0) + 1
++    return {week: groups[week] for week in sorted(groups)}
+diff --git a/B2/sync.py b/B2/sync.py
+new file mode 100644
+index 0000000..848d89b
+--- /dev/null
++++ b/B2/sync.py
+@@ -0,0 +1,220 @@
++"""BE2 F9 local offline queue and conflict-safe sync primitives.
++
++This module demonstrates local durable queueing and deterministic reconciliation
++for synthetic prototype records. It does not connect to a remote server. Real
++sync requires authenticated transport, encryption, access control, backup,
++conflict review, and a privacy review before any non-synthetic data is used.
++"""
++
++import json
++import os
++import tempfile
++from copy import deepcopy
++from pathlib import Path
++from uuid import uuid4
++
++from B2.demo_clock import DateLike, parse_date
++
++
++SCHEMA_VERSION = 1
++ALLOWED_ENTITY_TYPES = frozenset({"task", "referral", "consent", "fallback"})
++ALLOWED_ACTIONS = frozenset({"upsert"})
++
++
++class SyncError(ValueError):
++    """Raised when an offline operation or queue is invalid."""
++
++
++def _required_text(value, name):
++    if not isinstance(value, str) or not value.strip():
++        raise SyncError(f"{name} is required.")
++    return value.strip()
++
++
++def _read_queue(path):
++    file_path = Path(path)
++    if not file_path.exists():
++        return {"schema_version": SCHEMA_VERSION, "operations": []}
++    try:
++        data = json.loads(file_path.read_text(encoding="utf-8"))
++    except (OSError, json.JSONDecodeError) as exc:
++        raise SyncError("Offline queue file is unreadable or invalid JSON.") from exc
++    if not isinstance(data, dict) or data.get("schema_version") != SCHEMA_VERSION:
++        raise SyncError("Offline queue has an unsupported schema version.")
++    if not isinstance(data.get("operations"), list):
++        raise SyncError("Offline queue operations must be a list.")
++    return data
++
++
++def _write_queue(path, data):
++    file_path = Path(path)
++    file_path.parent.mkdir(parents=True, exist_ok=True)
++    temp_name = None
++    try:
++        with tempfile.NamedTemporaryFile(
++            mode="w",
++            encoding="utf-8",
++            dir=str(file_path.parent),
++            prefix=file_path.name + ".",
++            suffix=".tmp",
++            delete=False,
++        ) as temp:
++            temp_name = temp.name
++            json.dump(data, temp, ensure_ascii=False, indent=2, sort_keys=True)
++            temp.flush()
++            os.fsync(temp.fileno())
++        os.replace(temp_name, file_path)
++    except OSError as exc:
++        if temp_name and os.path.exists(temp_name):
++            os.unlink(temp_name)
++        raise SyncError("Could not save the offline queue safely.") from exc
++
++
++def enqueue_operation(
++    path,
++    entity_type: str,
++    entity_id: str,
++    payload: dict,
++    base_version: int,
++    created_at: DateLike,
++    action: str = "upsert",
++    operation_id: str = "",
++):
++    """Atomically append a pending, idempotent operation to a local JSON queue."""
++    kind = _required_text(entity_type, "entity_type").lower()
++    entity = _required_text(entity_id, "entity_id")
++    action_value = _required_text(action, "action").lower()
++    if kind not in ALLOWED_ENTITY_TYPES:
++        raise SyncError("Unsupported entity_type.")
++    if action_value not in ALLOWED_ACTIONS:
++        raise SyncError("Unsupported operation action.")
++    if not isinstance(payload, dict):
++        raise SyncError("payload must be a dictionary.")
++    if isinstance(base_version, bool) or not isinstance(base_version, int) or base_version < 0:
++        raise SyncError("base_version must be a non-negative integer.")
++    try:
++        json.dumps(payload)
++    except (TypeError, ValueError) as exc:
++        raise SyncError("payload must contain JSON-serializable values.") from exc
++
++    identifier = operation_id.strip() if isinstance(operation_id, str) else ""
++    identifier = identifier or str(uuid4())
++    operation = {
++        "operation_id": identifier,
++        "entity_type": kind,
++        "entity_id": entity,
++        "action": action_value,
++        "base_version": base_version,
++        "payload": deepcopy(payload),
++        "created_at": parse_date(created_at).isoformat(),
++        "sync_status": "pending",
++    }
++    data = _read_queue(path)
++    existing = next(
++        (item for item in data["operations"]
++         if isinstance(item, dict) and item.get("operation_id") == identifier),
++        None,
++    )
++    if existing is not None:
++        comparable = {key: value for key, value in existing.items() if key != "sync_status"}
++        expected = {key: value for key, value in operation.items() if key != "sync_status"}
++        if comparable != expected:
++            raise SyncError("operation_id was already used for different operation data.")
++        return deepcopy(existing)
++    data["operations"].append(operation)
++    _write_queue(path, data)
++    return deepcopy(operation)
++
++
++def load_operations(path, status=None):
++    """Load queued operations, optionally filtering by sync status."""
++    operations = deepcopy(_read_queue(path)["operations"])
++    return [op for op in operations if status is None or op.get("sync_status") == status]
++
++
++def reconcile_operations(operations: list, server_state: dict, applied_operation_ids=None):
++    """Apply version-matched operations to an in-memory server snapshot.
++
++    Operations are idempotent by operation_id. A stale base_version becomes a
++    conflict and is not overwritten automatically, preserving newer data for
++    explicit review instead of silently using last-write-wins.
++    """
++    if not isinstance(operations, list) or not isinstance(server_state, dict):
++        raise SyncError("operations and server_state must be list/dictionary.")
++    state = deepcopy(server_state)
++    applied = set(applied_operation_ids or [])
++    results = []
++
++    for operation in operations:
++        if not isinstance(operation, dict):
++            raise SyncError("Each operation must be a dictionary.")
++        op_id = _required_text(operation.get("operation_id"), "operation_id")
++        entity_type = _required_text(operation.get("entity_type"), "entity_type").lower()
++        entity_id = _required_text(operation.get("entity_id"), "entity_id")
++        if entity_type not in ALLOWED_ENTITY_TYPES:
++            raise SyncError("Unsupported entity_type.")
++        if operation.get("action") not in ALLOWED_ACTIONS:
++            raise SyncError("Unsupported operation action.")
++        payload = operation.get("payload")
++        base_version = operation.get("base_version")
++        if not isinstance(payload, dict):
++            raise SyncError("operation payload must be a dictionary.")
++        if isinstance(base_version, bool) or not isinstance(base_version, int) or base_version < 0:
++            raise SyncError("operation base_version must be a non-negative integer.")
++
++        if op_id in applied:
++            results.append({"operation_id": op_id, "status": "duplicate", "entity_id": entity_id})
++            continue
++
++        state_key = f"{entity_type}:{entity_id}"
++        current = state.get(state_key)
++        current_version = current.get("version", 0) if isinstance(current, dict) else 0
++        if current_version != base_version:
++            results.append({
++                "operation_id": op_id,
++                "status": "conflict",
++                "entity_id": entity_id,
++                "expected_base_version": base_version,
++                "current_version": current_version,
++                "message": "Server record changed since this offline edit; review before retrying.",
++            })
++            continue
++
++        merged = deepcopy(current) if isinstance(current, dict) else {}
++        merged.update(deepcopy(payload))
++        merged.update({
++            "entity_id": entity_id,
++            "entity_type": entity_type,
++            "version": current_version + 1,
++            "last_operation_id": op_id,
++        })
++        state[state_key] = merged
++        applied.add(op_id)
++        results.append({
++            "operation_id": op_id,
++            "status": "synced",
++            "entity_id": entity_id,
++            "new_version": merged["version"],
++        })
++
++    return {"server_state": state, "results": results, "applied_operation_ids": sorted(applied)}
++
++
++def apply_sync_results(path, results):
++    """Persist sync statuses locally after the caller completes a sync attempt."""
++    if not isinstance(results, list):
++        raise SyncError("results must be a list.")
++    data = _read_queue(path)
++    by_id = {result.get("operation_id"): result for result in results if isinstance(result, dict)}
++    for operation in data["operations"]:
++        result = by_id.get(operation.get("operation_id"))
++        if not result:
++            continue
++        if result.get("status") == "synced" or result.get("status") == "duplicate":
++            operation["sync_status"] = "synced"
++            operation.pop("sync_error", None)
++        elif result.get("status") == "conflict":
++            operation["sync_status"] = "conflict"
++            operation["sync_error"] = result.get("message", "Conflict requires review.")
++    _write_queue(path, data)
++    return deepcopy(data["operations"])
+diff --git a/B2/test_day2.py b/B2/test_day2.py
+new file mode 100644
+index 0000000..c476532
+--- /dev/null
++++ b/B2/test_day2.py
+@@ -0,0 +1,192 @@
++"""Unit tests for BE2 F5/F6/F7/F9/F10 prototype helpers."""
++
++import tempfile
++import unittest
++from pathlib import Path
++
++from B2.audit import (
++    AuditRecordError,
++    append_event,
++    audit_consent_change,
++    change_consent_status,
++    create_consent_record,
++)
++from B2.fallback import can_continue_safely, create_fallback_record, mark_fallback_action
++from B2.referrals import (
++    ReferralError,
++    issue_referral,
++    log_referral_outcome,
++    mark_not_needed,
++    record_contact_attempt,
++    referral_summary,
++    suggested_next_step,
++)
++from B2.roles import (
++    RolePermissionError,
++    has_permission,
++    require_capacity,
++    tasks_per_worker,
++    visible_tasks,
++    weekly_grouping,
++    worker_capacity,
++)
++from B2.sync import (
++    SyncError,
++    apply_sync_results,
++    enqueue_operation,
++    load_operations,
++    reconcile_operations,
++)
++
++
++class ReferralTests(unittest.TestCase):
++    def setUp(self):
++        self.referral = issue_referral(
++            child_id="C0001",
++            issued_by="W07",
++            destination="Synthetic clinic A",
++            reason="Synthetic BE2 test reason",
++            on="2026-10-15",
++            task_id="TASK-C0001",
++            referral_id="REF-C0001",
++        )
++
++    def test_contact_not_reached_records_reason_and_suggestion(self):
++        updated = record_contact_attempt(
++            self.referral, "W07", "2026-10-16", False, "no_answer"
++        )
++        self.assertEqual(updated["status"], "issued")
++        self.assertFalse(updated["reached"])
++        self.assertEqual(updated["last_contact_reason"], "no_answer")
++        self.assertIn("next approved contact", suggested_next_step(updated)["text"])
++        self.assertEqual(len(self.referral["timeline"]), 1)
++        self.assertEqual(self.referral["timeline"][0]["event"], "referral_issued")
++
++    def test_not_reached_requires_reason_and_other_requires_note(self):
++        with self.assertRaises(ReferralError):
++            record_contact_attempt(self.referral, "W07", "2026-10-16", False)
++        with self.assertRaises(ReferralError):
++            record_contact_attempt(self.referral, "W07", "2026-10-16", False, "other")
++
++    def test_outcome_is_separate_from_contact_and_updates_status(self):
++        contacted = record_contact_attempt(self.referral, "W07", "2026-10-16", True)
++        result = log_referral_outcome(contacted, "W07", "attended", "2026-10-18")
++        self.assertEqual(result["status"], "outcome_logged")
++        self.assertEqual(result["outcome"], "attended")
++        self.assertEqual(len(result["timeline"]), 3)
++
++    def test_summary_counts_status_and_reasons(self):
++        missed = record_contact_attempt(self.referral, "W07", "2026-10-16", False, "transport_barrier")
++        no_ref = mark_not_needed("C0002", "SUP01", "2026-10-15", "Not indicated in this synthetic scenario")
++        summary = referral_summary([missed, no_ref])
++        self.assertEqual(summary["total"], 2)
++        self.assertEqual(summary["by_status"]["issued"], 1)
++        self.assertEqual(summary["by_contact_reason"]["transport_barrier"], 1)
++
++
++class FallbackTests(unittest.TestCase):
++    def test_auth_failure_offers_manual_path_without_bypassing_access(self):
++        record = create_fallback_record(
++            "C0001", "audit", "authentication_failed", "2026-10-15",
++            "W07", "TASK-C0001", fallback_id="FB1",
++        )
++        self.assertTrue(can_continue_safely(record))
++        self.assertFalse(record["automated_action_allowed"])
++        self.assertFalse(record["protected_data_access_allowed"])
++        self.assertIn("Protected records remain unavailable", record["next_action"])
++
++    def test_manual_action_is_copy_on_write_and_not_protected_access(self):
++        record = create_fallback_record("C0001", "sync", "offline", "2026-10-15", fallback_id="FB2")
++        updated = mark_fallback_action(record, "W07", "2026-10-16", "Followed approved manual process")
++        self.assertEqual(record["state"], "manual_action_pending")
++        self.assertEqual(updated["state"], "manual_action_recorded")
++        self.assertFalse(updated["protected_data_access_allowed"])
++
++
++class AuditAndConsentTests(unittest.TestCase):
++    def test_audit_append_is_immutable_and_redacts_nothing_implicitly(self):
++        empty = []
++        result = append_event(empty, "W07", "task_acknowledged", "task", "TASK1", "2026-10-15", {"status": "acknowledged"}, "EV1")
++        self.assertEqual(empty, [])
++        self.assertEqual(result[0]["event_id"], "EV1")
++        with self.assertRaises(AuditRecordError):
++            append_event(result, "W07", "duplicate", "task", "TASK1", "2026-10-15", event_id="EV1")
++
++    def test_consent_changes_append_a_history_and_audit_event(self):
++        record = create_consent_record("C0001", "W07", "synthetic demo", "granted", "2026-10-15", method="in_person", consent_id="CONS1")
++        declined = change_consent_status(record, "W07", "withdrawn", "2026-10-16", "Synthetic test withdrawal")
++        self.assertEqual(record["current_status"], "granted")
++        self.assertEqual(declined["current_status"], "withdrawn")
++        self.assertEqual(len(declined["events"]), 2)
++        audit = audit_consent_change([], declined, "2026-10-16")
++        self.assertEqual(audit[0]["action"], "consent_status_changed")
++        self.assertEqual(audit[0]["details"]["to_status"], "withdrawn")
++
++
++class RolesAndWorkloadTests(unittest.TestCase):
++    def setUp(self):
++        self.tasks = [
++            {"task_id": "T1", "child_id": "C1", "owner_id": "W1", "status": "open", "created_on": "2026-10-15"},
++            {"task_id": "T2", "child_id": "C2", "owner_id": "W1", "status": "acknowledged", "created_on": "2026-10-16"},
++            {"task_id": "T3", "child_id": "C3", "owner_id": "W2", "status": "closed", "created_on": "2026-10-17"},
++        ]
++
++    def test_worker_views_only_own_tasks_and_permission_matrix(self):
++        self.assertEqual(len(visible_tasks(self.tasks, "W1", "worker")), 2)
++        self.assertFalse(has_permission("worker", "view_all_tasks"))
++        self.assertTrue(has_permission("supervisor", "view_all_tasks"))
++        with self.assertRaises(RolePermissionError):
++            visible_tasks(self.tasks, "W1", "unrecognized")
++
++    def test_capacity_guard_counts_only_active_tasks(self):
++        counts = tasks_per_worker(self.tasks)
++        self.assertEqual(counts["W1"]["total_active"], 2)
++        self.assertEqual(worker_capacity(self.tasks, "W1", 3)["can_assign"], True)
++        with self.assertRaises(RolePermissionError):
++            require_capacity(self.tasks, "W1", 2)
++
++    def test_weekly_grouping_reports_iso_week_and_worker_counts(self):
++        grouping = weekly_grouping(self.tasks)
++        self.assertEqual(grouping["2026-W42"]["total"], 3)
++        self.assertEqual(grouping["2026-W42"]["by_worker"]["W1"], 2)
++
++
++class SyncTests(unittest.TestCase):
++    def test_offline_queue_persists_and_duplicate_enqueue_is_idempotent(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            path = Path(tmp) / "offline.json"
++            first = enqueue_operation(path, "task", "T1", {"status": "acknowledged"}, 0, "2026-10-15", operation_id="OP1")
++            duplicate = enqueue_operation(path, "task", "T1", {"status": "acknowledged"}, 0, "2026-10-15", operation_id="OP1")
++            self.assertEqual(first, duplicate)
++            self.assertEqual(len(load_operations(path, "pending")), 1)
++            with self.assertRaises(SyncError):
++                enqueue_operation(path, "task", "T1", {"status": "closed"}, 0, "2026-10-15", operation_id="OP1")
++
++    def test_sync_applies_versioned_change_once_and_flags_conflict(self):
++        operation = {
++            "operation_id": "OP2", "entity_type": "task", "entity_id": "T1",
++            "action": "upsert", "base_version": 1,
++            "payload": {"status": "acknowledged"}, "created_at": "2026-10-15",
++        }
++        initial = {"task:T1": {"version": 1, "status": "open"}}
++        result = reconcile_operations([operation], initial)
++        self.assertEqual(result["results"][0]["status"], "synced")
++        self.assertEqual(result["server_state"]["task:T1"]["version"], 2)
++        duplicate = reconcile_operations([operation], result["server_state"], result["applied_operation_ids"])
++        self.assertEqual(duplicate["results"][0]["status"], "duplicate")
++
++        conflict = reconcile_operations([operation], {"task:T1": {"version": 2, "status": "closed"}})
++        self.assertEqual(conflict["results"][0]["status"], "conflict")
++        self.assertEqual(conflict["server_state"]["task:T1"]["status"], "closed")
++
++    def test_sync_results_mark_queue_status(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            path = Path(tmp) / "offline.json"
++            enqueue_operation(path, "referral", "R1", {"status": "issued"}, 0, "2026-10-15", operation_id="OP3")
++            changed = apply_sync_results(path, [{"operation_id": "OP3", "status": "synced"}])
++            self.assertEqual(changed[0]["sync_status"], "synced")
++            self.assertEqual(load_operations(path, "pending"), [])
++
++
++if __name__ == "__main__":
++    unittest.main()
