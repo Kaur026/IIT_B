@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rounded background badge with subtle gradient -->
+  <rect width="64" height="64" rx="20" fill="#ECFDF5"/>
+  <rect x="1" y="1" width="62" height="62" rx="19" stroke="#A7F3D0" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- Subtle aura -->
+  <circle cx="32" cy="32" r="22" fill="#D1FAE5" fill-opacity="0.6"/>
+
+  <!-- Adolescent Girl Hair with neat Indian side-braid -->
+  <path d="M23 11C18 11 15 16 15 22C15 25 17 28 20 28C19 23 21 17 26 15C31 13 36 15 37 18C37 13 32 11 26 11H23Z" fill="#064E3B"/>
+  <!-- Braid hanging over shoulder with hair tie -->
+  <path d="M17 25C15 28 14 34 16 38C17 40 18 43 17 46C16.5 48 15 50 16 52C16.5 53 18 53 18.5 52C19 50 18.5 47 19 44C19.5 41 20 37 19 32" stroke="#064E3B" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="16.5" cy="51.5" r="1.5" fill="#10B981"/> <!-- Ribbon / Paranda -->
+
+  <!-- Adolescent Girl Face & Head -->
+  <path d="M24 15C24 12.8 25.8 11 28 11C30.2 11 32 12.8 32 15V23C32 25.2 30.2 27 28 27C25.8 27 24 25.2 24 23V15Z" fill="#D98A5B"/>
+
+  <!-- Bindi & determined confident expression -->
+  <circle cx="29" cy="16.5" r="0.8" fill="#059669"/>
+  <!-- Confident smiling eyes -->
+  <path d="M26.5 18.5C27 18 28 18 28.5 18.5" stroke="#1E293B" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M30 18.5C30.5 18 31.5 18 32 18.5" stroke="#1E293B" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- Cheerful warm smile -->
+  <path d="M28 22C28.8 22.8 29.8 22.8 30.5 22" stroke="#78350F" stroke-width="1" stroke-linecap="round"/>
+  <circle cx="26.5" cy="20.5" r="1" fill="#FCA5A5" fill-opacity="0.6"/>
+
+  <!-- Neck -->
+  <path d="M26 25V28H29V25" fill="#D98A5B"/>
+
+  <!-- Salwar Kameez / School Kurti & Dupatta -->
+  <path d="M20 28C20 28 17 38 17 48C17 51 20 53 23 53H36C39 53 41 51 41 48C41 38 38 28 38 28H20Z" fill="#059669"/>
+  <!-- Dupatta / Scarf Fold -->
+  <path d="M20 28L28 38L37 28" stroke="#A7F3D0" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M28 38V53" stroke="#A7F3D0" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Arms holding School Notebooks & Nutrition health -->
+  <path d="M37 32L43 37L44 42" stroke="#D98A5B" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="43.5" cy="42" r="1.8" fill="#C57545"/>
+
+  <!-- School Notebooks / Kishori Empowerment Slate -->
+  <rect x="36" y="38" width="13" height="15" rx="1.5" fill="#047857" transform="rotate(-6 36 38)"/>
+  <rect x="38" y="39.5" width="10" height="12" rx="1" fill="#FFFFFF" transform="rotate(-6 38 39.5)"/>
+  <path d="M40 43L46 42.5" stroke="#10B981" stroke-width="1" stroke-linecap="round"/>
+  <path d="M40 46L45 45.5" stroke="#6EE7B7" stroke-width="1" stroke-linecap="round"/>
+
+  <!-- Healthy Nutrition Apple / Iron Leaf Motif -->
+  <circle cx="51" cy="20" r="4.5" fill="#EF4444"/>
+  <path d="M51 15.5C52 14.5 54 15 54 15C54 15 53.5 17 52 17" stroke="#10B981" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

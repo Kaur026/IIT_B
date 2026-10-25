@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rounded background badge with subtle gradient -->
+  <rect width="64" height="64" rx="20" fill="#FAF5FF"/>
+  <rect x="1" y="1" width="62" height="62" rx="19" stroke="#E9D5FF" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- Subtle aura -->
+  <circle cx="32" cy="32" r="22" fill="#F3E8FF" fill-opacity="0.6"/>
+
+  <!-- Mother's hair & bun -->
+  <path d="M22 14C17 14 14 19 14 24C14 28 16 31 19 32C18 28 19 23 23 21C27 19 31 20 33 22C33 17 29 14 22 14Z" fill="#2E1065"/>
+  <circle cx="16" cy="20" r="3.5" fill="#2E1065"/>
+
+  <!-- Head & Face (tilted lovingly down) -->
+  <path d="M22 18C22 15.5 24 13.5 26.5 13.5C29 13.5 31 15.5 31 18V24C31 26.5 29 28.5 26.5 28.5C24 28.5 22 26.5 22 24V18Z" fill="#D98A5B"/>
+
+  <!-- Traditional Bindi -->
+  <circle cx="28" cy="18" r="0.9" fill="#9333EA"/>
+
+  <!-- Gentle closed eye looking at baby -->
+  <path d="M26 21C26.5 21.5 27.5 21.5 28 21" stroke="#5C3420" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M26 24C26.5 24.5 27.2 24.5 27.8 24.2" stroke="#5C3420" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Mother's body & Kurta drape -->
+  <path d="M18 30C15 35 14 43 14 50C14 53 17 55 21 55H43C47 55 50 53 50 50C50 43 47 34 40 31L33 34L26 29L18 30Z" fill="#9333EA"/>
+  <path d="M19 36C22 39 25 41 29 42" stroke="#E9D5FF" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Baby swaddle wrap resting in mother's arms -->
+  <path d="M26 38C23 40 21 44 23 48C25 51 29 52 35 51C41 50 43 46 42 41C41 37 36 36 32 37L26 38Z" fill="#C084FC"/>
+
+  <!-- Baby's head nestled against mother -->
+  <circle cx="27" cy="38" r="5" fill="#E8A67B"/>
+  <!-- Baby bonnet / soft cap -->
+  <path d="M23 37C23 34 26 33 29 34C31 35 32 37 32 39C30 40 26 40 23 37Z" fill="#DDD6FE"/>
+  <path d="M25 39C25.5 39.5 26.5 39.5 27 39" stroke="#78350F" stroke-width="0.7" stroke-linecap="round"/>
+
+  <!-- Mother's loving arms embracing the baby -->
+  <path d="M36 32C37 34 39 37 40 40C41 43 40 46 37 47C34 48 30 47 28 46" stroke="#D98A5B" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="27" cy="45.5" r="2" fill="#C57545"/>
+
+  <!-- Nourishment / drop icon -->
+  <path d="M50 20C50 20 46 25 46 28C46 30.2 47.8 32 50 32C52.2 32 54 30.2 54 28C54 25 50 20 50 20Z" fill="#A855F7"/>
+  <circle cx="49" cy="28" r="1" fill="#FFFFFF"/>
+</svg>

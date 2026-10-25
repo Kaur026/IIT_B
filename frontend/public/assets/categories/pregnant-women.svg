@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rounded background badge with subtle gradient -->
+  <rect width="64" height="64" rx="20" fill="#FFF1F2"/>
+  <rect x="1" y="1" width="62" height="62" rx="19" stroke="#FECDD3" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- Subtle aura -->
+  <circle cx="32" cy="32" r="22" fill="#FFE4E6" fill-opacity="0.6"/>
+
+  <!-- Mother's hair & bun -->
+  <path d="M26 15C20 15 17 21 17 26C17 31 19 33 22 34C21 30 22 25 26 23C30 21 34 22 36 24C36 19 32 15 26 15Z" fill="#331A1E"/>
+  <circle cx="18" cy="22" r="4" fill="#331A1E"/>
+
+  <!-- Head & Face -->
+  <path d="M24 20C24 17.2 26.2 15 29 15C31.8 15 34 17.2 34 20V26C34 28.8 31.8 31 29 31C26.2 31 24 28.8 24 26V20Z" fill="#D98A5B"/>
+
+  <!-- Traditional Bindi -->
+  <circle cx="30" cy="20.5" r="1" fill="#E11D48"/>
+
+  <!-- Gentle closed smiling eye & smile -->
+  <path d="M28.5 23C29 23.5 30 23.5 30.5 23" stroke="#5C3420" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M29 26C29.6 26.5 30.4 26.5 31 26" stroke="#5C3420" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Neck -->
+  <path d="M27 29V34H31V29" fill="#D98A5B"/>
+
+  <!-- Dupatta / Sari Pallu Drape -->
+  <path d="M21 27C21 27 16 35 15 45C14.5 49.5 17 53 21 54C24 54.8 29 55 35 55C41 55 45 54 48 51C49 50 49.5 48 48 45C45 39 42 34 38 33L35 37L28 32L21 27Z" fill="#F43F5E"/>
+  <path d="M19 34C22 37 25 39 28 40" stroke="#FFE4E6" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Pregnant Belly Curve -->
+  <path d="M28 33C25 35 22 39 23 46C24 53 30 54 36 54C42 54 45 50 45 44C45 39 40 34 34 33" fill="#FB7185"/>
+
+  <!-- Hands gently holding the bump -->
+  <path d="M37 45C35 44 32 44.5 30 46.5C28.5 48 30 50 32 50C34.5 50 37 49 39 47C40 46 39 45 37 45Z" fill="#C57545"/>
+  <path d="M26 43C25 44.5 25 46.5 27 48C28 48.8 29.5 48 29 46.5C28.5 45 28 43.5 26 43Z" fill="#D98A5B"/>
+
+  <!-- Tiny Golden Sari Border -->
+  <path d="M21 53.5C25 54.5 31 55 36 55C41 55 44 54 47.5 51.5" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Subtle health / love spark -->
+  <path d="M46 22C46 19.8 47.8 18 50 18C51.2 18 52.2 18.5 52.8 19.4C53.4 18.5 54.4 18 55.6 18C57.8 18 59.6 19.8 59.6 22C59.6 25 54 28 52.8 29C51.6 28 46 25 46 22Z" fill="#E11D48"/>
+</svg>

@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Poshan Action Layer",
+  "description": "Student research prototype for frontline Anganwadi casework, verification workflows, and plausible growth monitoring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

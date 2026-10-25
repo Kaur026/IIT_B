@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rounded background badge with subtle gradient -->
+  <rect width="64" height="64" rx="20" fill="#FFFBEB"/>
+  <rect x="1" y="1" width="62" height="62" rx="19" stroke="#FDE68A" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- Subtle aura -->
+  <circle cx="32" cy="32" r="22" fill="#FEF3C7" fill-opacity="0.6"/>
+
+  <!-- Preschooler Hair with cute side pony/parting -->
+  <path d="M22 13C17 13 15 18 15 22C15 24 16 25 18 25C17 21 19 17 23 16C27 15 31 16 33 19C34 21 34 23 35 24C35 18 31 13 25 13Z" fill="#1C1917"/>
+  <circle cx="34" cy="16" r="3" fill="#D97706"/> <!-- Cute hair ribbon -->
+  <circle cx="36" cy="18" r="2" fill="#1C1917"/>
+
+  <!-- Child Head & Cheerful Face -->
+  <circle cx="25" cy="21" r="7.5" fill="#E8A67B"/>
+
+  <!-- Sparkly happy eyes -->
+  <circle cx="23" cy="20.5" r="1.3" fill="#1C1917"/>
+  <circle cx="28" cy="20.5" r="1.3" fill="#1C1917"/>
+  <circle cx="23.4" cy="20" r="0.5" fill="#FFFFFF"/>
+  <circle cx="28.4" cy="20" r="0.5" fill="#FFFFFF"/>
+
+  <!-- Big happy smile & blush -->
+  <circle cx="21" cy="23" r="1.3" fill="#FCA5A5" fill-opacity="0.7"/>
+  <circle cx="30" cy="23" r="1.3" fill="#FCA5A5" fill-opacity="0.7"/>
+  <path d="M24 23.5C24.8 25.5 26.5 25.5 27.5 23.5" stroke="#78350F" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Anganwadi Preschool Uniform / Dress -->
+  <path d="M19 28C19 27 22 26 25 26C28 26 31 27 31 28L34 40H16L19 28Z" fill="#F59E0B"/>
+  <path d="M22 28L25 33L28 28" fill="#FFFFFF"/> <!-- Collar -->
+
+  <!-- Arms - One waving in hello, one holding anganwadi slate/book -->
+  <path d="M19 29L13 23C12.5 22.5 11.5 23 11 23.5C10.5 24.5 11 25.5 12 26L17 33" stroke="#D98A5B" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="11.5" cy="23.5" r="1.8" fill="#C57545"/> <!-- Waving hand -->
+
+  <path d="M31 30L37 34L39 38" stroke="#D98A5B" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Preschool Legs in active stance -->
+  <rect x="21" y="40" width="3.5" height="9" rx="1.5" fill="#D98A5B"/>
+  <rect x="26" y="40" width="3.5" height="9" rx="1.5" fill="#D98A5B"/>
+  <!-- Shoes -->
+  <rect x="19.5" y="47.5" width="5.5" height="3" rx="1.5" fill="#78350F"/>
+  <rect x="25.5" y="47.5" width="5.5" height="3" rx="1.5" fill="#78350F"/>
+
+  <!-- Learning Slate / Book (Pre-school early education) -->
+  <rect x="38" y="32" width="14" height="18" rx="2" fill="#047857" transform="rotate(8 38 32)"/>
+  <rect x="40" y="34" width="10" height="14" rx="1" fill="#065F46" transform="rotate(8 40 34)"/>
+  <path d="M42 39L48 40" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M42 43L46 43.5" stroke="#FDE68A" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,1930 @@
+/**
+ * Single Master Reactive Mock Store for Poshan Action Layer
+ * 100% synthetic data consistency across all portal screens and routes.
+ * Persists demo state in localStorage with confirmed reset capability.
+ * Storage Key: poshan_action_layer_store_v2 (bumped to prevent resurrection of personal names)
+ */
+
+import {
+  calculateAge,
+  evaluateMeasurementEntry,
+  validateMeasurementInput,
+  DEMO_CURRENT_DATE,
+  ESCALATION_TIERS,
+} from '../utils/casework.ts';
+import { type UserRole, canPerformAction } from '../utils/permissions.ts';
+
+export const DEMO_TODAY = DEMO_CURRENT_DATE; // '2026-10-24'
+
+export interface BeneficiaryRecord {
+  id: string; // BEN-xxxx
+  dob: string; // YYYY-MM-DD
+  gender: 'Male' | 'Female' | 'Other';
+  category: 'child_under_6' | 'pregnant' | 'lactating' | 'adolescent';
+  caregiverKinship: string; // e.g. 'Mother', 'Father', 'Grandmother'
+  centreCode: string; // e.g. 'AWC-702'
+  assignedAww: string; // e.g. 'AWW-409'
+  birthWeight: number;
+  status: 'Active' | 'Under Monitoring' | 'Referred' | 'Discharged';
+  registrationDate: string;
+  lastMeasurementDate?: string;
+  lastWeight?: number;
+  lastHeight?: number;
+  hasActiveFlag?: boolean;
+}
+
+export interface MeasurementRecord {
+  id: string; // MEA-xxxx
+  beneficiaryId: string;
+  date: string;
+  ageMonths: number;
+  weightKg: number;
+  heightCm: number;
+  muacCm?: number;
+  hasEdema: boolean;
+  posture: 'recumbent' | 'standing';
+  recordedBy: string; // e.g. 'AWW-409'
+  qualityFlags: string[];
+  clinicalFlags: string[];
+  isVerified: boolean;
+  notes?: string;
+}
+
+export interface ReferralFollowUp {
+  id: string;
+  date: string;
+  actor: string; // e.g. 'AWW-409' or 'Sector Supervisor (LS-01)'
+  method: 'Home Visit' | 'Phone Call' | 'AWC Consultation';
+  findings: string;
+  outcomeNote?: string;
+}
+
+export interface ReferralRecord {
+  id: string; // REF-xxxx
+  beneficiaryId: string;
+  ageDisplay: string;
+  reason: string;
+  destination:
+    | 'Primary Health Centre (PHC)'
+    | 'Nutrition Rehabilitation Centre (NRC)'
+    | 'Community Health Centre (CHC)'
+    | 'District Hospital';
+  referralDate: string;
+  owner: string; // e.g. 'AWW-409'
+  dueDate: string;
+  status: 'Pending' | 'Follow-up In Progress' | 'Completed' | 'Escalated';
+  priority: 'Urgent' | 'High' | 'Routine';
+  followUpAttempts: ReferralFollowUp[];
+  finalOutcome?: string;
+  outcomeConfirmed?: boolean;
+  outcomeDate?: string;
+  nextSteps?: string;
+}
+
+export interface EscalationStep {
+  timestamp: string;
+  fromTier: number;
+  toTier: number;
+  fromActor: string;
+  toActor: string;
+  reason: string;
+}
+
+export interface BeneficiaryCase {
+  id: string; // BEN-xxxx
+  actionId: string; // ACT-xxxx
+  ageMonths: number;
+  gender: 'Male' | 'Female' | 'Other';
+  caregiverKinship: string;
+  centreCode: string; // 'AWC-702'
+  assignedAww: string; // 'AWW-409'
+  category: 'urgent' | 'drift' | 'sam' | 'visit';
+  categoryLabel: string;
+  concernSummary: string;
+  ruleCode: string;
+  ruleName: string;
+  triggerDetail: string;
+  prevWeight: number;
+  prevHeight: number;
+  prevDate: string;
+  flaggedWeight: number;
+  flaggedHeight: number;
+  flaggedDate: string;
+  weightDelta: string;
+  priority: 'Urgent' | 'Needs Attention' | 'Referral Pending' | 'Resolved';
+  priorityColor: string;
+  dueDate: string;
+  status: 'Pending Verification' | 'Under Review' | 'Resolved' | 'Follow-up Assigned';
+  isVerified: boolean;
+  verifiedWeight?: number;
+  verifiedHeight?: number;
+  verifiedNotes?: string;
+  verificationHash?: string;
+  tierLevel: 1 | 2 | 3 | 4;
+  assignedRole: string;
+  assignedActor: string;
+  escalationHistory: EscalationStep[];
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+}
+
+export interface RuleDefinition {
+  id: string; // RUL-01
+  name: string;
+  category: 'velocity' | 'negative' | 'stagnation' | 'clumping';
+  targetGroup: string;
+  condition: string;
+  actionGenerated: string;
+  severity: 'Urgent' | 'Needs Attention' | 'Warning';
+  thresholdValue: number;
+  isActive: boolean;
+  triggers30d: number;
+  isIllustrative: boolean;
+}
+
+export interface AuditLedgerEntry {
+  id: string;
+  timestamp: string;
+  actionId: string;
+  palId: string; // BEN-xxxx
+  actor: string; // Synthetic ID e.g. 'AWW-409', 'LS-01', 'CDPO-01'
+  actionType: string;
+  deltaSummary: string;
+  proofHash: string;
+  status: 'Verified' | 'Escalated' | 'Logged';
+}
+
+export const STORAGE_KEY = 'poshan_action_layer_store_v2';
+
+// Canonical Baseline Seed Data
+function generateCanonicalSeed() {
+  const beneficiaries: BeneficiaryRecord[] = [
+    {
+      id: 'BEN-0142',
+      dob: '2025-08-10', // ~14 months on 2026-10-24
+      gender: 'Male',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-409',
+      birthWeight: 2.85,
+      status: 'Under Monitoring',
+      registrationDate: '2025-08-15',
+      lastMeasurementDate: '2026-10-24',
+      lastWeight: 12.3,
+      lastHeight: 77.5,
+      hasActiveFlag: true,
+    },
+    {
+      id: 'BEN-0891',
+      dob: '2024-12-04', // ~22 months on 2026-10-24
+      gender: 'Female',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-412',
+      birthWeight: 2.9,
+      status: 'Under Monitoring',
+      registrationDate: '2024-12-10',
+      lastMeasurementDate: '2026-10-10',
+      lastWeight: 10.9,
+      lastHeight: 82.5,
+      hasActiveFlag: true,
+    },
+    {
+      id: 'BEN-0334',
+      dob: '2026-01-14', // ~9 months on 2026-10-24
+      gender: 'Male',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-405',
+      birthWeight: 2.7,
+      status: 'Referred',
+      registrationDate: '2026-01-20',
+      lastMeasurementDate: '2026-10-14',
+      lastWeight: 6.85,
+      lastHeight: 67.0,
+      hasActiveFlag: true,
+    },
+    {
+      id: 'BEN-0512',
+      dob: '2024-02-18', // ~32 months
+      gender: 'Male',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-409',
+      birthWeight: 3.1,
+      status: 'Under Monitoring',
+      registrationDate: '2024-02-22',
+      lastMeasurementDate: '2026-10-09',
+      lastWeight: 12.3,
+      lastHeight: 95.4,
+      hasActiveFlag: true,
+    },
+    {
+      id: 'BEN-0773',
+      dob: '2025-11-05', // ~11 months
+      gender: 'Female',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-410',
+      birthWeight: 2.65,
+      status: 'Under Monitoring',
+      registrationDate: '2025-11-10',
+      lastMeasurementDate: '2026-10-09',
+      lastWeight: 6.8,
+      lastHeight: 71.8,
+      hasActiveFlag: true,
+    },
+    {
+      id: 'BEN-0922',
+      dob: '2025-07-20', // ~15 months
+      gender: 'Male',
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-412',
+      birthWeight: 3.0,
+      status: 'Under Monitoring',
+      registrationDate: '2025-07-25',
+      lastMeasurementDate: '2026-10-11',
+      lastWeight: 10.0,
+      lastHeight: 76.2,
+      hasActiveFlag: true,
+    },
+  ];
+
+  // Synthesize remaining 127 children and mothers across centres to match cohort
+  for (let i = 0; i < 127; i++) {
+    const idNum = 1000 + i * 19;
+    const isGirl = i % 2 === 0;
+    const gender = isGirl ? 'Female' : 'Male';
+    const ageMonths = 1 + ((i * 3) % 68);
+
+    const dobYear = 2026 - Math.floor(ageMonths / 12);
+    const dobMonth = 1 + (Math.abs(10 - (ageMonths % 12)) % 12);
+    const dobStr = `${dobYear}-${String(dobMonth).padStart(2, '0')}-15`;
+
+    const isStale = i % 7 === 0;
+    const lastDate = isStale ? '2026-08-12' : `2026-10-${String(1 + (i % 22)).padStart(2, '0')}`;
+    const weight = Number((4.5 + ageMonths * 0.28 + (i % 3) * 0.2).toFixed(1));
+    const height = Number((55.0 + ageMonths * 0.8 + (i % 4) * 0.5).toFixed(1));
+
+    // Distribution across centres in Sector-4 (AWC-702, AWC-703, AWC-704)
+    const centreCode = i % 5 === 0 ? 'AWC-703' : i % 8 === 0 ? 'AWC-704' : 'AWC-702';
+    const assignedAww = centreCode === 'AWC-702' ? (i % 2 === 0 ? 'AWW-409' : 'AWW-412') : centreCode === 'AWC-703' ? 'AWW-405' : 'AWW-410';
+
+    beneficiaries.push({
+      id: `BEN-${idNum}`,
+      dob: dobStr,
+      gender,
+      category: 'child_under_6',
+      caregiverKinship: 'Mother',
+      centreCode,
+      assignedAww,
+      birthWeight: Number((2.6 + (i % 5) * 0.15).toFixed(2)),
+      status: isStale ? 'Under Monitoring' : 'Active',
+      registrationDate: dobStr,
+      lastMeasurementDate: lastDate,
+      lastWeight: weight,
+      lastHeight: height,
+      hasActiveFlag: isStale,
+    });
+  }
+
+  // 35 Action Cases
+  const cases: BeneficiaryCase[] = [
+    {
+      id: 'BEN-0142',
+      actionId: 'ACT-2041',
+      ageMonths: 14,
+      gender: 'Male',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-409',
+      category: 'urgent',
+      categoryLabel: 'Urgent Anomaly',
+      concernSummary: 'Measurement needs verification • Abrupt +3.8 kg weight gain in 28 days',
+      ruleCode: 'RUL-01',
+      ruleName: 'Weight Velocity Outlier',
+      triggerDetail: '+3.8 kg in 28 days (8.5 kg on 26 Sep -> 12.3 kg on 24 Oct) exceeds velocity threshold',
+      prevWeight: 8.5,
+      prevHeight: 77.2,
+      prevDate: '26 Sep 2026',
+      flaggedWeight: 12.3,
+      flaggedHeight: 77.5,
+      flaggedDate: '24 Oct 2026',
+      weightDelta: '+3.8 kg in 28d',
+      priority: 'Urgent',
+      priorityColor: 'bg-rose-100 text-rose-800 border-rose-200',
+      dueDate: 'Today, 2:00 PM',
+      status: 'Pending Verification',
+      isVerified: false,
+      tierLevel: 1,
+      assignedRole: 'Frontline AWW',
+      assignedActor: 'AWW-409',
+      escalationHistory: [
+        {
+          timestamp: '24 Oct 2026, 09:15 AM',
+          fromTier: 1,
+          toTier: 1,
+          fromActor: 'System Engine',
+          toActor: 'AWW-409',
+          reason: 'Initial anthropometric velocity alert flagged upon field entry.',
+        },
+      ],
+    },
+    {
+      id: 'BEN-0891',
+      actionId: 'ACT-2038',
+      ageMonths: 22,
+      gender: 'Female',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-412',
+      category: 'drift',
+      categoryLabel: 'Measurement Drift',
+      concernSummary: 'Physical shrinkage warning • Height dropped -2.0 cm compared to preceding month',
+      ruleCode: 'RUL-02',
+      ruleName: 'Negative Length / Height Step',
+      triggerDetail: '-2.0 cm decrement from 84.5 cm to 82.5 cm over 30 days',
+      prevWeight: 10.8,
+      prevHeight: 84.5,
+      prevDate: '10 Sep 2026',
+      flaggedWeight: 10.9,
+      flaggedHeight: 82.5,
+      flaggedDate: '10 Oct 2026',
+      weightDelta: '-2.0 cm (Height)',
+      priority: 'Needs Attention',
+      priorityColor: 'bg-amber-100 text-amber-800 border-amber-200',
+      dueDate: 'Yesterday (Overdue)',
+      status: 'Pending Verification',
+      isVerified: false,
+      tierLevel: 1,
+      assignedRole: 'Frontline AWW',
+      assignedActor: 'AWW-412',
+      escalationHistory: [
+        {
+          timestamp: '10 Oct 2026, 11:30 AM',
+          fromTier: 1,
+          toTier: 1,
+          fromActor: 'System Engine',
+          toActor: 'AWW-412',
+          reason: 'Negative length alert triggered.',
+        },
+      ],
+    },
+    {
+      id: 'BEN-0334',
+      actionId: 'ACT-2035',
+      ageMonths: 9,
+      gender: 'Male',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-405',
+      category: 'sam',
+      categoryLabel: 'SAM / MAM Flag',
+      concernSummary: 'Severe Acute Malnutrition risk • Weight flatlined for 62 days + Red MUAC band (11.4 cm)',
+      ruleCode: 'RUL-04',
+      ruleName: 'Growth Stagnation & Red MUAC',
+      triggerDetail: '+50g weight change across 62 days with MUAC 11.4 cm (< 11.5 cm WHO cut-off)',
+      prevWeight: 6.8,
+      prevHeight: 66.2,
+      prevDate: '12 Aug 2026',
+      flaggedWeight: 6.85,
+      flaggedHeight: 67.0,
+      flaggedDate: '14 Oct 2026',
+      weightDelta: '+0.05 kg in 62d',
+      priority: 'Urgent',
+      priorityColor: 'bg-rose-100 text-rose-800 border-rose-200',
+      dueDate: '22 Oct 2026',
+      status: 'Under Review',
+      isVerified: false,
+      tierLevel: 2,
+      assignedRole: 'Sector Supervisor',
+      assignedActor: 'Sector Supervisor (LS-01)',
+      escalationHistory: [
+        {
+          timestamp: '14 Oct 2026, 02:00 PM',
+          fromTier: 1,
+          toTier: 1,
+          fromActor: 'System Engine',
+          toActor: 'AWW-405',
+          reason: 'Severe growth stagnation detected.',
+        },
+        {
+          timestamp: '15 Oct 2026, 10:15 AM',
+          fromTier: 1,
+          toTier: 2,
+          fromActor: 'AWW-405',
+          toActor: 'Sector Supervisor (LS-01)',
+          reason: 'Escalated to Lady Supervisor for Nutrition Rehabilitation Centre referral slip.',
+        },
+      ],
+    },
+    {
+      id: 'BEN-0512',
+      actionId: 'ACT-1994',
+      ageMonths: 32,
+      gender: 'Male',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-409',
+      category: 'drift',
+      categoryLabel: 'Digit Preference',
+      concernSummary: 'Repeated round integer readings • 12.00 kg and 95.0 cm recorded consecutively',
+      ruleCode: 'RUL-08',
+      ruleName: 'Terminal Digit Clumping',
+      triggerDetail: 'Consecutive .00 / .50 decimal clustering suggests lack of fine graduation measurement',
+      prevWeight: 12.0,
+      prevHeight: 95.0,
+      prevDate: '09 Sep 2026',
+      flaggedWeight: 12.3,
+      flaggedHeight: 95.4,
+      flaggedDate: '09 Oct 2026',
+      weightDelta: '+0.3 kg / +0.4 cm',
+      priority: 'Needs Attention',
+      priorityColor: 'bg-amber-100 text-amber-800 border-amber-200',
+      dueDate: 'In 2 days',
+      status: 'Pending Verification',
+      isVerified: false,
+      tierLevel: 1,
+      assignedRole: 'Frontline AWW',
+      assignedActor: 'AWW-409',
+      escalationHistory: [],
+    },
+    {
+      id: 'BEN-0773',
+      actionId: 'ACT-1988',
+      ageMonths: 11,
+      gender: 'Female',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-410',
+      category: 'urgent',
+      categoryLabel: 'Acute Drop',
+      concernSummary: 'Acute weight depletion • Loss of -850g following gastrointestinal illness',
+      ruleCode: 'RUL-03',
+      ruleName: 'Negative Weight Progression',
+      triggerDetail: 'Drop from 7.65 kg to 6.80 kg in 25 days exceeds 5% physiological limit',
+      prevWeight: 7.65,
+      prevHeight: 71.0,
+      prevDate: '14 Sep 2026',
+      flaggedWeight: 6.8,
+      flaggedHeight: 71.8,
+      flaggedDate: '09 Oct 2026',
+      weightDelta: '-0.85 kg in 25d',
+      priority: 'Urgent',
+      priorityColor: 'bg-rose-100 text-rose-800 border-rose-200',
+      dueDate: 'In 3 days',
+      status: 'Follow-up Assigned',
+      isVerified: false,
+      tierLevel: 1,
+      assignedRole: 'Frontline AWW',
+      assignedActor: 'AWW-410',
+      escalationHistory: [],
+    },
+    {
+      id: 'BEN-0922',
+      actionId: 'ACT-1972',
+      ageMonths: 15,
+      gender: 'Male',
+      caregiverKinship: 'Mother',
+      centreCode: 'AWC-702',
+      assignedAww: 'AWW-412',
+      category: 'visit',
+      categoryLabel: 'Overdue Visit',
+      concernSummary: 'Missing monthly growth check • 45 days since last AWC attendance',
+      ruleCode: 'RUL-06',
+      ruleName: 'Overdue Measurement Check',
+      triggerDetail: 'Last recorded measurement was 45 days ago; exceeded 35-day routine surveillance threshold',
+      prevWeight: 9.8,
+      prevHeight: 75.8,
+      prevDate: '27 Aug 2026',
+      flaggedWeight: 10.0,
+      flaggedHeight: 76.2,
+      flaggedDate: '11 Oct 2026',
+      weightDelta: '+0.2 kg in 45d',
+      priority: 'Needs Attention',
+      priorityColor: 'bg-amber-100 text-amber-800 border-amber-200',
+      dueDate: 'Today',
+      status: 'Pending Verification',
+      isVerified: false,
+      tierLevel: 1,
+      assignedRole: 'Frontline AWW',
+      assignedActor: 'AWW-412',
+      escalationHistory: [],
+    },
+  ];
+
+  // Synthesize remaining 29 cases to complete 35 active cases
+  const RULES_LIST = [
+    { code: 'RUL-01', name: 'Weight Velocity Outlier', cat: 'urgent' as const, label: 'Urgent Anomaly' },
+    { code: 'RUL-02', name: 'Negative Height Step', cat: 'drift' as const, label: 'Measurement Drift' },
+    { code: 'RUL-03', name: 'Negative Weight Progression', cat: 'urgent' as const, label: 'Acute Drop' },
+    { code: 'RUL-04', name: 'Growth Stagnation Alert', cat: 'sam' as const, label: 'SAM / MAM Flag' },
+    { code: 'RUL-08', name: 'Digit Clumping Pattern', cat: 'drift' as const, label: 'Digit Clumping' },
+  ];
+
+  for (let i = 0; i < 29; i++) {
+    const ben = beneficiaries[6 + i];
+    const rule = RULES_LIST[i % RULES_LIST.length];
+    const isUrgent = rule.cat === 'urgent' || rule.cat === 'sam';
+
+    cases.push({
+      id: ben.id,
+      actionId: `ACT-${2050 + i}`,
+      ageMonths: 8 + (i % 40),
+      gender: ben.gender,
+      caregiverKinship: ben.caregiverKinship,
+      centreCode: ben.centreCode,
+      assignedAww: ben.assignedAww,
+      category: rule.cat,
+      categoryLabel: rule.label,
+      concernSummary: `${rule.name} • Triage flag generated for supervisory verification`,
+      ruleCode: rule.code,
+      ruleName: rule.name,
+      triggerDetail: `Variance detected against ${rule.name} standard thresholds (Illustrative demo rule • Demo simulation)`,
+      prevWeight: ben.lastWeight ? Number((ben.lastWeight - 0.4).toFixed(1)) : 8.0,
+      prevHeight: ben.lastHeight ? Number((ben.lastHeight - 1.2).toFixed(1)) : 70.0,
+      prevDate: '12 Sep 2026',
+      flaggedWeight: ben.lastWeight || 8.4,
+      flaggedHeight: ben.lastHeight || 71.2,
+      flaggedDate: ben.lastMeasurementDate || '20 Oct 2026',
+      weightDelta: isUrgent ? '+1.9 kg in 30d' : '-1.5 cm in 30d',
+      priority: isUrgent ? 'Urgent' : 'Needs Attention',
+      priorityColor: isUrgent ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-amber-100 text-amber-800 border-amber-200',
+      dueDate: i % 3 === 0 ? 'Today' : i % 3 === 1 ? 'Tomorrow' : 'In 3 days',
+      status: i % 5 === 0 ? 'Resolved' : i % 4 === 0 ? 'Under Review' : 'Pending Verification',
+      isVerified: i % 5 === 0,
+      tierLevel: (1 + (i % 3)) as 1 | 2 | 3 | 4,
+      assignedRole: i % 3 === 0 ? 'Frontline AWW' : i % 3 === 1 ? 'Sector Supervisor' : 'Clinical Officer / ANM',
+      assignedActor: i % 3 === 0 ? ben.assignedAww : i % 3 === 1 ? 'Sector Supervisor (LS-01)' : 'PHC Medical Officer',
+      escalationHistory: [],
+    });
+  }
+
+  // 8 Configurable Screening Rules
+  const rules: RuleDefinition[] = [
+    {
+      id: 'RUL-01',
+      name: 'Weight Velocity Outlier',
+      category: 'velocity',
+      targetGroup: 'Children 0-59 months',
+      condition: 'Monthly weight delta exceeds upper biological threshold (> +1.5 kg / 30 days)',
+      actionGenerated: 'Generates Tier-1 physical re-weighing task for frontline AWW.',
+      severity: 'Urgent',
+      thresholdValue: 1.5,
+      isActive: true,
+      triggers30d: 14,
+      isIllustrative: false,
+    },
+    {
+      id: 'RUL-02',
+      name: 'Negative Length / Height Step',
+      category: 'negative',
+      targetGroup: 'Children 0-59 months',
+      condition: 'Child recorded height decreases by > 1.5 cm compared to previous month',
+      actionGenerated: 'Flags posture alignment check and stadiometer re-measure task.',
+      severity: 'Needs Attention',
+      thresholdValue: 1.5,
+      isActive: true,
+      triggers30d: 9,
+      isIllustrative: false,
+    },
+    {
+      id: 'RUL-03',
+      name: 'Acute Weight Depletion',
+      category: 'negative',
+      targetGroup: 'Children 6-59 months',
+      condition: 'Rapid drop of > 0.8 kg in under 30 days without recorded illness note',
+      actionGenerated: 'Initiates immediate home visit and clinical triage review.',
+      severity: 'Urgent',
+      thresholdValue: 0.8,
+      isActive: true,
+      triggers30d: 6,
+      isIllustrative: false,
+    },
+    {
+      id: 'RUL-04',
+      name: 'Growth Stagnation (> 45 Days)',
+      category: 'stagnation',
+      targetGroup: 'Infants 6-23 months',
+      condition: 'Total weight gain <= 0.1 kg across 45 consecutive calendar days',
+      actionGenerated: 'Escalates to Sector Lady Supervisor for NRC referral consideration.',
+      severity: 'Urgent',
+      thresholdValue: 0.1,
+      isActive: true,
+      triggers30d: 11,
+      isIllustrative: false,
+    },
+    {
+      id: 'RUL-05',
+      name: 'Supra-Physiological Stature Delta',
+      category: 'velocity',
+      targetGroup: 'Children 0-59 months',
+      condition: 'Height velocity exceeds +4.5 cm / month',
+      actionGenerated: 'Prompts inspection of infantometer headboard alignment.',
+      severity: 'Needs Attention',
+      thresholdValue: 4.5,
+      isActive: true,
+      triggers30d: 4,
+      isIllustrative: true,
+    },
+    {
+      id: 'RUL-06',
+      name: 'Overdue Surveillance Check',
+      category: 'stagnation',
+      targetGroup: 'All registered cohorts',
+      condition: 'No physical measurement logged for > 35 calendar days',
+      actionGenerated: 'Generates home visit reminder on AWW mobile roster.',
+      severity: 'Needs Attention',
+      thresholdValue: 35.0,
+      isActive: true,
+      triggers30d: 18,
+      isIllustrative: true,
+    },
+    {
+      id: 'RUL-07',
+      name: 'Extreme Biological Implausibility',
+      category: 'velocity',
+      targetGroup: 'All beneficiaries',
+      condition: 'Weight outside absolute human limits (0.5 kg - 45 kg for children < 5y)',
+      actionGenerated: 'Hard blocks submission; requires supervisor confirmation override.',
+      severity: 'Urgent',
+      thresholdValue: 45.0,
+      isActive: true,
+      triggers30d: 2,
+      isIllustrative: false,
+    },
+    {
+      id: 'RUL-08',
+      name: 'Terminal Digit Clumping',
+      category: 'clumping',
+      targetGroup: 'All entries',
+      condition: 'Consecutive .00 or .50 terminal digit clustering on digital scale',
+      actionGenerated: 'Flags potential scale tare miscalibration or keying heuristic.',
+      severity: 'Warning',
+      thresholdValue: 3.0,
+      isActive: true,
+      triggers30d: 22,
+      isIllustrative: true,
+    },
+  ];
+
+  // Referrals
+  const referrals: ReferralRecord[] = [
+    {
+      id: 'REF-501',
+      beneficiaryId: 'BEN-0334',
+      ageDisplay: '9 months',
+      reason: 'Severe Acute Malnutrition (SAM) • WAZ < -3 SD & Stagnation > 60d',
+      destination: 'Nutrition Rehabilitation Centre (NRC)',
+      referralDate: '15 Oct 2026',
+      owner: 'AWW-405',
+      dueDate: '22 Oct 2026',
+      status: 'Follow-up In Progress',
+      priority: 'Urgent',
+      followUpAttempts: [
+        {
+          id: 'FU-1',
+          date: '17 Oct 2026',
+          actor: 'AWW-405',
+          method: 'Home Visit',
+          findings: 'Caregiver informed of NRC admission protocol. Prepared initial referral slip.',
+        },
+        {
+          id: 'FU-2',
+          date: '20 Oct 2026',
+          actor: 'Sector Supervisor (LS-01)',
+          method: 'Home Visit',
+          findings: 'Family agreed to transport child to District Hospital NRC on Monday morning.',
+        },
+      ],
+    },
+    {
+      id: 'REF-502',
+      beneficiaryId: 'BEN-0773',
+      ageDisplay: '11 months',
+      reason: 'Post-measles acute weight depletion (> 20% loss in 21 days)',
+      destination: 'Primary Health Centre (PHC)',
+      referralDate: '10 Oct 2026',
+      owner: 'AWW-410',
+      dueDate: '16 Oct 2026',
+      status: 'Completed',
+      priority: 'High',
+      followUpAttempts: [
+        {
+          id: 'FU-3',
+          date: '12 Oct 2026',
+          actor: 'AWW-410',
+          method: 'AWC Consultation',
+          findings: 'Caregiver brought infant to PHC outpatient department.',
+        },
+      ],
+      finalOutcome: 'Therapeutic antibiotic course completed; oral rehydration therapy stabilized weight.',
+      outcomeDate: '18 Oct 2026',
+      nextSteps: 'Weekly weight spot-checks at AWC-702; double ration THR provided.',
+    },
+    {
+      id: 'REF-503',
+      beneficiaryId: 'BEN-1019',
+      ageDisplay: '18 months',
+      reason: 'Bilateral pedal edema (Kwashiorkor presentation)',
+      destination: 'District Hospital',
+      referralDate: '21 Oct 2026',
+      owner: 'AWW-409',
+      dueDate: '25 Oct 2026',
+      status: 'Pending',
+      priority: 'Urgent',
+      followUpAttempts: [],
+    },
+  ];
+
+  // Audit Log (Synthetic IDs and role actors only)
+  const auditLog: AuditLedgerEntry[] = [
+    {
+      id: 'LED-8921',
+      timestamp: '24 Oct 2026, 11:30 AM',
+      actionId: 'ACT-2041',
+      palId: 'BEN-0142',
+      actor: 'AWW-409',
+      actionType: 'Supervisory Physical Re-weigh',
+      deltaSummary: 'Identified typo: 12.30 kg keyed -> 8.90 kg verified',
+      proofHash: '0x8f2a...c419',
+      status: 'Verified',
+    },
+    {
+      id: 'LED-8920',
+      timestamp: '23 Oct 2026, 04:15 PM',
+      actionId: 'ACT-2038',
+      palId: 'BEN-0891',
+      actor: 'AWW-412',
+      actionType: 'Infant Stadiometer Alignment Check',
+      deltaSummary: 'Adjusted length headboard to 84.8 cm',
+      proofHash: '0x3b1c...e892',
+      status: 'Verified',
+    },
+    {
+      id: 'LED-8919',
+      timestamp: '22 Oct 2026, 02:40 PM',
+      actionId: 'ACT-2035',
+      palId: 'BEN-0334',
+      actor: 'Sector Supervisor (LS-01)',
+      actionType: 'NRC Escalation & Referral Slip',
+      deltaSummary: 'Dispatched to Sector PHC for SAM evaluation',
+      proofHash: '0x7a4d...1102',
+      status: 'Escalated',
+    },
+    {
+      id: 'LED-8918',
+      timestamp: '21 Oct 2026, 10:05 AM',
+      actionId: 'ACT-1994',
+      palId: 'BEN-0512',
+      actor: 'AWW-409',
+      actionType: 'Height Parallax Rectification',
+      deltaSummary: 'Confirmed true standing height: 90.2 cm',
+      proofHash: '0x99e1...77b3',
+      status: 'Verified',
+    },
+    {
+      id: 'LED-8917',
+      timestamp: '20 Oct 2026, 01:20 PM',
+      actionId: 'ACT-1988',
+      palId: 'BEN-0773',
+      actor: 'AWW-410',
+      actionType: 'Post-Illness Weight Recovery Check',
+      deltaSummary: 'Weight stabilized at 7.10 kg (+300g)',
+      proofHash: '0x44f0...aa29',
+      status: 'Verified',
+    },
+  ];
+
+  const measurements: MeasurementRecord[] = generateCanonicalMeasurements();
+
+  return { beneficiaries, measurements, cases, rules, referrals, auditLog };
+}
+
+// Canonical Measurements Seed
+function generateCanonicalMeasurements(): MeasurementRecord[] {
+  return [
+    // BEN-0142 - Longitudinal History leading to outlier
+    {
+      id: 'MEA-101',
+      beneficiaryId: 'BEN-0142',
+      date: '2026-06-14',
+      ageMonths: 10,
+      weightKg: 7.2,
+      heightCm: 72.0,
+      muacCm: 13.5,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-409',
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+      notes: 'Initial monthly growth monitoring entry.',
+    },
+    {
+      id: 'MEA-102',
+      beneficiaryId: 'BEN-0142',
+      date: '2026-07-16',
+      ageMonths: 11,
+      weightKg: 7.7,
+      heightCm: 73.8,
+      muacCm: 13.7,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-409',
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+      notes: 'Normal growth velocity; THR ration provided.',
+    },
+    {
+      id: 'MEA-103',
+      beneficiaryId: 'BEN-0142',
+      date: '2026-08-18',
+      ageMonths: 12,
+      weightKg: 8.1,
+      heightCm: 75.5,
+      muacCm: 13.9,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-409',
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+      notes: '1-Year milestone check; Vitamin A dose administered.',
+    },
+    {
+      id: 'MEA-104',
+      beneficiaryId: 'BEN-0142',
+      date: '2026-09-26',
+      ageMonths: 13,
+      weightKg: 8.5,
+      heightCm: 77.2,
+      muacCm: 14.1,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-409',
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+      notes: 'Consistent positive velocity trajectory.',
+    },
+    {
+      id: 'MEA-105',
+      beneficiaryId: 'BEN-0142',
+      date: '2026-10-24',
+      ageMonths: 14,
+      weightKg: 12.3,
+      heightCm: 77.5,
+      muacCm: 14.2,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-409',
+      qualityFlags: ['Weight Velocity Outlier (+3.8 kg / 28d)'],
+      clinicalFlags: [],
+      isVerified: false,
+      notes: 'Flagged for supervisory physical re-weigh.',
+    },
+
+    // BEN-0891 - Negative height step anomaly
+    {
+      id: 'MEA-106',
+      beneficiaryId: 'BEN-0891',
+      date: '2026-09-10',
+      ageMonths: 21,
+      weightKg: 10.8,
+      heightCm: 84.5,
+      muacCm: 14.5,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-412',
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+    },
+    {
+      id: 'MEA-107',
+      beneficiaryId: 'BEN-0891',
+      date: '2026-10-10',
+      ageMonths: 22,
+      weightKg: 10.9,
+      heightCm: 82.5,
+      muacCm: 14.5,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-412',
+      qualityFlags: ['Negative Length / Height Step (-2.0 cm)'],
+      clinicalFlags: [],
+      isVerified: false,
+      notes: 'Decreased stature indicates stadiometer positioning misalignment.',
+    },
+
+    // BEN-0334 - Growth stagnation & SAM evaluation
+    {
+      id: 'MEA-108',
+      beneficiaryId: 'BEN-0334',
+      date: '2026-08-12',
+      ageMonths: 7,
+      weightKg: 6.8,
+      heightCm: 66.2,
+      muacCm: 12.2,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-405',
+      qualityFlags: [],
+      clinicalFlags: ['Moderate Acute Malnutrition (MAM)'],
+      isVerified: true,
+    },
+    {
+      id: 'MEA-109',
+      beneficiaryId: 'BEN-0334',
+      date: '2026-10-14',
+      ageMonths: 9,
+      weightKg: 6.85,
+      heightCm: 67.0,
+      muacCm: 11.4,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: 'AWW-405',
+      qualityFlags: [],
+      clinicalFlags: ['Multi-Month Growth Stagnation', 'Red MUAC (< 11.5 cm)'],
+      isVerified: false,
+      notes: 'Flat 62-day trajectory and red MUAC; referred to NRC.',
+    },
+  ];
+}
+
+// Deterministic proof hash generator (no Math.random)
+function generateDeterministicProofHash(counter: number, prefixCode: number = 4829): string {
+  const p1 = ((counter * prefixCode + 1357) % 65536).toString(16).padStart(4, '0');
+  const p2 = ((counter * 1031 + 8421) % 65536).toString(16).padStart(4, '0');
+  return `0x${p1}...${p2}`;
+}
+
+// Initial In-Memory Reactive Store with Persistence
+class MockStore {
+  private beneficiaries: BeneficiaryRecord[] = [];
+  private measurements: MeasurementRecord[] = [];
+  private cases: BeneficiaryCase[] = [];
+  private rules: RuleDefinition[] = [];
+  private referrals: ReferralRecord[] = [];
+  private auditLog: AuditLedgerEntry[] = [];
+  private listeners: Set<() => void> = new Set();
+
+  constructor() {
+    this.loadState();
+  }
+
+  private loadState() {
+    try {
+      const saved = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem(STORAGE_KEY) : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          Array.isArray(parsed.beneficiaries) &&
+          parsed.beneficiaries.length > 0 &&
+          Array.isArray(parsed.cases) &&
+          Array.isArray(parsed.rules)
+        ) {
+          this.beneficiaries = parsed.beneficiaries;
+          this.measurements =
+            Array.isArray(parsed.measurements) && parsed.measurements.length > 0
+              ? parsed.measurements
+              : generateCanonicalMeasurements();
+          this.cases = parsed.cases;
+          this.rules = parsed.rules;
+          this.referrals = Array.isArray(parsed.referrals) ? parsed.referrals : [];
+          this.auditLog = Array.isArray(parsed.auditLog) ? parsed.auditLog : [];
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Poshan Action Layer: Failed to restore state from localStorage, falling back to seed.', err);
+    }
+
+    // Default to Canonical Seed
+    const seed = generateCanonicalSeed();
+    this.beneficiaries = seed.beneficiaries;
+    this.measurements = seed.measurements;
+    this.cases = seed.cases;
+    this.rules = seed.rules;
+    this.referrals = seed.referrals;
+    this.auditLog = seed.auditLog;
+  }
+
+  private saveState() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const data = {
+          beneficiaries: this.beneficiaries,
+          measurements: this.measurements,
+          cases: this.cases,
+          rules: this.rules,
+          referrals: this.referrals,
+          auditLog: this.auditLog,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+    } catch {
+      // Storage quota or policy exception
+    }
+  }
+
+  public subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify() {
+    this.saveState();
+    this.listeners.forEach((l) => l());
+  }
+
+  // =========================================================================
+  // RESET DEMO DATA
+  // =========================================================================
+  public resetToDemoSeed() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
+    const seed = generateCanonicalSeed();
+    this.beneficiaries = seed.beneficiaries;
+    this.measurements = seed.measurements;
+    this.cases = seed.cases;
+    this.rules = seed.rules;
+    this.referrals = seed.referrals;
+    this.auditLog = seed.auditLog;
+
+    this.notify();
+  }
+
+  // =========================================================================
+  // BENEFICIARY OPERATIONS WITH ROLE SCOPING
+  // =========================================================================
+  public getBeneficiaries(scope?: { role?: UserRole | null; centreCode?: string }): BeneficiaryRecord[] {
+    if (scope?.role === 'AWW') {
+      const targetCentre = scope.centreCode || 'AWC-702';
+      return this.beneficiaries.filter((b) => b.centreCode === targetCentre);
+    }
+    return [...this.beneficiaries];
+  }
+
+  public getBeneficiaryById(id: string): BeneficiaryRecord | undefined {
+    return this.beneficiaries.find((b) => b.id === id);
+  }
+
+  public addBeneficiary(
+    ben: {
+      dob: string;
+      gender: 'Male' | 'Female' | 'Other';
+      category: 'child_under_6' | 'pregnant' | 'lactating' | 'adolescent';
+      caregiverKinship?: string;
+      centreCode?: string;
+      assignedAww?: string;
+      birthWeight?: number;
+      customId?: string;
+    },
+    actorContext?: { actorId?: string; role?: UserRole | null }
+  ): { id: string; error?: string } {
+    // Validation
+    if (!ben.dob) return { id: '', error: 'Date of birth is required.' };
+
+    // Enforce role permission check
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
+      return { id: '', error: `Role ${actorContext.role} cannot register beneficiaries directly.` };
+    }
+
+    const nextBenNum = 2000 + this.beneficiaries.length;
+    let candidateId = ben.customId || `BEN-${nextBenNum}`;
+
+    // Prevent duplicate IDs
+    if (this.beneficiaries.some((b) => b.id === candidateId)) {
+      if (ben.customId) {
+        return { id: '', error: `Beneficiary ID ${candidateId} already exists in records.` };
+      }
+      candidateId = `BEN-${nextBenNum + 7}`;
+    }
+
+    const birthWeight = ben.birthWeight || 2.9;
+    const actorId = actorContext?.actorId || ben.assignedAww || 'AWW-409';
+    const centreCode = ben.centreCode || 'AWC-702';
+
+    const newRecord: BeneficiaryRecord = {
+      id: candidateId,
+      dob: ben.dob,
+      gender: ben.gender,
+      category: ben.category,
+      caregiverKinship: ben.caregiverKinship || 'Mother',
+      centreCode,
+      assignedAww: actorId,
+      birthWeight,
+      status: 'Active',
+      registrationDate: DEMO_CURRENT_DATE,
+      lastMeasurementDate: DEMO_CURRENT_DATE,
+      lastWeight: birthWeight,
+      lastHeight: 50.0,
+      hasActiveFlag: false,
+    };
+
+    this.beneficiaries.unshift(newRecord);
+
+    const baselineMeasurementId = `MEA-${1200 + this.measurements.length}`;
+
+    // Create baseline measurement entry
+    this.measurements.unshift({
+      id: baselineMeasurementId,
+      beneficiaryId: candidateId,
+      date: DEMO_CURRENT_DATE,
+      ageMonths: calculateAge(ben.dob, DEMO_CURRENT_DATE).completedMonths,
+      weightKg: birthWeight,
+      heightCm: 50.0,
+      hasEdema: false,
+      posture: 'recumbent',
+      recordedBy: actorId,
+      qualityFlags: [],
+      clinicalFlags: [],
+      isVerified: true,
+      notes: 'Initial intake baseline metric recorded at registration.',
+    });
+
+    // Create baseline casework log
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId: `REG-${candidateId.replace('BEN-', '')}`,
+      palId: candidateId,
+      actor: actorId,
+      actionType: 'Beneficiary Registration',
+      deltaSummary: `New ${ben.category} registered at ${centreCode}. Baseline weight ${birthWeight} kg recorded.`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 3571),
+      status: 'Logged',
+    });
+
+    this.notify();
+    return { id: candidateId };
+  }
+
+  // =========================================================================
+  // MEASUREMENT & SCREENING INTAKE
+  // =========================================================================
+  public getMeasurements(beneficiaryId?: string): MeasurementRecord[] {
+    if (!beneficiaryId) return [...this.measurements];
+    return this.measurements.filter((m) => m.beneficiaryId === beneficiaryId);
+  }
+
+  public recordMeasurement(
+    params: {
+      beneficiaryId: string;
+      weightKg: number;
+      heightCm: number;
+      measurementDate?: string;
+      posture?: 'recumbent' | 'standing';
+      muacCm?: number;
+      hasEdema?: boolean;
+      notes?: string;
+      actor?: string;
+    },
+    actorContext?: { actorId?: string; role?: UserRole | null }
+  ): { success: boolean; measurementId?: string; flags: string[]; caseCreated?: string; error?: string } {
+    // Check permission: CDPO and DPO cannot record measurements
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
+      return {
+        success: false,
+        flags: [],
+        error: `Role ${actorContext.role} cannot record field measurements. Restricted to AWW and Lady Supervisor.`,
+      };
+    }
+
+    const ben = this.getBeneficiaryById(params.beneficiaryId);
+    if (!ben) return { success: false, flags: [], error: 'Beneficiary not found.' };
+
+    const measurementDate = params.measurementDate === undefined ? DEMO_CURRENT_DATE : params.measurementDate;
+    const inputError = validateMeasurementInput(params.weightKg, params.heightCm, measurementDate);
+    if (inputError) return { success: false, flags: [], error: inputError };
+
+    if (this.measurements.some((m) => m.beneficiaryId === ben.id && m.date === measurementDate)) {
+      return {
+        success: false,
+        flags: [],
+        error: 'A measurement already exists for this beneficiary on that date.',
+      };
+    }
+
+    const actor = actorContext?.actorId || params.actor || ben.assignedAww || 'AWW-409';
+
+    // Retrieve previous measurement
+    const previous = this.measurements
+      .filter((m) => m.beneficiaryId === params.beneficiaryId)
+      .sort((a, b) => b.date.localeCompare(a.date))[0] || {
+      weight: ben.lastWeight || ben.birthWeight,
+      height: ben.lastHeight || 50.0,
+      date: ben.lastMeasurementDate || ben.registrationDate,
+    };
+
+    // Run screening heuristic engine with active custom rules
+    const evaluation = evaluateMeasurementEntry({
+      currentWeight: params.weightKg,
+      currentHeight: params.heightCm,
+      measurementDate,
+      dob: ben.dob,
+      previousRecord: {
+        weight: 'weightKg' in previous ? previous.weightKg : previous.weight,
+        height: 'heightCm' in previous ? previous.heightCm : previous.height,
+        date: previous.date,
+      },
+      muacCm: params.muacCm,
+      hasBilateralEdema: params.hasEdema,
+      customRules: this.rules,
+    });
+
+    if (evaluation.isImpossible) {
+      return {
+        success: false,
+        flags: evaluation.flags.map((f) => f.name),
+        error: evaluation.flags[0]?.summary || 'Biologically impossible measurement parameters.',
+      };
+    }
+
+    const age = calculateAge(ben.dob, measurementDate);
+    const measurementId = `MEA-${1200 + this.measurements.length}`;
+
+    const newMeasurement: MeasurementRecord = {
+      id: measurementId,
+      beneficiaryId: ben.id,
+      date: measurementDate,
+      ageMonths: age.completedMonths,
+      weightKg: params.weightKg,
+      heightCm: params.heightCm,
+      muacCm: params.muacCm,
+      hasEdema: !!params.hasEdema,
+      posture: params.posture || age.recommendedMeasurementPosture,
+      recordedBy: actor,
+      qualityFlags: evaluation.qualityFlags.map((f) => f.name),
+      clinicalFlags: evaluation.clinicalFlags.map((f) => f.name),
+      isVerified: evaluation.flags.length === 0,
+      notes: params.notes,
+    };
+
+    this.measurements.unshift(newMeasurement);
+
+    // Update Beneficiary Record
+    ben.lastMeasurementDate = measurementDate;
+    ben.lastWeight = params.weightKg;
+    ben.lastHeight = params.heightCm;
+    ben.hasActiveFlag = evaluation.flags.length > 0;
+
+    let caseCreatedId: string | undefined;
+
+    // If anomalous or clinical flags present, generate or update Action Queue Case
+    if (evaluation.flags.length > 0) {
+      const actionId = `ACT-${2100 + this.cases.length}`;
+      const primaryFlag = evaluation.flags[0];
+      const isUrgent = evaluation.primaryPriority === 'Urgent';
+
+      const newCase: BeneficiaryCase = {
+        id: ben.id,
+        actionId,
+        ageMonths: age.completedMonths,
+        gender: ben.gender,
+        caregiverKinship: ben.caregiverKinship,
+        centreCode: ben.centreCode,
+        assignedAww: ben.assignedAww,
+        category: primaryFlag.type === 'clinical' ? 'sam' : isUrgent ? 'urgent' : 'drift',
+        categoryLabel: primaryFlag.type === 'clinical' ? 'SAM / MAM Flag' : isUrgent ? 'Urgent Anomaly' : 'Measurement Drift',
+        concernSummary: `${primaryFlag.name} • ${primaryFlag.summary}`,
+        ruleCode: primaryFlag.code,
+        ruleName: primaryFlag.name,
+        triggerDetail: primaryFlag.triggerDetail,
+        prevWeight: (previous as any).weightKg || (previous as any).weight || 0,
+        prevHeight: (previous as any).heightCm || (previous as any).height || 0,
+        prevDate: previous.date,
+        flaggedWeight: params.weightKg,
+        flaggedHeight: params.heightCm,
+        flaggedDate: measurementDate,
+        weightDelta: `${evaluation.weightDeltaKg > 0 ? '+' : ''}${evaluation.weightDeltaKg.toFixed(2)} kg in ${evaluation.daysElapsed}d`,
+        priority: evaluation.primaryPriority,
+        priorityColor:
+          evaluation.primaryPriority === 'Urgent'
+            ? 'bg-rose-100 text-rose-800 border-rose-200'
+            : 'bg-amber-100 text-amber-800 border-amber-200',
+        dueDate: 'Within 24 Hours',
+        status: 'Pending Verification',
+        isVerified: false,
+        tierLevel: 1,
+        assignedRole: 'Frontline AWW',
+        assignedActor: ben.assignedAww,
+        escalationHistory: [
+          {
+            timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            fromTier: 1,
+            toTier: 1,
+            fromActor: 'Rule Engine',
+            toActor: ben.assignedAww,
+            reason: `Heuristic flag triggered: ${primaryFlag.name}`,
+          },
+        ],
+      };
+
+      this.cases.unshift(newCase);
+      caseCreatedId = actionId;
+
+      // Add to audit trail
+      this.auditLog.unshift({
+        id: `LED-${String(8922 + this.auditLog.length)}`,
+        timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actionId,
+        palId: ben.id,
+        actor,
+        actionType: 'Anomaly Flag Triggered',
+        deltaSummary: `Screening generated ${primaryFlag.name}: ${primaryFlag.summary}`,
+        proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 1024),
+        status: 'Logged',
+      });
+    }
+
+    this.notify();
+    return {
+      success: true,
+      measurementId,
+      flags: evaluation.flags.map((f) => f.name),
+      caseCreated: caseCreatedId,
+    };
+  }
+
+  // =========================================================================
+  // ACTION CASES & MULTI-TIER ESCALATION WITH ROLE SCOPING
+  // =========================================================================
+  public getCases(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): BeneficiaryCase[] {
+    if (scope?.role === 'AWW') {
+      const targetCentre = scope.centreCode || 'AWC-702';
+      const actor = scope.actorId || 'AWW-409';
+      return this.cases.filter((c) => c.centreCode === targetCentre || c.assignedAww === actor || c.assignedActor === actor);
+    }
+    return [...this.cases];
+  }
+
+  public getCaseById(id: string): BeneficiaryCase | undefined {
+    return this.cases.find((c) => c.id === id || c.actionId === id);
+  }
+
+  public acknowledgeCase(actionId: string, actorContext?: string | { actorId?: string; role?: UserRole | null }): boolean {
+    const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
+    if (!role || !canPerformAction(role, 'acknowledge_case')) return false;
+    const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
+    if (idx === -1) return false;
+
+    const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
+
+    this.cases[idx].status = 'Under Review';
+    this.cases[idx].acknowledgedAt = '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    this.cases[idx].acknowledgedBy = actor;
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId,
+      palId: this.cases[idx].id,
+      actor,
+      actionType: 'Case Acknowledgement',
+      deltaSummary: `Frontline worker acknowledged case and scheduled physical review visit.`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 7129),
+      status: 'Logged',
+    });
+
+    this.notify();
+    return true;
+  }
+
+  public assignCase(
+    actionId: string,
+    assignedActor: string,
+    dueDate: string,
+    actorContext?: { actorId?: string; role?: UserRole | null }
+  ): { success: boolean; error?: string } {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'assign_owner')) {
+      return { success: false, error: `Role ${actorContext.role} cannot assign owners. Restricted to Supervisor and CDPO.` };
+    }
+
+    const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
+    if (idx === -1) return { success: false, error: 'Case not found.' };
+
+    const target = this.cases[idx];
+    target.assignedActor = assignedActor;
+    target.dueDate = dueDate;
+
+    const actor = actorContext?.actorId || 'Sector Supervisor (LS-01)';
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId,
+      palId: target.id,
+      actor,
+      actionType: 'Case Owner Reassigned',
+      deltaSummary: `Assigned to ${assignedActor}. Target due date set to ${dueDate}.`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 6311),
+      status: 'Logged',
+    });
+
+    this.notify();
+    return { success: true };
+  }
+
+  public escalateCase(
+    actionId: string,
+    targetTier: 1 | 2 | 3 | 4,
+    reason: string,
+    actorContext?: string | { actorId?: string; role?: UserRole | null }
+  ): boolean {
+    const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
+    if (!role || !canPerformAction(role, 'escalate')) return false;
+    const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
+    if (idx === -1) return false;
+
+    const targetCase = this.cases[idx];
+    const tierInfo = ESCALATION_TIERS[targetTier];
+    if (!tierInfo) return false;
+
+    const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'Sector Supervisor (LS-01)';
+
+    const fromTier = targetCase.tierLevel;
+    targetCase.tierLevel = targetTier;
+    targetCase.assignedRole = tierInfo.roleName;
+    targetCase.assignedActor = tierInfo.actorName;
+    targetCase.status = 'Under Review';
+
+    if (targetTier >= 3) {
+      targetCase.priority = 'Urgent';
+      targetCase.priorityColor = 'bg-rose-100 text-rose-800 border-rose-200';
+    }
+
+    targetCase.escalationHistory.unshift({
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      fromTier,
+      toTier: targetTier,
+      fromActor: actor,
+      toActor: tierInfo.actorName,
+      reason: reason.trim() || 'Escalated following supervisory protocol triage.',
+    });
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId,
+      palId: targetCase.id,
+      actor,
+      actionType: `Escalated to Tier ${targetTier}`,
+      deltaSummary: `Transferred to ${tierInfo.roleName} (${tierInfo.actorName}). Reason: ${reason}`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 9157),
+      status: 'Escalated',
+    });
+
+    this.notify();
+    return true;
+  }
+
+  public verifyCase(
+    actionId: string,
+    verifiedWeight: number,
+    verifiedHeight: number,
+    notes: string,
+    actorContext?: string | { actorId?: string; role?: UserRole | null }
+  ): boolean {
+    if (!Number.isFinite(verifiedWeight) || verifiedWeight <= 0 || !Number.isFinite(verifiedHeight) || verifiedHeight <= 0) {
+      return false;
+    }
+    const caseIndex = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
+    if (caseIndex === -1) return false;
+
+    const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
+    if (!role || !canPerformAction(role, 're_measure')) {
+      return false;
+    }
+
+    const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
+
+    const target = this.cases[caseIndex];
+    const hashPart1 = ((actionId.length * 3721 + Math.round(verifiedWeight * 100)) % 65536).toString(16).padStart(4, '0');
+    const hashPart2 = ((Math.round(verifiedHeight * 10) + 1234) % 65536).toString(16).padStart(4, '0');
+    const verificationHash = `0x${hashPart1}...${hashPart2}`;
+
+    const updated: BeneficiaryCase = {
+      ...target,
+      isVerified: true,
+      status: 'Resolved',
+      priority: 'Resolved',
+      priorityColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      verifiedWeight,
+      verifiedHeight,
+      verifiedNotes: notes,
+      verificationHash,
+    };
+
+    this.cases[caseIndex] = updated;
+
+    // Update child profile last known weight if verified
+    const ben = this.getBeneficiaryById(target.id);
+    if (ben) {
+      ben.lastWeight = verifiedWeight;
+      ben.lastHeight = verifiedHeight;
+      ben.hasActiveFlag = false;
+    }
+
+    const newAudit: AuditLedgerEntry = {
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId: target.actionId,
+      palId: target.id,
+      actor,
+      actionType: 'Supervisory Physical Re-weigh',
+      deltaSummary: `Physical spot-check: ${verifiedWeight.toFixed(2)} kg / ${verifiedHeight.toFixed(1)} cm verified`,
+      proofHash: verificationHash,
+      status: 'Verified',
+    };
+
+    this.auditLog.unshift(newAudit);
+    this.notify();
+    return true;
+  }
+
+  // =========================================================================
+  // REFERRALS & FOLLOW-UP WORKFLOW WITH ROLE SCOPING
+  // =========================================================================
+  public getReferrals(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): ReferralRecord[] {
+    if (scope?.role === 'AWW') {
+      const targetCentre = scope.centreCode || 'AWC-702';
+      const actor = scope.actorId || 'AWW-409';
+      return this.referrals.filter((r) => {
+        if (r.owner === actor) return true;
+        const ben = this.getBeneficiaryById(r.beneficiaryId);
+        return ben?.centreCode === targetCentre;
+      });
+    }
+    return [...this.referrals];
+  }
+
+  public getReferralById(id: string): ReferralRecord | undefined {
+    return this.referrals.find((r) => r.id === id);
+  }
+
+  public createReferral(
+    data: {
+      beneficiaryId: string;
+      reason: string;
+      destination: ReferralRecord['destination'];
+      dueDate: string;
+      priority?: 'Urgent' | 'High' | 'Routine';
+      owner?: string;
+    },
+    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
+  ): { success: boolean; referralId?: string; error?: string } {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'create_referral')) {
+      return { success: false, error: `Role ${actorContext.role} cannot initiate clinical referrals.` };
+    }
+
+    const ben = this.getBeneficiaryById(data.beneficiaryId);
+    if (!ben) return { success: false, error: 'Beneficiary not found.' };
+    if (!data.reason.trim() || !data.dueDate.trim()) {
+      return { success: false, error: 'A referral reason and due date are required.' };
+    }
+    if (actorContext.role === 'AWW' && ben.centreCode !== (actorContext.centreCode || 'AWC-702')) {
+      return { success: false, error: 'AWW referral creation is limited to the worker\'s centre.' };
+    }
+    if (actorContext.role === 'AWW' && data.owner && actorContext.actorId && data.owner !== actorContext.actorId) {
+      return { success: false, error: 'AWW referrals must remain assigned to the creating worker.' };
+    }
+
+    const refId = `REF-${504 + this.referrals.length}`;
+    const age = calculateAge(ben.dob, DEMO_CURRENT_DATE);
+    const owner = actorContext.role === 'AWW'
+      ? actorContext.actorId || ben.assignedAww || 'AWW-409'
+      : data.owner || actorContext.actorId || ben.assignedAww || 'AWW-409';
+
+    const newReferral: ReferralRecord = {
+      id: refId,
+      beneficiaryId: ben.id,
+      ageDisplay: age.ageDisplay,
+      reason: data.reason.trim(),
+      destination: data.destination,
+      referralDate: DEMO_CURRENT_DATE,
+      owner,
+      dueDate: data.dueDate,
+      status: 'Pending',
+      priority: data.priority || 'Urgent',
+      followUpAttempts: [],
+    };
+
+    this.referrals.unshift(newReferral);
+    ben.status = 'Referred';
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId: refId,
+      palId: ben.id,
+      actor: owner,
+      actionType: 'Clinical Referral Dispatched',
+      deltaSummary: `Referred to ${data.destination}. Reason: ${data.reason}`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 2381),
+      status: 'Escalated',
+    });
+
+    this.notify();
+    return { success: true, referralId: refId };
+  }
+
+  public addFollowUpAttempt(
+    refId: string,
+    attempt: {
+      method: 'Home Visit' | 'Phone Call' | 'AWC Consultation';
+      findings: string;
+      actor?: string;
+    },
+    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
+  ): boolean {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'log_follow_up')) return false;
+    if (!attempt.findings.trim() || !['Home Visit', 'Phone Call', 'AWC Consultation'].includes(attempt.method)) return false;
+    const rIdx = this.referrals.findIndex((r) => r.id === refId);
+    if (rIdx === -1) return false;
+
+    const target = this.referrals[rIdx];
+    if (actorContext.role === 'AWW') {
+      const beneficiary = this.getBeneficiaryById(target.beneficiaryId);
+      const actorId = actorContext.actorId || 'AWW-409';
+      const centreCode = actorContext.centreCode || 'AWC-702';
+      if (target.owner !== actorId && beneficiary?.centreCode !== centreCode) return false;
+    }
+    const actor = actorContext.actorId || attempt.actor || 'AWW-409';
+    const newAttempt: ReferralFollowUp = {
+      id: `FU-${target.followUpAttempts.length + 1}`,
+      date: DEMO_CURRENT_DATE,
+      actor,
+      method: attempt.method,
+      findings: attempt.findings.trim(),
+    };
+
+    target.followUpAttempts.unshift(newAttempt);
+    if (target.status === 'Pending') {
+      target.status = 'Follow-up In Progress';
+    }
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId: refId,
+      palId: target.beneficiaryId,
+      actor,
+      actionType: 'Referral Follow-up Logged',
+      deltaSummary: `${attempt.method}: ${attempt.findings}`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 4423),
+      status: 'Logged',
+    });
+
+    this.notify();
+    return true;
+  }
+
+  public resolveReferral(
+    refId: string,
+    outcome: string,
+    nextSteps: string,
+    actorContext?: string | { actorId?: string; role?: UserRole | null; outcomeConfirmed?: boolean }
+  ): { success: boolean; error?: string } {
+    const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
+    if (!role || !canPerformAction(role, 'resolve_referral')) {
+      return { success: false, error: `Role ${role} cannot close referrals. Restricted to Supervisor and CDPO.` };
+    }
+    if (!outcome.trim()) {
+      return { success: false, error: 'Select a clinical outcome before closing the referral.' };
+    }
+    if (typeof actorContext !== 'object' || actorContext.outcomeConfirmed !== true) {
+      return { success: false, error: 'Confirm that the selected clinical outcome is supported by a verified record.' };
+    }
+    if (nextSteps.trim().length < 10) {
+      return { success: false, error: 'Enter meaningful next steps (at least 10 characters) before closing the referral.' };
+    }
+
+    const rIdx = this.referrals.findIndex((r) => r.id === refId);
+    if (rIdx === -1) return { success: false, error: 'Referral not found.' };
+
+    if (this.referrals[rIdx].status === 'Completed') {
+      return { success: false, error: 'Referral is already completed.' };
+    }
+
+    const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'Sector Supervisor (LS-01)';
+
+    const target = this.referrals[rIdx];
+    target.status = 'Completed';
+    target.finalOutcome = outcome.trim();
+    target.outcomeConfirmed = true;
+    target.outcomeDate = DEMO_CURRENT_DATE;
+    target.nextSteps = nextSteps.trim();
+
+    const ben = this.getBeneficiaryById(target.beneficiaryId);
+    if (ben) {
+      ben.status = 'Active';
+    }
+
+    this.auditLog.unshift({
+      id: `LED-${String(8922 + this.auditLog.length)}`,
+      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionId: refId,
+      palId: target.beneficiaryId,
+      actor,
+      actionType: 'Referral Case Resolved',
+      deltaSummary: `Closed with outcome: ${outcome}. Next: ${nextSteps}`,
+      proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 5521),
+      status: 'Verified',
+    });
+
+    this.notify();
+    return { success: true };
+  }
+
+  // =========================================================================
+  // RULE DEFINITIONS & SETTINGS WITH ROLE RESTRICTION
+  // =========================================================================
+  public getRules(): RuleDefinition[] {
+    return [...this.rules];
+  }
+
+  public toggleRule(ruleId: string, actorContext?: { actorId?: string; role?: UserRole | null }): { success: boolean; error?: string } {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'edit_rules')) {
+      return { success: false, error: 'Only CDPO role can modify demo rule settings.' };
+    }
+
+    const rIndex = this.rules.findIndex((r) => r.id === ruleId);
+    if (rIndex === -1) return { success: false, error: 'Rule not found' };
+
+    this.rules[rIndex].isActive = !this.rules[rIndex].isActive;
+    this.notify();
+    return { success: true };
+  }
+
+  public updateRuleThreshold(
+    ruleId: string,
+    newThreshold: number,
+    actorContext?: { actorId?: string; role?: UserRole | null }
+  ): { success: boolean; error?: string } {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'edit_rules')) {
+      return { success: false, error: 'Only CDPO role can modify demo rule settings.' };
+    }
+
+    const rIndex = this.rules.findIndex((r) => r.id === ruleId);
+    if (rIndex === -1) return { success: false, error: 'Rule not found' };
+
+    this.rules[rIndex].thresholdValue = newThreshold;
+    this.rules[rIndex].condition = `${this.rules[rIndex].name} threshold set to ${newThreshold.toFixed(1)} (Illustrative demo rule • Demo simulation)`;
+    this.notify();
+    return { success: true };
+  }
+
+  public createRule(
+    rule: Omit<RuleDefinition, 'id' | 'triggers30d' | 'isIllustrative'> & { triggers30d?: number; isIllustrative?: boolean },
+    actorContext?: { actorId?: string; role?: UserRole | null }
+  ): string {
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'edit_rules')) {
+      return '';
+    }
+    const id = `RUL-${String(this.rules.length + 1).padStart(2, '0')}`;
+    const newRule: RuleDefinition = {
+      id,
+      name: rule.name,
+      category: rule.category,
+      targetGroup: rule.targetGroup,
+      condition: rule.condition,
+      actionGenerated: rule.actionGenerated,
+      severity: rule.severity,
+      thresholdValue: rule.thresholdValue,
+      isActive: rule.isActive ?? true,
+      triggers30d: rule.triggers30d ?? 0,
+      isIllustrative: rule.isIllustrative ?? true,
+    };
+    this.rules.push(newRule);
+    this.notify();
+    return id;
+  }
+
+  public getAuditLog(scope?: { role?: UserRole | null }): AuditLedgerEntry[] {
+    if (scope?.role === 'AWW') {
+      return []; // AWW has no audit ledger access per matrix
+    }
+    return [...this.auditLog];
+  }
+
+  // =========================================================================
+  // DYNAMIC POPULATION & REPORTING METRICS WITH SCOPE
+  // =========================================================================
+  public getMetrics(scope?: { role?: UserRole | null; centreCode?: string }) {
+    const bens = this.getBeneficiaries(scope);
+    const cases = this.getCases(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
+    const referrals = this.getReferrals(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
+
+    const total = bens.length;
+
+    let pregnantWomen = 0;
+    let lactatingMothers = 0;
+    let children0to6m = 0;
+    let children6mTo3y = 0;
+    let children3to6y = 0;
+    let adolescentGirls = 0;
+    let staleCount = 0;
+
+    bens.forEach((b) => {
+      const age = calculateAge(b.dob, DEMO_CURRENT_DATE, b.category);
+      if (b.category === 'pregnant') pregnantWomen++;
+      else if (b.category === 'lactating') lactatingMothers++;
+      else if (b.category === 'adolescent' || age.cohort === 'adolescentGirls') adolescentGirls++;
+      else if (age.cohort === 'children0to6m') children0to6m++;
+      else if (age.cohort === 'children6mTo3y') children6mTo3y++;
+      else children3to6y++;
+
+      if (b.lastMeasurementDate) {
+        const p1 = new Date(b.lastMeasurementDate);
+        const p2 = new Date(DEMO_CURRENT_DATE);
+        const diffDays = Math.round((p2.getTime() - p1.getTime()) / (1000 * 3600 * 24));
+        if (diffDays > 35) staleCount++;
+      }
+    });
+
+    const totalChildren = children0to6m + children6mTo3y + children3to6y;
+    const totalMothers = pregnantWomen + lactatingMothers;
+
+    const urgentCases = cases.filter((c) => c.priority === 'Urgent' && !c.isVerified).length;
+    const attentionCases = cases.filter((c) => c.priority === 'Needs Attention' && !c.isVerified).length;
+    const pendingCases = cases.filter((c) => !c.isVerified).length;
+    const resolvedCases = cases.filter((c) => c.isVerified).length;
+
+    const openReferrals = referrals.filter((r) => r.status !== 'Completed').length;
+    const completedReferrals = referrals.filter((r) => r.status === 'Completed').length;
+
+    return {
+      total,
+      pregnantWomen,
+      lactatingMothers,
+      children0to6m,
+      children6mTo3y,
+      children3to6y,
+      adolescentGirls,
+      totalChildren,
+      totalMothers,
+      staleCount,
+      urgentCases,
+      attentionCases,
+      pendingCases,
+      resolvedCases,
+      openReferrals,
+      completedReferrals,
+      subtext: `${totalChildren} children • ${totalMothers} mothers • ${adolescentGirls} adolescent girls`,
+    };
+  }
+}
+
+export const mockStore = new MockStore();
+
+// Export legacy static POPULATION_METRICS compatibility helper
+export const POPULATION_METRICS = {
+  get total() {
+    return mockStore.getMetrics().total;
+  },
+  get pregnantWomen() {
+    return mockStore.getMetrics().pregnantWomen;
+  },
+  get lactatingMothers() {
+    return mockStore.getMetrics().lactatingMothers;
+  },
+  get children0to6m() {
+    return mockStore.getMetrics().children0to6m;
+  },
+  get children6mTo3y() {
+    return mockStore.getMetrics().children6mTo3y;
+  },
+  get children3to6y() {
+    return mockStore.getMetrics().children3to6y;
+  },
+  get adolescentGirls() {
+    return mockStore.getMetrics().adolescentGirls;
+  },
+  get totalChildren() {
+    return mockStore.getMetrics().totalChildren;
+  },
+  get totalMothers() {
+    return mockStore.getMetrics().totalMothers;
+  },
+  get subtext() {
+    return mockStore.getMetrics().subtext;
+  },
+};
