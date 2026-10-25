@@ -1,34 +1,37 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Frontend demo
 
-# Run and deploy your AI Studio app
+Standalone React/TypeScript application built with Vite. It contains a public landing/dashboard experience and simulated staff workflows for beneficiaries, measurements, action queues, referrals, rule settings, reports, and staff profiles. The records come from `src/store/mockStore.ts` and browser localStorage; this app does not call the Python modules in `B1`, `B2`, or `member3_data_simulation`.
 
-This contains everything you need to run your app locally.
+## Requirements and setup
 
-View your app in AI Studio: https://ai.studio/apps/2ad5b51f-a8b2-4716-9cba-e8fdd238cd89
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-
-## Poshan Action Layer in this repository
-
-From the repository root, start the frontend with:
+Install a current Node.js LTS release and npm, then from this directory run:
 
 ```powershell
-cd frontend
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-The legacy peer flag is needed with the current manifest because Vite 8's optional esbuild peer range conflicts with the declared esbuild 0.25 range. The frontend is a standalone React/Vite app. Its sign-in is simulated, and workflow data is synthetic in-memory/localStorage demo data. It does not connect to the Python modules in `B1`, `B2`, or `member3_data_simulation`, and does not provide authenticated backend persistence.
+Vite reports the local address; the manifest sets port `3000`. The peer-dependency flag is needed for the current dependency declarations. No environment file or API key is used by the implemented frontend. The Gemini/Express dependencies and inherited AI Studio text are not evidence of an implemented Gemini integration or server.
 
-Validate with `npm test` and `npm run build` from this directory.
+## Useful commands
+
+```powershell
+npm test
+npm run lint
+npm run build
+npm run preview
+```
+
+`test` runs the Node built-in test runner against `src/utils/casework.test.ts`; `lint` runs `tsc --noEmit`; `build` creates a Vite production bundle in `dist`; `preview` serves that bundle locally. `clean` currently uses a Unix `rm` command and is not a Windows PowerShell setup command.
+
+## Structure
+
+- `src/App.tsx`: routes and page composition.
+- `src/pages/`: route-level screens.
+- `src/components/`: shared landing and portal UI.
+- `src/context/`: simulated staff session and toast state.
+- `src/store/mockStore.ts`: synthetic seed records, actions, and browser persistence.
+- `src/utils/`: local casework calculations/validation and role navigation rules.
+- `public/`: static illustrations and media.
+
+Route guards and role selection are client-side demo behavior, not authentication or security enforcement. Some screen actions update mock local state only. There is no API contract, backend persistence, frontend integration test, or shared live dataset with B1/B2. Clear the app's localStorage demo keys/reset through the UI if you need a fresh browser fixture.
