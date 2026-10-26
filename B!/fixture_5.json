@@ -1,0 +1,249 @@
+{
+ "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
+ "centres": [
+  {
+   "centre_id": "AWC-001",
+   "name": "Anganwadi Centre 001",
+   "block": "Block-1",
+   "district": "District-A",
+   "state": "Synthetic State",
+   "worker_id": "WRK-001",
+   "synthetic_flag": "SYNTHETIC"
+  }
+ ],
+ "beneficiaries": [
+  {
+   "beneficiary_id": "BEN-9001",
+   "centre_id": "AWC-001",
+   "category": "child",
+   "name": "Fixture Child One",
+   "sex": "F",
+   "date_of_birth": "2025-08-01",
+   "enrolment_date": "2026-08-01",
+   "guardian_name": "Fixture Guardian",
+   "mobile_verification_status": "verified",
+   "possible_duplicate_of": null,
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "beneficiary_id": "BEN-9002",
+   "centre_id": "AWC-001",
+   "category": "child",
+   "name": "Fixture Child Two",
+   "sex": "F",
+   "date_of_birth": "2025-06-15",
+   "enrolment_date": "2026-08-01",
+   "guardian_name": "Fixture Guardian",
+   "mobile_verification_status": "pending",
+   "possible_duplicate_of": null,
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "beneficiary_id": "BEN-9003",
+   "centre_id": "AWC-001",
+   "category": "pregnant_woman",
+   "name": "Fixture Mother Three",
+   "sex": "F",
+   "date_of_birth": "1999-03-10",
+   "enrolment_date": "2026-08-01",
+   "guardian_name": null,
+   "mobile_verification_status": "verified",
+   "possible_duplicate_of": null,
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "beneficiary_id": "BEN-9004",
+   "centre_id": "AWC-001",
+   "category": "child",
+   "name": "Fixture Child Four",
+   "sex": "F",
+   "date_of_birth": "2024-12-05",
+   "enrolment_date": "2026-08-01",
+   "guardian_name": "Fixture Guardian",
+   "mobile_verification_status": "verified",
+   "possible_duplicate_of": null,
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "beneficiary_id": "BEN-9005",
+   "centre_id": "AWC-001",
+   "category": "child",
+   "name": "Fixture Child Four",
+   "sex": "F",
+   "date_of_birth": "2024-12-05",
+   "enrolment_date": "2026-09-10",
+   "guardian_name": "Fixture Guardian",
+   "mobile_verification_status": "verified",
+   "possible_duplicate_of": "BEN-9004",
+   "synthetic_flag": "SYNTHETIC"
+  }
+ ],
+ "measurements": [
+  {
+   "measurement_id": "MEA-F0001",
+   "beneficiary_id": "BEN-9001",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-08-12",
+   "recorded_by": "WRK-001",
+   "weight_value": 8.0,
+   "weight_unit": "kg",
+   "height_value": 70.0,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 1,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0002",
+   "beneficiary_id": "BEN-9001",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-09-12",
+   "recorded_by": "WRK-001",
+   "weight_value": 8.2,
+   "weight_unit": "kg",
+   "height_value": 71.2,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 0,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0003",
+   "beneficiary_id": "BEN-9001",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-10-10",
+   "recorded_by": "WRK-001",
+   "weight_value": 12.9,
+   "weight_unit": "kg",
+   "height_value": 72.3,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 0,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0004",
+   "beneficiary_id": "BEN-9001",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-10-14",
+   "recorded_by": "WRK-001",
+   "weight_value": 8.6,
+   "weight_unit": "kg",
+   "height_value": 72.4,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 0,
+   "supersedes_id": "MEA-F0003",
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0005",
+   "beneficiary_id": "BEN-9002",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-10-05",
+   "recorded_by": "WRK-001",
+   "weight_value": 8.9,
+   "weight_unit": "kg",
+   "height_value": 69.8,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 1,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0006",
+   "beneficiary_id": "BEN-9004",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-08-10",
+   "recorded_by": "WRK-001",
+   "weight_value": 10.1,
+   "weight_unit": "kg",
+   "height_value": 76.0,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 1,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0007",
+   "beneficiary_id": "BEN-9004",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-09-09",
+   "recorded_by": "WRK-001",
+   "weight_value": 10.4,
+   "weight_unit": "kg",
+   "height_value": 76.9,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 0,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  },
+  {
+   "measurement_id": "MEA-F0008",
+   "beneficiary_id": "BEN-9004",
+   "centre_id": "AWC-001",
+   "measured_on": "2026-10-08",
+   "recorded_by": "WRK-001",
+   "weight_value": 10.6,
+   "weight_unit": "kg",
+   "height_value": 77.7,
+   "height_unit": "cm",
+   "muac_cm": 14.0,
+   "is_baseline": 0,
+   "supersedes_id": null,
+   "entry_source": "mobile",
+   "synthetic_flag": "SYNTHETIC"
+  }
+ ],
+ "verification_records": [
+  {
+   "verification_id": "VER-F0001",
+   "beneficiary_id": "BEN-9002",
+   "centre_id": "AWC-001",
+   "barrier_type": "pending_mobile_auth",
+   "status": "open",
+   "opened_on": "2026-10-01",
+   "resolved_on": null,
+   "resolution_note": null,
+   "synthetic_flag": "SYNTHETIC"
+  }
+ ],
+ "maternal_profiles": [
+  {
+   "maternal_id": "MAT-F0001",
+   "beneficiary_id": "BEN-9003",
+   "centre_id": "AWC-001",
+   "stage": "trimester_2",
+   "registered_on": "2026-08-20",
+   "last_visit_on": "2026-10-12",
+   "next_visit_due_on": "2026-11-11",
+   "access_level": "restricted",
+   "synthetic_flag": "SYNTHETIC"
+  }
+ ],
+ "expected_flags": [
+  {
+   "dataset": "measurements",
+   "record_id": "MEA-F0003",
+   "rule_id": "UNUSUAL_CHANGE"
+  },
+  {
+   "dataset": "beneficiaries",
+   "record_id": "BEN-9005",
+   "rule_id": "DUPLICATE"
+  }
+ ]
+}
