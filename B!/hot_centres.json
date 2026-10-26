@@ -1,0 +1,20 @@
+{
+ "note": "centres with planted error rate ~4x higher; evaluation only",
+ "centres": [
+  "AWC-009",
+  "AWC-020",
+  "AWC-022",
+  "AWC-027",
+  "AWC-030",
+  "AWC-044",
+  "AWC-056",
+  "AWC-059",
+  "AWC-067",
+  "AWC-076",
+  "AWC-077",
+  "AWC-080",
+  "AWC-087",
+  "AWC-091",
+  "AWC-104"
+ ]
+}
