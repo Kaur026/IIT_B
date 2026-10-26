@@ -1,6 +1,0 @@
-child_id,sex,age_months,measurement_date,weight_kg,height_cm,muac_mm,oedema,measurement_valid,referral_status,assigned_worker_id,task_status,enrolled,enrolment_date,last_visit_date,referral_date,danger_sign,weight_prev1_kg,weight_prev2_kg
-T0001,M,10,2026-10-14,6.5,70.0,112,no,True,none,W01,new,no,,,,no,,
-T0002,F,20,2026-10-12,8.21,80.0,124,no,True,none,W01,new,no,,,,no,,
-T0003,M,36,2026-10-10,14.29,95.0,152,no,True,none,W02,new,no,,,,no,,
-T0004,F,18,2026-10-13,9.28,78.0,,yes,True,none,W02,new,no,,,,no,,
-T0005,M,15,2026-10-14,84.0,76.0,140,no,False,none,W03,new,no,,,,no,,
