@@ -1,0 +1,6346 @@
+{
+ "AWC-001": {
+  "centre_id": "AWC-001",
+  "readings": 65,
+  "flagged": 1,
+  "flag_rate": 0.0154,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-002": {
+  "centre_id": "AWC-002",
+  "readings": 103,
+  "flagged": 5,
+  "flag_rate": 0.0485,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 27,
+    "flagged": 2,
+    "flag_rate": 0.0741,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 24,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-003": {
+  "centre_id": "AWC-003",
+  "readings": 86,
+  "flagged": 3,
+  "flag_rate": 0.0349,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-004": {
+  "centre_id": "AWC-004",
+  "readings": 88,
+  "flagged": 3,
+  "flag_rate": 0.0341,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 2,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-005": {
+  "centre_id": "AWC-005",
+  "readings": 75,
+  "flagged": 2,
+  "flag_rate": 0.0267,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-006": {
+  "centre_id": "AWC-006",
+  "readings": 65,
+  "flagged": 2,
+  "flag_rate": 0.0308,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-007": {
+  "centre_id": "AWC-007",
+  "readings": 65,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-008": {
+  "centre_id": "AWC-008",
+  "readings": 53,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-009": {
+  "centre_id": "AWC-009",
+  "readings": 86,
+  "flagged": 9,
+  "flag_rate": 0.1047,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 2,
+    "flag_rate": 0.1,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 5,
+    "flag_rate": 0.25,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-010": {
+  "centre_id": "AWC-010",
+  "readings": 87,
+  "flagged": 3,
+  "flag_rate": 0.0345,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-011": {
+  "centre_id": "AWC-011",
+  "readings": 82,
+  "flagged": 2,
+  "flag_rate": 0.0244,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-012": {
+  "centre_id": "AWC-012",
+  "readings": 74,
+  "flagged": 2,
+  "flag_rate": 0.027,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-013": {
+  "centre_id": "AWC-013",
+  "readings": 67,
+  "flagged": 2,
+  "flag_rate": 0.0299,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-014": {
+  "centre_id": "AWC-014",
+  "readings": 83,
+  "flagged": 3,
+  "flag_rate": 0.0361,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 2,
+    "flag_rate": 0.1053,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-015": {
+  "centre_id": "AWC-015",
+  "readings": 66,
+  "flagged": 2,
+  "flag_rate": 0.0303,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-016": {
+  "centre_id": "AWC-016",
+  "readings": 84,
+  "flagged": 3,
+  "flag_rate": 0.0357,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 2,
+    "flag_rate": 0.0952,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-017": {
+  "centre_id": "AWC-017",
+  "readings": 74,
+  "flagged": 3,
+  "flag_rate": 0.0405,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-018": {
+  "centre_id": "AWC-018",
+  "readings": 66,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-019": {
+  "centre_id": "AWC-019",
+  "readings": 99,
+  "flagged": 3,
+  "flag_rate": 0.0303,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-020": {
+  "centre_id": "AWC-020",
+  "readings": 105,
+  "flagged": 6,
+  "flag_rate": 0.0571,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 24,
+    "flagged": 2,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 25,
+    "flagged": 2,
+    "flag_rate": 0.08,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-021": {
+  "centre_id": "AWC-021",
+  "readings": 82,
+  "flagged": 2,
+  "flag_rate": 0.0244,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-022": {
+  "centre_id": "AWC-022",
+  "readings": 89,
+  "flagged": 9,
+  "flag_rate": 0.1011,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 3,
+    "flag_rate": 0.1579,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 3,
+    "flag_rate": 0.1429,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-023": {
+  "centre_id": "AWC-023",
+  "readings": 78,
+  "flagged": 2,
+  "flag_rate": 0.0256,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-024": {
+  "centre_id": "AWC-024",
+  "readings": 57,
+  "flagged": 2,
+  "flag_rate": 0.0351,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-025": {
+  "centre_id": "AWC-025",
+  "readings": 73,
+  "flagged": 4,
+  "flag_rate": 0.0548,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 3,
+    "flag_rate": 0.1765,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-026": {
+  "centre_id": "AWC-026",
+  "readings": 93,
+  "flagged": 4,
+  "flag_rate": 0.043,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 2,
+    "flag_rate": 0.087,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-027": {
+  "centre_id": "AWC-027",
+  "readings": 59,
+  "flagged": 4,
+  "flag_rate": 0.0678,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 12,
+    "flagged": 2,
+    "flag_rate": 0.1667,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-028": {
+  "centre_id": "AWC-028",
+  "readings": 68,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-029": {
+  "centre_id": "AWC-029",
+  "readings": 82,
+  "flagged": 1,
+  "flag_rate": 0.0122,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-030": {
+  "centre_id": "AWC-030",
+  "readings": 82,
+  "flagged": 3,
+  "flag_rate": 0.0366,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-031": {
+  "centre_id": "AWC-031",
+  "readings": 60,
+  "flagged": 2,
+  "flag_rate": 0.0333,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 1,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-032": {
+  "centre_id": "AWC-032",
+  "readings": 93,
+  "flagged": 1,
+  "flag_rate": 0.0108,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 27,
+    "flagged": 1,
+    "flag_rate": 0.037,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-033": {
+  "centre_id": "AWC-033",
+  "readings": 87,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-034": {
+  "centre_id": "AWC-034",
+  "readings": 53,
+  "flagged": 2,
+  "flag_rate": 0.0377,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 12,
+    "flagged": 1,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-035": {
+  "centre_id": "AWC-035",
+  "readings": 88,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-036": {
+  "centre_id": "AWC-036",
+  "readings": 109,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 26,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 26,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-037": {
+  "centre_id": "AWC-037",
+  "readings": 71,
+  "flagged": 2,
+  "flag_rate": 0.0282,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 1,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-038": {
+  "centre_id": "AWC-038",
+  "readings": 57,
+  "flagged": 2,
+  "flag_rate": 0.0351,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-039": {
+  "centre_id": "AWC-039",
+  "readings": 89,
+  "flagged": 2,
+  "flag_rate": 0.0225,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-040": {
+  "centre_id": "AWC-040",
+  "readings": 92,
+  "flagged": 2,
+  "flag_rate": 0.0217,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-041": {
+  "centre_id": "AWC-041",
+  "readings": 62,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-042": {
+  "centre_id": "AWC-042",
+  "readings": 91,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-043": {
+  "centre_id": "AWC-043",
+  "readings": 49,
+  "flagged": 1,
+  "flag_rate": 0.0204,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-044": {
+  "centre_id": "AWC-044",
+  "readings": 75,
+  "flagged": 6,
+  "flag_rate": 0.08,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 2,
+    "flag_rate": 0.1053,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 2,
+    "flag_rate": 0.1333,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-045": {
+  "centre_id": "AWC-045",
+  "readings": 87,
+  "flagged": 1,
+  "flag_rate": 0.0115,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-046": {
+  "centre_id": "AWC-046",
+  "readings": 104,
+  "flagged": 4,
+  "flag_rate": 0.0385,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 24,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 25,
+    "flagged": 4,
+    "flag_rate": 0.16,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-047": {
+  "centre_id": "AWC-047",
+  "readings": 77,
+  "flagged": 2,
+  "flag_rate": 0.026,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 1,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-048": {
+  "centre_id": "AWC-048",
+  "readings": 77,
+  "flagged": 3,
+  "flag_rate": 0.039,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-049": {
+  "centre_id": "AWC-049",
+  "readings": 71,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-050": {
+  "centre_id": "AWC-050",
+  "readings": 74,
+  "flagged": 3,
+  "flag_rate": 0.0405,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 2,
+    "flag_rate": 0.1176,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-051": {
+  "centre_id": "AWC-051",
+  "readings": 108,
+  "flagged": 6,
+  "flag_rate": 0.0556,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 27,
+    "flagged": 2,
+    "flag_rate": 0.0741,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 27,
+    "flagged": 2,
+    "flag_rate": 0.0741,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-052": {
+  "centre_id": "AWC-052",
+  "readings": 81,
+  "flagged": 2,
+  "flag_rate": 0.0247,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-053": {
+  "centre_id": "AWC-053",
+  "readings": 88,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-054": {
+  "centre_id": "AWC-054",
+  "readings": 93,
+  "flagged": 2,
+  "flag_rate": 0.0215,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 23,
+    "flagged": 1,
+    "flag_rate": 0.0435,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-055": {
+  "centre_id": "AWC-055",
+  "readings": 64,
+  "flagged": 2,
+  "flag_rate": 0.0312,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-056": {
+  "centre_id": "AWC-056",
+  "readings": 79,
+  "flagged": 8,
+  "flag_rate": 0.1013,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 2,
+    "flag_rate": 0.1667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 3,
+    "flag_rate": 0.1667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 2,
+    "flag_rate": 0.1111,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-057": {
+  "centre_id": "AWC-057",
+  "readings": 62,
+  "flagged": 2,
+  "flag_rate": 0.0323,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 1,
+    "flag_rate": 0.1,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-058": {
+  "centre_id": "AWC-058",
+  "readings": 78,
+  "flagged": 3,
+  "flag_rate": 0.0385,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-059": {
+  "centre_id": "AWC-059",
+  "readings": 86,
+  "flagged": 14,
+  "flag_rate": 0.1628,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 2,
+    "flag_rate": 0.2,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 2,
+    "flag_rate": 0.1,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 2,
+    "flag_rate": 0.1111,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 7,
+    "flag_rate": 0.3182,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-060": {
+  "centre_id": "AWC-060",
+  "readings": 74,
+  "flagged": 1,
+  "flag_rate": 0.0135,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-061": {
+  "centre_id": "AWC-061",
+  "readings": 66,
+  "flagged": 2,
+  "flag_rate": 0.0303,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 2,
+    "flag_rate": 0.1667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-062": {
+  "centre_id": "AWC-062",
+  "readings": 85,
+  "flagged": 1,
+  "flag_rate": 0.0118,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-063": {
+  "centre_id": "AWC-063",
+  "readings": 94,
+  "flagged": 5,
+  "flag_rate": 0.0532,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 23,
+    "flagged": 1,
+    "flag_rate": 0.0435,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 4,
+    "flag_rate": 0.1905,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-064": {
+  "centre_id": "AWC-064",
+  "readings": 79,
+  "flagged": 2,
+  "flag_rate": 0.0253,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-065": {
+  "centre_id": "AWC-065",
+  "readings": 65,
+  "flagged": 3,
+  "flag_rate": 0.0462,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-066": {
+  "centre_id": "AWC-066",
+  "readings": 100,
+  "flagged": 2,
+  "flag_rate": 0.02,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 25,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 24,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 25,
+    "flagged": 1,
+    "flag_rate": 0.04,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-067": {
+  "centre_id": "AWC-067",
+  "readings": 91,
+  "flagged": 8,
+  "flag_rate": 0.0879,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 2,
+    "flag_rate": 0.0952,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 4,
+    "flag_rate": 0.1905,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-068": {
+  "centre_id": "AWC-068",
+  "readings": 52,
+  "flagged": 1,
+  "flag_rate": 0.0192,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 11,
+    "flagged": 1,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-069": {
+  "centre_id": "AWC-069",
+  "readings": 88,
+  "flagged": 1,
+  "flag_rate": 0.0114,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-070": {
+  "centre_id": "AWC-070",
+  "readings": 92,
+  "flagged": 1,
+  "flag_rate": 0.0109,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 24,
+    "flagged": 1,
+    "flag_rate": 0.0417,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-071": {
+  "centre_id": "AWC-071",
+  "readings": 93,
+  "flagged": 4,
+  "flag_rate": 0.043,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 25,
+    "flagged": 2,
+    "flag_rate": 0.08,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 2,
+    "flag_rate": 0.0952,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-072": {
+  "centre_id": "AWC-072",
+  "readings": 103,
+  "flagged": 6,
+  "flag_rate": 0.0583,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 2,
+    "flag_rate": 0.087,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 4,
+    "flag_rate": 0.1818,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-073": {
+  "centre_id": "AWC-073",
+  "readings": 56,
+  "flagged": 2,
+  "flag_rate": 0.0357,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 12,
+    "flagged": 1,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-074": {
+  "centre_id": "AWC-074",
+  "readings": 71,
+  "flagged": 2,
+  "flag_rate": 0.0282,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-075": {
+  "centre_id": "AWC-075",
+  "readings": 85,
+  "flagged": 2,
+  "flag_rate": 0.0235,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 2,
+    "flag_rate": 0.1053,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-076": {
+  "centre_id": "AWC-076",
+  "readings": 76,
+  "flagged": 5,
+  "flag_rate": 0.0658,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 2,
+    "flag_rate": 0.125,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-077": {
+  "centre_id": "AWC-077",
+  "readings": 105,
+  "flagged": 2,
+  "flag_rate": 0.019,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 26,
+    "flagged": 2,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 26,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-078": {
+  "centre_id": "AWC-078",
+  "readings": 110,
+  "flagged": 1,
+  "flag_rate": 0.0091,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 28,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 27,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 27,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-079": {
+  "centre_id": "AWC-079",
+  "readings": 57,
+  "flagged": 1,
+  "flag_rate": 0.0175,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-080": {
+  "centre_id": "AWC-080",
+  "readings": 38,
+  "flagged": 3,
+  "flag_rate": 0.0789,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 5,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-09",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-10",
+    "readings": 9,
+    "flagged": 2,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   }
+  ]
+ },
+ "AWC-081": {
+  "centre_id": "AWC-081",
+  "readings": 80,
+  "flagged": 1,
+  "flag_rate": 0.0125,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-082": {
+  "centre_id": "AWC-082",
+  "readings": 66,
+  "flagged": 1,
+  "flag_rate": 0.0152,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-083": {
+  "centre_id": "AWC-083",
+  "readings": 87,
+  "flagged": 2,
+  "flag_rate": 0.023,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 1,
+    "flag_rate": 0.0476,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-084": {
+  "centre_id": "AWC-084",
+  "readings": 72,
+  "flagged": 2,
+  "flag_rate": 0.0278,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 1,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-085": {
+  "centre_id": "AWC-085",
+  "readings": 62,
+  "flagged": 1,
+  "flag_rate": 0.0161,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 8,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 8 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-086": {
+  "centre_id": "AWC-086",
+  "readings": 84,
+  "flagged": 2,
+  "flag_rate": 0.0238,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-087": {
+  "centre_id": "AWC-087",
+  "readings": 78,
+  "flagged": 7,
+  "flag_rate": 0.0897,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 2,
+    "flag_rate": 0.1053,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 3,
+    "flag_rate": 0.15,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 21,
+    "flagged": 2,
+    "flag_rate": 0.0952,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-088": {
+  "centre_id": "AWC-088",
+  "readings": 107,
+  "flagged": 5,
+  "flag_rate": 0.0467,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 27,
+    "flagged": 1,
+    "flag_rate": 0.037,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 24,
+    "flagged": 2,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-089": {
+  "centre_id": "AWC-089",
+  "readings": 71,
+  "flagged": 2,
+  "flag_rate": 0.0282,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 1,
+    "flag_rate": 0.0556,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-090": {
+  "centre_id": "AWC-090",
+  "readings": 70,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-091": {
+  "centre_id": "AWC-091",
+  "readings": 80,
+  "flagged": 9,
+  "flag_rate": 0.1125,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 2,
+    "flag_rate": 0.1,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 5,
+    "flag_rate": 0.2632,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-092": {
+  "centre_id": "AWC-092",
+  "readings": 66,
+  "flagged": 2,
+  "flag_rate": 0.0303,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 11,
+    "flagged": 1,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-093": {
+  "centre_id": "AWC-093",
+  "readings": 82,
+  "flagged": 2,
+  "flag_rate": 0.0244,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 2,
+    "flag_rate": 0.0952,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-094": {
+  "centre_id": "AWC-094",
+  "readings": 111,
+  "flagged": 2,
+  "flag_rate": 0.018,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 29,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 29,
+    "flagged": 1,
+    "flag_rate": 0.0345,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 27,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-095": {
+  "centre_id": "AWC-095",
+  "readings": 76,
+  "flagged": 3,
+  "flag_rate": 0.0395,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 19,
+    "flagged": 2,
+    "flag_rate": 0.1053,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-096": {
+  "centre_id": "AWC-096",
+  "readings": 67,
+  "flagged": 2,
+  "flag_rate": 0.0299,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 2,
+    "flag_rate": 0.125,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-097": {
+  "centre_id": "AWC-097",
+  "readings": 97,
+  "flagged": 2,
+  "flag_rate": 0.0206,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-098": {
+  "centre_id": "AWC-098",
+  "readings": 58,
+  "flagged": 1,
+  "flag_rate": 0.0172,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 1,
+    "flag_rate": 0.0769,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-099": {
+  "centre_id": "AWC-099",
+  "readings": 64,
+  "flagged": 2,
+  "flag_rate": 0.0312,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 1,
+    "flag_rate": 0.0588,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-100": {
+  "centre_id": "AWC-100",
+  "readings": 89,
+  "flagged": 2,
+  "flag_rate": 0.0225,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 22,
+    "flagged": 2,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-101": {
+  "centre_id": "AWC-101",
+  "readings": 87,
+  "flagged": 1,
+  "flag_rate": 0.0115,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 1,
+    "flag_rate": 0.0526,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-102": {
+  "centre_id": "AWC-102",
+  "readings": 72,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-103": {
+  "centre_id": "AWC-103",
+  "readings": 94,
+  "flagged": 1,
+  "flag_rate": 0.0106,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-104": {
+  "centre_id": "AWC-104",
+  "readings": 62,
+  "flagged": 3,
+  "flag_rate": 0.0484,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 2,
+    "flag_rate": 0.1111,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-105": {
+  "centre_id": "AWC-105",
+  "readings": 57,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-106": {
+  "centre_id": "AWC-106",
+  "readings": 113,
+  "flagged": 1,
+  "flag_rate": 0.0088,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 26,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 25,
+    "flagged": 1,
+    "flag_rate": 0.04,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 24,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-107": {
+  "centre_id": "AWC-107",
+  "readings": 66,
+  "flagged": 3,
+  "flag_rate": 0.0455,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-108": {
+  "centre_id": "AWC-108",
+  "readings": 110,
+  "flagged": 2,
+  "flag_rate": 0.0182,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 5,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 5 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 25,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 26,
+    "flagged": 1,
+    "flag_rate": 0.0385,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-109": {
+  "centre_id": "AWC-109",
+  "readings": 103,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 25,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-110": {
+  "centre_id": "AWC-110",
+  "readings": 71,
+  "flagged": 4,
+  "flag_rate": 0.0563,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 2,
+    "flag_rate": 0.125,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-111": {
+  "centre_id": "AWC-111",
+  "readings": 109,
+  "flagged": 5,
+  "flag_rate": 0.0459,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 30,
+    "flagged": 1,
+    "flag_rate": 0.0333,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 24,
+    "flagged": 2,
+    "flag_rate": 0.0833,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 23,
+    "flagged": 1,
+    "flag_rate": 0.0435,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-112": {
+  "centre_id": "AWC-112",
+  "readings": 59,
+  "flagged": 1,
+  "flag_rate": 0.0169,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-113": {
+  "centre_id": "AWC-113",
+  "readings": 57,
+  "flagged": 2,
+  "flag_rate": 0.0351,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-08",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-114": {
+  "centre_id": "AWC-114",
+  "readings": 78,
+  "flagged": 0,
+  "flag_rate": 0.0,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 1,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 1 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 6,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 6 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 20,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-115": {
+  "centre_id": "AWC-115",
+  "readings": 74,
+  "flagged": 2,
+  "flag_rate": 0.027,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 16,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-116": {
+  "centre_id": "AWC-116",
+  "readings": 93,
+  "flagged": 2,
+  "flag_rate": 0.0215,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 3,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 3 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 15,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 23,
+    "flagged": 1,
+    "flag_rate": 0.0435,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 20,
+    "flagged": 1,
+    "flag_rate": 0.05,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-117": {
+  "centre_id": "AWC-117",
+  "readings": 55,
+  "flagged": 2,
+  "flag_rate": 0.0364,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 7,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 7 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 10,
+    "flagged": 1,
+    "flag_rate": 0.1,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 12,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 11,
+    "flagged": 1,
+    "flag_rate": 0.0909,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-118": {
+  "centre_id": "AWC-118",
+  "readings": 67,
+  "flagged": 3,
+  "flag_rate": 0.0448,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 9,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 9 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 17,
+    "flagged": 2,
+    "flag_rate": 0.1176,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 13,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 15,
+    "flagged": 1,
+    "flag_rate": 0.0667,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-119": {
+  "centre_id": "AWC-119",
+  "readings": 77,
+  "flagged": 2,
+  "flag_rate": 0.026,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 1,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 16,
+    "flagged": 1,
+    "flag_rate": 0.0625,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 21,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-120": {
+  "centre_id": "AWC-120",
+  "readings": 73,
+  "flagged": 3,
+  "flag_rate": 0.0411,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 4,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 4 < 10"
+   },
+   {
+    "month": "2026-07",
+    "readings": 14,
+    "flagged": 1,
+    "flag_rate": 0.0714,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 18,
+    "flagged": 2,
+    "flag_rate": 0.1111,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 18,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 17,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-121": {
+  "centre_id": "AWC-121",
+  "readings": 121,
+  "flagged": 1,
+  "flag_rate": 0.0083,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 0,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 0 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 10,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 25,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 31,
+    "flagged": 1,
+    "flag_rate": 0.0323,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 26,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 29,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   }
+  ]
+ },
+ "AWC-122": {
+  "centre_id": "AWC-122",
+  "readings": 99,
+  "flagged": 1,
+  "flag_rate": 0.0101,
+  "sample_note": null,
+  "denominator": "original readings in window",
+  "monthly": [
+   {
+    "month": "2026-05",
+    "readings": 2,
+    "flagged": 0,
+    "flag_rate": null,
+    "sample_note": "sample 2 < 10"
+   },
+   {
+    "month": "2026-06",
+    "readings": 11,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-07",
+    "readings": 19,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-08",
+    "readings": 22,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-09",
+    "readings": 23,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "sample_note": null
+   },
+   {
+    "month": "2026-10",
+    "readings": 22,
+    "flagged": 1,
+    "flag_rate": 0.0455,
+    "sample_note": null
+   }
+  ]
+ }
+}

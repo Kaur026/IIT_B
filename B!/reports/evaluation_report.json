@@ -1,0 +1,172 @@
+{
+ "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
+ "caveat": "Synthetic-prototype findings only. These numbers describe how the rules behave on planted synthetic errors, not real-world accuracy.",
+ "config_version": "1.0.0",
+ "reporting_date": "2026-10-24",
+ "flag_quality": {
+  "flags_raised": 356,
+  "planted_errors": 340,
+  "true_positives": 340,
+  "false_positives": 16,
+  "missed_errors": 0,
+  "precision": 0.9551,
+  "recall": 1.0,
+  "false_positives_documented_benign": 15,
+  "false_positives_unexplained": 1,
+  "by_rule": {
+   "DUPLICATE": {
+    "planted": 65,
+    "found": 65,
+    "missed": 0,
+    "false_positives": 0,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "FUTURE_DATE": {
+    "planted": 30,
+    "found": 30,
+    "missed": 0,
+    "false_positives": 0,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "GROWTH_TREND_DATA_CHECK": {
+    "planted": 25,
+    "found": 25,
+    "missed": 0,
+    "false_positives": 1,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 1,
+    "precision": 0.9615,
+    "recall": 1.0
+   },
+   "IMPLAUSIBLE_VALUE": {
+    "planted": 40,
+    "found": 40,
+    "missed": 0,
+    "false_positives": 0,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "MISSING_FIELD": {
+    "planted": 60,
+    "found": 60,
+    "missed": 0,
+    "false_positives": 0,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "UNIT_MISMATCH": {
+    "planted": 60,
+    "found": 60,
+    "missed": 0,
+    "false_positives": 0,
+    "false_positives_documented_benign": 0,
+    "false_positives_unexplained": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "UNUSUAL_CHANGE": {
+    "planted": 60,
+    "found": 60,
+    "missed": 0,
+    "false_positives": 15,
+    "false_positives_documented_benign": 15,
+    "false_positives_unexplained": 0,
+    "precision": 0.8,
+    "recall": 1.0
+   }
+  },
+  "missed_sample": [],
+  "unexplained_false_positive_sample": [
+   [
+    "measurements",
+    "MEA-003608",
+    "GROWTH_TREND_DATA_CHECK"
+   ]
+  ]
+ },
+ "review_time": {
+  "reviews_total": 246,
+  "reviews_completed": 229,
+  "reviews_pending": 17,
+  "mean_days_flag_to_review": 5.36,
+  "median_days_flag_to_review": 5,
+  "share_reviewed_within_7_days": 0.821,
+  "decisions": {
+   "confirmed_error": 157,
+   "needs_remeasure": 32,
+   "valid_reading": 40
+  }
+ },
+ "followup_completion": {
+  "tasks_total": 152,
+  "tasks_due_by_reporting_date": 136,
+  "task_followup_completion": 0.4706,
+  "task_status": {
+   "in_progress": 41,
+   "closed": 70,
+   "assigned": 24,
+   "acknowledged": 17
+  },
+  "referrals_total": 85,
+  "referral_states": {
+   "sent": 21,
+   "acknowledged": 28,
+   "attended": 12,
+   "outcome_recorded": 24
+  },
+  "referral_loop_completion": 0.2824,
+  "referrals_overdue": 18,
+  "access_exceptions_open": 484,
+  "access_exceptions_total": 773
+ },
+ "audit_completeness": {
+  "tasks_checked": 152,
+  "tasks_with_audit_gap": 4,
+  "audit_completeness": 0.9737,
+  "planted_gaps": 4,
+  "planted_gaps_found": 4,
+  "unexpected_gaps": []
+ },
+ "centre_ranking": {
+  "hot_centres_planted": 15,
+  "hot_in_top_n_by_flag_rate": 12,
+  "note": "Shows whether the flag rate surfaces centres that were seeded with more errors."
+ },
+ "fixture_check": {
+  "expected": [
+   [
+    "beneficiaries",
+    "BEN-9005",
+    "DUPLICATE"
+   ],
+   [
+    "measurements",
+    "MEA-F0003",
+    "UNUSUAL_CHANGE"
+   ]
+  ],
+  "got": [
+   [
+    "beneficiaries",
+    "BEN-9005",
+    "DUPLICATE"
+   ],
+   [
+    "measurements",
+    "MEA-F0003",
+    "UNUSUAL_CHANGE"
+   ]
+  ],
+  "match": true
+ }
+}
