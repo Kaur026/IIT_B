@@ -1,0 +1,14 @@
+{
+  "approved": false,
+  "version": "DRAFT-ONLY-REQUIRES-SUPERVISOR-AND-TEAM-REVIEW",
+  "case_types": {
+    "default": {
+      "confirmations": [
+        {"key": "worker_completion", "role": "worker"},
+        {"key": "supervisor_review", "role": "supervisor"}
+      ],
+      "outcome_required": true
+    }
+  },
+  "warning": "This is a synthetic example only. The two roles/actions and case-type mapping must be confirmed by the supervisor/team before the approved flag is changed for a demo. Never use this file as production policy."
+}

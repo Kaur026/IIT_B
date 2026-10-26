@@ -12,3 +12,9 @@ build/
 .env.*
 !.env.example
 npm-debug.log*
+
+# BE2 local synthetic prototype databases and offline queue
+*.sqlite
+*.db
+B2/.offline_queue.json
+B2/.offline/
