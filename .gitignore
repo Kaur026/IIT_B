@@ -1,14 +1,5 @@
 .venv/
 __pycache__/
-*.py[cod]
-.pytest_cache/
 .vscode/
-
-node_modules/
-dist/
-build/
-*.tsbuildinfo
-.env
-.env.*
-!.env.example
-npm-debug.log*
+*.sqlite
+*.db
