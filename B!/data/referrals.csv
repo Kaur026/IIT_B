@@ -1,0 +1,86 @@
+referral_id,beneficiary_id,centre_id,referral_type,state,sent_on,acknowledged_on,attended_on,outcome_on,outcome_note,due_on,synthetic_flag
+REF-9001,BEN-0499,AWC-010,disability_deic,sent,2026-10-18,,,,,2026-11-01,SYNTHETIC
+REF-9002,BEN-1071,AWC-021,disability_deic,acknowledged,2026-10-04,2026-10-06,,,,2026-10-18,SYNTHETIC
+REF-9003,BEN-1701,AWC-013,disability_deic,attended,2026-09-24,2026-09-26,2026-10-01,,,2026-10-08,SYNTHETIC
+REF-9004,BEN-0881,AWC-109,disability_deic,outcome_recorded,2026-09-09,2026-09-11,2026-09-16,2026-09-19,Outcome recorded (synthetic),2026-09-23,SYNTHETIC
+REF-9005,BEN-0130,AWC-078,disability_deic,sent,2026-09-14,,,,,2026-09-28,SYNTHETIC
+REF-0001,BEN-2513,AWC-115,health_facility,attended,2026-09-13,2026-09-15,2026-09-20,,,2026-09-27,SYNTHETIC
+REF-0002,BEN-2776,AWC-053,disability_deic,acknowledged,2026-08-27,2026-08-29,,,,2026-09-10,SYNTHETIC
+REF-0003,BEN-2108,AWC-118,disability_deic,outcome_recorded,2026-09-22,2026-09-24,2026-09-29,2026-10-02,Outcome recorded (synthetic),2026-10-06,SYNTHETIC
+REF-0004,BEN-0608,AWC-049,disability_deic,acknowledged,2026-10-21,2026-10-23,,,,2026-11-04,SYNTHETIC
+REF-0005,BEN-2774,AWC-104,disability_deic,outcome_recorded,2026-10-04,2026-10-06,2026-10-11,2026-10-14,Outcome recorded (synthetic),2026-10-18,SYNTHETIC
+REF-0006,BEN-2688,AWC-047,disability_deic,sent,2026-08-12,,,,,2026-08-26,SYNTHETIC
+REF-0007,BEN-2380,AWC-059,disability_deic,sent,2026-08-11,,,,,2026-08-25,SYNTHETIC
+REF-0008,BEN-2541,AWC-003,disability_deic,acknowledged,2026-08-05,2026-08-07,,,,2026-08-19,SYNTHETIC
+REF-0009,BEN-0616,AWC-068,health_facility,sent,2026-08-05,,,,,2026-08-19,SYNTHETIC
+REF-0010,BEN-2203,AWC-095,health_facility,acknowledged,2026-10-02,2026-10-04,,,,2026-10-16,SYNTHETIC
+REF-0011,BEN-1705,AWC-089,health_facility,acknowledged,2026-09-29,2026-10-01,,,,2026-10-13,SYNTHETIC
+REF-0012,BEN-1367,AWC-100,health_facility,outcome_recorded,2026-08-24,2026-08-26,2026-08-31,2026-09-03,Outcome recorded (synthetic),2026-09-07,SYNTHETIC
+REF-0013,BEN-2605,AWC-060,disability_deic,outcome_recorded,2026-09-08,2026-09-10,2026-09-15,2026-09-18,Outcome recorded (synthetic),2026-09-22,SYNTHETIC
+REF-0014,BEN-0587,AWC-100,disability_deic,outcome_recorded,2026-07-31,2026-08-02,2026-08-07,2026-08-10,Outcome recorded (synthetic),2026-08-14,SYNTHETIC
+REF-0015,BEN-2206,AWC-046,disability_deic,outcome_recorded,2026-10-07,2026-10-09,2026-10-14,2026-10-17,Outcome recorded (synthetic),2026-10-21,SYNTHETIC
+REF-0016,BEN-2762,AWC-011,health_facility,attended,2026-10-10,2026-10-12,2026-10-17,,,2026-10-24,SYNTHETIC
+REF-0017,BEN-2866,AWC-119,disability_deic,sent,2026-09-22,,,,,2026-10-06,SYNTHETIC
+REF-0018,BEN-1220,AWC-040,health_facility,sent,2026-07-28,,,,,2026-08-11,SYNTHETIC
+REF-0019,BEN-2045,AWC-028,health_facility,sent,2026-09-29,,,,,2026-10-13,SYNTHETIC
+REF-0020,BEN-0997,AWC-057,health_facility,sent,2026-08-13,,,,,2026-08-27,SYNTHETIC
+REF-0021,BEN-0253,AWC-020,health_facility,attended,2026-09-21,2026-09-23,2026-09-28,,,2026-10-05,SYNTHETIC
+REF-0022,BEN-2184,AWC-077,health_facility,acknowledged,2026-09-05,2026-09-07,,,,2026-09-19,SYNTHETIC
+REF-0023,BEN-0684,AWC-073,disability_deic,outcome_recorded,2026-09-06,2026-09-08,2026-09-13,2026-09-16,Outcome recorded (synthetic),2026-09-20,SYNTHETIC
+REF-0024,BEN-1397,AWC-040,health_facility,outcome_recorded,2026-08-07,2026-08-09,2026-08-14,2026-08-17,Outcome recorded (synthetic),2026-08-21,SYNTHETIC
+REF-0025,BEN-1101,AWC-109,disability_deic,outcome_recorded,2026-09-10,2026-09-12,2026-09-17,2026-09-20,Outcome recorded (synthetic),2026-09-24,SYNTHETIC
+REF-0026,BEN-2875,AWC-050,disability_deic,sent,2026-10-16,,,,,2026-10-30,SYNTHETIC
+REF-0027,BEN-0737,AWC-002,disability_deic,attended,2026-09-10,2026-09-12,2026-09-17,,,2026-09-24,SYNTHETIC
+REF-0028,BEN-2968,AWC-002,health_facility,sent,2026-08-19,,,,,2026-09-02,SYNTHETIC
+REF-0029,BEN-0123,AWC-056,health_facility,sent,2026-09-12,,,,,2026-09-26,SYNTHETIC
+REF-0030,BEN-0604,AWC-033,health_facility,acknowledged,2026-09-22,2026-09-24,,,,2026-10-06,SYNTHETIC
+REF-0031,BEN-0767,AWC-089,disability_deic,acknowledged,2026-08-06,2026-08-08,,,,2026-08-20,SYNTHETIC
+REF-0032,BEN-2210,AWC-042,health_facility,acknowledged,2026-08-27,2026-08-29,,,,2026-09-10,SYNTHETIC
+REF-0033,BEN-1173,AWC-093,health_facility,sent,2026-09-17,,,,,2026-10-01,SYNTHETIC
+REF-0034,BEN-2398,AWC-063,health_facility,acknowledged,2026-08-05,2026-08-07,,,,2026-08-19,SYNTHETIC
+REF-0035,BEN-0653,AWC-048,disability_deic,acknowledged,2026-08-06,2026-08-08,,,,2026-08-20,SYNTHETIC
+REF-0036,BEN-0832,AWC-062,health_facility,acknowledged,2026-07-31,2026-08-02,,,,2026-08-14,SYNTHETIC
+REF-0037,BEN-2763,AWC-098,health_facility,acknowledged,2026-08-23,2026-08-25,,,,2026-09-06,SYNTHETIC
+REF-0038,BEN-2318,AWC-054,health_facility,acknowledged,2026-10-18,2026-10-20,,,,2026-11-01,SYNTHETIC
+REF-0039,BEN-0478,AWC-098,disability_deic,sent,2026-08-01,,,,,2026-08-15,SYNTHETIC
+REF-0040,BEN-1210,AWC-109,health_facility,sent,2026-09-12,,,,,2026-09-26,SYNTHETIC
+REF-0041,BEN-2553,AWC-035,disability_deic,outcome_recorded,2026-08-30,2026-09-01,2026-09-06,2026-09-09,Outcome recorded (synthetic),2026-09-13,SYNTHETIC
+REF-0042,BEN-1319,AWC-026,health_facility,outcome_recorded,2026-08-16,2026-08-18,2026-08-23,2026-08-26,Outcome recorded (synthetic),2026-08-30,SYNTHETIC
+REF-0043,BEN-0134,AWC-057,health_facility,attended,2026-09-24,2026-09-26,2026-10-01,,,2026-10-08,SYNTHETIC
+REF-0044,BEN-2317,AWC-036,disability_deic,acknowledged,2026-07-31,2026-08-02,,,,2026-08-14,SYNTHETIC
+REF-0045,BEN-1136,AWC-058,disability_deic,acknowledged,2026-08-12,2026-08-14,,,,2026-08-26,SYNTHETIC
+REF-0046,BEN-1821,AWC-010,health_facility,sent,2026-09-24,,,,,2026-10-08,SYNTHETIC
+REF-0047,BEN-1606,AWC-013,health_facility,acknowledged,2026-09-01,2026-09-03,,,,2026-09-15,SYNTHETIC
+REF-0048,BEN-0734,AWC-028,health_facility,outcome_recorded,2026-10-06,2026-10-08,2026-10-13,2026-10-16,Outcome recorded (synthetic),2026-10-20,SYNTHETIC
+REF-0049,BEN-1789,AWC-074,disability_deic,attended,2026-09-04,2026-09-06,2026-09-11,,,2026-09-18,SYNTHETIC
+REF-0050,BEN-0511,AWC-016,disability_deic,outcome_recorded,2026-10-02,2026-10-04,2026-10-09,2026-10-12,Outcome recorded (synthetic),2026-10-16,SYNTHETIC
+REF-0051,BEN-0599,AWC-088,disability_deic,acknowledged,2026-09-15,2026-09-17,,,,2026-09-29,SYNTHETIC
+REF-0052,BEN-0185,AWC-077,disability_deic,attended,2026-08-13,2026-08-15,2026-08-20,,,2026-08-27,SYNTHETIC
+REF-0053,BEN-1987,AWC-030,health_facility,acknowledged,2026-10-04,2026-10-06,,,,2026-10-18,SYNTHETIC
+REF-0054,BEN-2469,AWC-052,health_facility,outcome_recorded,2026-09-22,2026-09-24,2026-09-29,2026-10-02,Outcome recorded (synthetic),2026-10-06,SYNTHETIC
+REF-0055,BEN-2639,AWC-103,health_facility,acknowledged,2026-09-23,2026-09-25,,,,2026-10-07,SYNTHETIC
+REF-0056,BEN-1046,AWC-099,disability_deic,sent,2026-09-09,,,,,2026-09-23,SYNTHETIC
+REF-0057,BEN-1574,AWC-021,disability_deic,acknowledged,2026-09-11,2026-09-13,,,,2026-09-25,SYNTHETIC
+REF-0058,BEN-0542,AWC-009,health_facility,outcome_recorded,2026-10-08,2026-10-10,2026-10-15,2026-10-18,Outcome recorded (synthetic),2026-10-22,SYNTHETIC
+REF-0059,BEN-0744,AWC-011,health_facility,outcome_recorded,2026-09-16,2026-09-18,2026-09-23,2026-09-26,Outcome recorded (synthetic),2026-09-30,SYNTHETIC
+REF-0060,BEN-2280,AWC-118,disability_deic,outcome_recorded,2026-09-14,2026-09-16,2026-09-21,2026-09-24,Outcome recorded (synthetic),2026-09-28,SYNTHETIC
+REF-0061,BEN-0305,AWC-085,disability_deic,outcome_recorded,2026-10-14,2026-10-16,2026-10-21,2026-10-24,Outcome recorded (synthetic),2026-10-28,SYNTHETIC
+REF-0062,BEN-0865,AWC-089,disability_deic,acknowledged,2026-08-30,2026-09-01,,,,2026-09-13,SYNTHETIC
+REF-0063,BEN-0990,AWC-007,disability_deic,outcome_recorded,2026-07-29,2026-07-31,2026-08-05,2026-08-08,Outcome recorded (synthetic),2026-08-12,SYNTHETIC
+REF-0064,BEN-2409,AWC-003,health_facility,attended,2026-09-14,2026-09-16,2026-09-21,,,2026-09-28,SYNTHETIC
+REF-0065,BEN-2424,AWC-095,disability_deic,acknowledged,2026-08-03,2026-08-05,,,,2026-08-17,SYNTHETIC
+REF-0066,BEN-0955,AWC-084,health_facility,acknowledged,2026-08-05,2026-08-07,,,,2026-08-19,SYNTHETIC
+REF-0067,BEN-0657,AWC-016,health_facility,outcome_recorded,2026-07-29,2026-07-31,2026-08-05,2026-08-08,Outcome recorded (synthetic),2026-08-12,SYNTHETIC
+REF-0068,BEN-1554,AWC-050,health_facility,acknowledged,2026-10-02,2026-10-04,,,,2026-10-16,SYNTHETIC
+REF-0069,BEN-0886,AWC-066,disability_deic,attended,2026-08-11,2026-08-13,2026-08-18,,,2026-08-25,SYNTHETIC
+REF-0070,BEN-2526,AWC-104,disability_deic,sent,2026-09-24,,,,,2026-10-08,SYNTHETIC
+REF-0071,BEN-2124,AWC-026,health_facility,acknowledged,2026-08-01,2026-08-03,,,,2026-08-15,SYNTHETIC
+REF-0072,BEN-2785,AWC-019,disability_deic,attended,2026-08-28,2026-08-30,2026-09-04,,,2026-09-11,SYNTHETIC
+REF-0073,BEN-1729,AWC-094,health_facility,sent,2026-08-11,,,,,2026-08-25,SYNTHETIC
+REF-0074,BEN-2333,AWC-017,disability_deic,outcome_recorded,2026-10-10,2026-10-12,2026-10-17,2026-10-20,Outcome recorded (synthetic),2026-10-24,SYNTHETIC
+REF-0075,BEN-0377,AWC-015,disability_deic,acknowledged,2026-09-30,2026-10-02,,,,2026-10-14,SYNTHETIC
+REF-0076,BEN-2432,AWC-030,health_facility,outcome_recorded,2026-10-21,2026-10-23,2026-10-28,2026-10-31,Outcome recorded (synthetic),2026-11-04,SYNTHETIC
+REF-0077,BEN-1412,AWC-067,disability_deic,outcome_recorded,2026-10-05,2026-10-07,2026-10-12,2026-10-15,Outcome recorded (synthetic),2026-10-19,SYNTHETIC
+REF-0078,BEN-0791,AWC-109,health_facility,sent,2026-10-14,,,,,2026-10-28,SYNTHETIC
+REF-0079,BEN-0312,AWC-084,health_facility,attended,2026-09-05,2026-09-07,2026-09-12,,,2026-09-19,SYNTHETIC
+REF-0080,BEN-1996,AWC-101,disability_deic,sent,2026-10-07,,,,,2026-10-21,SYNTHETIC
