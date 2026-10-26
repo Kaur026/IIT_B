@@ -1,0 +1,59 @@
+{
+  "config_version": "1.0.0",
+  "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
+  "reporting_date": "2026-10-24",
+  "note": "Single source of truth for thresholds. No screen or other module may hard-code these values. 'approved' = approved for data-quality flagging in this synthetic prototype by BE1 (pending supervisor confirmation). 'draft' = disabled or demo-only until verified.",
+  "rules": {
+    "MISSING_FIELD": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "A required measurement field is empty.",
+      "params": {"required_fields": ["weight_value", "weight_unit", "height_value", "height_unit", "measured_on"]}
+    },
+    "UNIT_MISMATCH": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Unit is not the expected unit, or the value looks like it is in another unit.",
+      "params": {"expected_weight_unit": "kg", "expected_height_unit": "cm", "weight_looks_like_grams_above": 100, "height_looks_like_metres_below": 3}
+    },
+    "FUTURE_DATE": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Measurement date is after the reporting date.",
+      "params": {}
+    },
+    "DUPLICATE": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Same beneficiary has more than one original reading on the same date, or beneficiary is flagged as a possible duplicate.",
+      "params": {}
+    },
+    "IMPLAUSIBLE_VALUE": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Value is outside the physically plausible range for a child under 6 (data-quality check, not a growth judgement).",
+      "params": {"weight_kg_min": 1.5, "weight_kg_max": 30, "height_cm_min": 35, "height_cm_max": 130, "muac_cm_min": 5, "muac_cm_max": 25}
+    },
+    "UNUSUAL_CHANGE": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Change since the previous original reading is larger than a plausible monthly change.",
+      "params": {"max_weight_gain_kg_per_month": 1.5, "max_weight_loss_pct": 10, "height_decrease_tolerance_cm": 0.5, "max_height_gain_cm_per_month": 4, "min_gap_days": 7}
+    },
+    "GROWTH_TREND_DATA_CHECK": {
+      "version": "1.0", "status": "approved", "enabled": true,
+      "description": "Data-quality check on the dated series: repeated flat weights or a series that moves against the expected direction. Not a growth interpretation.",
+      "params": {"flat_weight_run_length": 4, "min_points": 3}
+    },
+    "GROWTH_INTERPRETATION": {
+      "version": "0.1", "status": "draft", "enabled": false,
+      "description": "Growth classification against reference standards. Disabled until standards and thresholds are verified. No diagnosis.",
+      "params": {}
+    },
+    "AGE_TRANSITION": {
+      "version": "0.1", "status": "draft", "enabled": false, "demo_only": true,
+      "description": "Reminders for children moving between age bands. Disabled/demo-only until age bands and service names are verified.",
+      "params": {"reminder_lead_days": 30}
+    },
+    "DISABILITY_40_PERCENT": {
+      "version": "0.0", "status": "draft", "enabled": false,
+      "description": "Disability threshold rule. OFF. No eligibility decisions.",
+      "params": {}
+    }
+  },
+  "unverified_items": ["age_bands", "meaning_of_SCM", "ration_dates", "disability_40_percent_threshold"]
+}
