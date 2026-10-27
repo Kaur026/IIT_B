@@ -67,7 +67,7 @@ const mapMeasurementRows = (beneficiaryId: string): MeasurementRow[] =>
         weight: measurement.weightKg,
         height: measurement.heightCm,
         muac: measurement.muacCm,
-        waz: 'Not recorded',
+        waz: 'Z-score not calculated in this prototype',
         flag: hasFlag ? (measurement.qualityFlags[0] || measurement.clinicalFlags[0] || 'Flagged') : null,
         recordedBy: measurement.recordedBy,
         verified: measurement.isVerified,
@@ -618,9 +618,8 @@ export const ChildProfilePage: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as any)}
-              className={`relative px-4 py-2 text-xs font-semibold rounded-full transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] ${
-                isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900 bg-white/70'
-              }`}
+              className={`relative px-4 py-2 text-xs font-semibold rounded-full transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900 bg-white/70'
+                }`}
             >
               {isActive && (
                 <motion.div
@@ -813,7 +812,7 @@ export const ChildProfilePage: React.FC = () => {
                       {r.flag ? <span className="text-amber-800 font-medium">{r.flag}</span> : 'No recorded flag'}
                     </td>
                     <td className="py-3.5 px-5 text-right">
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full border ${r.verified ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full border ${r.verified ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
                         {r.verified ? <><CheckCircle2 className="w-3 h-3" />Verified</> : 'Not verified'}
                       </span>
                     </td>

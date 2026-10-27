@@ -189,70 +189,63 @@ export interface PortalNavItem {
 
 /**
  * Generates navigation tabs driven by role permissions.
- * Replaces hardcoded pills with role-authorized screens.
+ * Each role sees only the pages relevant to their ICDS responsibilities.
+ * No "View Only" labels — access control is enforced at the route guard level.
  */
 export function getNavItemsForRole(role: UserRole | null | undefined): PortalNavItem[] {
   if (!role) {
-    // Public demo visitor: aggregate-only dashboard
+    // Public demo visitor: overview dashboard only
     return [
       { id: 'dashboard', name: 'Overview', href: '/dashboard' },
     ];
   }
 
-  const items: PortalNavItem[] = [
+  // --- AWW: Anganwadi Worker (Centre-scope frontline) ---
+  if (role === 'AWW') {
+    return [
+      { id: 'dashboard', name: 'Briefing', href: '/dashboard' },
+      { id: 'beneficiaries', name: 'Beneficiaries', href: '/beneficiaries', scopeBadge: 'Own Centre' },
+      { id: 'measurements', name: 'Measurement Entry', href: '/measurements' },
+      { id: 'queue', name: 'My Cases', href: '/queue', scopeBadge: 'Own Centre' },
+    ];
+  }
+
+  // --- LS: Lady Supervisor (Sector-scope operational) ---
+  if (role === 'LS') {
+    return [
+      { id: 'dashboard', name: 'Briefing', href: '/dashboard' },
+      { id: 'beneficiaries', name: 'Beneficiaries', href: '/beneficiaries', scopeBadge: 'Sector' },
+      { id: 'queue', name: 'Case Queue', href: '/queue' },
+      { id: 'referrals', name: 'Referrals', href: '/referrals' },
+      { id: 'reports', name: 'Audit Reports', href: '/reports' },
+    ];
+  }
+
+  // --- CDPO: Block-level Officer (aggregate-first, can edit rules) ---
+  if (role === 'CDPO') {
+    return [
+      { id: 'dashboard', name: 'Briefing', href: '/dashboard' },
+      { id: 'beneficiaries', name: 'Centre View', href: '/beneficiaries', scopeBadge: 'Project' },
+      { id: 'queue', name: 'Case Queue', href: '/queue' },
+      { id: 'referrals', name: 'Referrals', href: '/referrals' },
+      { id: 'reports', name: 'Audit Reports', href: '/reports' },
+      { id: 'rules', name: 'Rule Settings', href: '/rules' },
+    ];
+  }
+
+  // --- DPO: District Programme Officer (read-only aggregate) ---
+  if (role === 'DPO') {
+    return [
+      { id: 'dashboard', name: 'Briefing', href: '/dashboard' },
+      { id: 'beneficiaries', name: 'District View', href: '/beneficiaries', scopeBadge: 'Read Only' },
+      { id: 'reports', name: 'Audit Reports', href: '/reports' },
+    ];
+  }
+
+  // Fallback (should not be reached)
+  return [
     { id: 'dashboard', name: 'Briefing', href: '/dashboard' },
-    {
-      id: 'beneficiaries',
-      name: 'Beneficiaries',
-      href: '/beneficiaries',
-      scopeBadge: role === 'AWW' ? 'Own Centre' : role === 'LS' ? 'Sector' : role === 'CDPO' ? 'Project' : 'District View',
-    },
-    {
-      id: 'queue',
-      name: 'Case Queue',
-      href: '/queue',
-      scopeBadge: role === 'AWW' ? 'Own Centre' : role === 'DPO' ? 'View Only' : 'All Cases',
-    },
   ];
-
-  // Measurement intake & spot check: AWW and LS only
-  if (role === 'AWW' || role === 'LS') {
-    items.push({
-      id: 'measurements',
-      name: 'Screening Intake',
-      href: '/measurements',
-    });
-  }
-
-  // Clinical Referrals: All staff roles have access
-  items.push({
-    id: 'referrals',
-    name: 'Referrals',
-    href: '/referrals',
-    scopeBadge: role === 'AWW' ? 'Own Cases' : role === 'DPO' ? 'View Only' : 'All',
-  });
-
-  // Audit trail / Reports: LS, CDPO, DPO only (AWW forbidden to protect audit ledger)
-  if (role === 'LS' || role === 'CDPO' || role === 'DPO') {
-    items.push({
-      id: 'reports',
-      name: 'Audit Reports',
-      href: '/reports',
-      scopeBadge: role === 'DPO' ? 'View Only' : undefined,
-    });
-  }
-
-  // Rule settings: LS (view), CDPO (edit demo), DPO (view). Forbidden for AWW.
-  if (role === 'LS' || role === 'CDPO' || role === 'DPO') {
-    items.push({
-      id: 'rules',
-      name: 'Rule Settings',
-      href: '/rules',
-      scopeBadge: role === 'CDPO' ? 'Edit Rules' : 'View Only',
-    });
-  }
-
-  return items;
 }
 
 /**
