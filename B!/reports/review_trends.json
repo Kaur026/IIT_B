@@ -1,0 +1,3638 @@
+{
+ "AWC-001": {
+  "centre_id": "AWC-001",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-002": {
+  "centre_id": "AWC-002",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-003": {
+  "centre_id": "AWC-003",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-004": {
+  "centre_id": "AWC-004",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-005": {
+  "centre_id": "AWC-005",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   }
+  ]
+ },
+ "AWC-006": {
+  "centre_id": "AWC-006",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-009": {
+  "centre_id": "AWC-009",
+  "pending_reviews": 2,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 2,
+    "median_days_to_review": 12.0
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 5.5
+   }
+  ]
+ },
+ "AWC-010": {
+  "centre_id": "AWC-010",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-012": {
+  "centre_id": "AWC-012",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-013": {
+  "centre_id": "AWC-013",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-014": {
+  "centre_id": "AWC-014",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-015": {
+  "centre_id": "AWC-015",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-016": {
+  "centre_id": "AWC-016",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   }
+  ]
+ },
+ "AWC-017": {
+  "centre_id": "AWC-017",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   }
+  ]
+ },
+ "AWC-019": {
+  "centre_id": "AWC-019",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-020": {
+  "centre_id": "AWC-020",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 10
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 10.0
+   }
+  ]
+ },
+ "AWC-021": {
+  "centre_id": "AWC-021",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-022": {
+  "centre_id": "AWC-022",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 9
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 4,
+    "median_days_to_review": 6.5
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 11
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 9
+   }
+  ]
+ },
+ "AWC-023": {
+  "centre_id": "AWC-023",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   }
+  ]
+ },
+ "AWC-025": {
+  "centre_id": "AWC-025",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 4,
+    "median_days_to_review": 5.5
+   }
+  ]
+ },
+ "AWC-026": {
+  "centre_id": "AWC-026",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 2,
+    "median_days_to_review": 1.0
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-027": {
+  "centre_id": "AWC-027",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 12
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 10.0
+   }
+  ]
+ },
+ "AWC-029": {
+  "centre_id": "AWC-029",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-030": {
+  "centre_id": "AWC-030",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 14
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-031": {
+  "centre_id": "AWC-031",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-032": {
+  "centre_id": "AWC-032",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-034": {
+  "centre_id": "AWC-034",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   }
+  ]
+ },
+ "AWC-037": {
+  "centre_id": "AWC-037",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   }
+  ]
+ },
+ "AWC-038": {
+  "centre_id": "AWC-038",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-039": {
+  "centre_id": "AWC-039",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-040": {
+  "centre_id": "AWC-040",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-043": {
+  "centre_id": "AWC-043",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-044": {
+  "centre_id": "AWC-044",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 8
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 10
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 3,
+    "median_days_to_review": 6
+   }
+  ]
+ },
+ "AWC-045": {
+  "centre_id": "AWC-045",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-046": {
+  "centre_id": "AWC-046",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-047": {
+  "centre_id": "AWC-047",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   }
+  ]
+ },
+ "AWC-048": {
+  "centre_id": "AWC-048",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   }
+  ]
+ },
+ "AWC-050": {
+  "centre_id": "AWC-050",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 5.5
+   }
+  ]
+ },
+ "AWC-051": {
+  "centre_id": "AWC-051",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 5.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-052": {
+  "centre_id": "AWC-052",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   }
+  ]
+ },
+ "AWC-054": {
+  "centre_id": "AWC-054",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-055": {
+  "centre_id": "AWC-055",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   }
+  ]
+ },
+ "AWC-056": {
+  "centre_id": "AWC-056",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 13
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 3,
+    "median_days_to_review": 11
+   }
+  ]
+ },
+ "AWC-057": {
+  "centre_id": "AWC-057",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 2,
+    "median_days_to_review": 6.0
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-058": {
+  "centre_id": "AWC-058",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-059": {
+  "centre_id": "AWC-059",
+  "pending_reviews": 2,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 4,
+    "median_days_to_review": 5.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 4,
+    "median_days_to_review": 7.5
+   }
+  ]
+ },
+ "AWC-061": {
+  "centre_id": "AWC-061",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-062": {
+  "centre_id": "AWC-062",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-063": {
+  "centre_id": "AWC-063",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 3,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-064": {
+  "centre_id": "AWC-064",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-065": {
+  "centre_id": "AWC-065",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   }
+  ]
+ },
+ "AWC-066": {
+  "centre_id": "AWC-066",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   }
+  ]
+ },
+ "AWC-067": {
+  "centre_id": "AWC-067",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 3,
+    "median_days_to_review": 12
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 10.0
+   }
+  ]
+ },
+ "AWC-068": {
+  "centre_id": "AWC-068",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-069": {
+  "centre_id": "AWC-069",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-071": {
+  "centre_id": "AWC-071",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-072": {
+  "centre_id": "AWC-072",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.0
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 4,
+    "median_days_to_review": 6.0
+   }
+  ]
+ },
+ "AWC-073": {
+  "centre_id": "AWC-073",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   }
+  ]
+ },
+ "AWC-074": {
+  "centre_id": "AWC-074",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-075": {
+  "centre_id": "AWC-075",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   }
+  ]
+ },
+ "AWC-076": {
+  "centre_id": "AWC-076",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 7.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 11
+   }
+  ]
+ },
+ "AWC-077": {
+  "centre_id": "AWC-077",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 14
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 3,
+    "median_days_to_review": 12
+   }
+  ]
+ },
+ "AWC-078": {
+  "centre_id": "AWC-078",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-079": {
+  "centre_id": "AWC-079",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-080": {
+  "centre_id": "AWC-080",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 10
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 9
+   }
+  ]
+ },
+ "AWC-081": {
+  "centre_id": "AWC-081",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.0
+   }
+  ]
+ },
+ "AWC-082": {
+  "centre_id": "AWC-082",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-083": {
+  "centre_id": "AWC-083",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.0
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-084": {
+  "centre_id": "AWC-084",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-086": {
+  "centre_id": "AWC-086",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-087": {
+  "centre_id": "AWC-087",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 10.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-088": {
+  "centre_id": "AWC-088",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 6.5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-089": {
+  "centre_id": "AWC-089",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.0
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-090": {
+  "centre_id": "AWC-090",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   }
+  ]
+ },
+ "AWC-091": {
+  "centre_id": "AWC-091",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 9
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 7.0
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 4,
+    "median_days_to_review": 5.0
+   }
+  ]
+ },
+ "AWC-092": {
+  "centre_id": "AWC-092",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   }
+  ]
+ },
+ "AWC-093": {
+  "centre_id": "AWC-093",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-094": {
+  "centre_id": "AWC-094",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-095": {
+  "centre_id": "AWC-095",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 2,
+    "median_days_to_review": 4.0
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-096": {
+  "centre_id": "AWC-096",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   }
+  ]
+ },
+ "AWC-097": {
+  "centre_id": "AWC-097",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-098": {
+  "centre_id": "AWC-098",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   }
+  ]
+ },
+ "AWC-099": {
+  "centre_id": "AWC-099",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 2,
+    "median_days_to_review": 4.0
+   }
+  ]
+ },
+ "AWC-100": {
+  "centre_id": "AWC-100",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-101": {
+  "centre_id": "AWC-101",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-103": {
+  "centre_id": "AWC-103",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-104": {
+  "centre_id": "AWC-104",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 12
+   }
+  ]
+ },
+ "AWC-106": {
+  "centre_id": "AWC-106",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-107": {
+  "centre_id": "AWC-107",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-108": {
+  "centre_id": "AWC-108",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-110": {
+  "centre_id": "AWC-110",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 2,
+    "median_days_to_review": 2.5
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   }
+  ]
+ },
+ "AWC-111": {
+  "centre_id": "AWC-111",
+  "pending_reviews": 1,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 1
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-113": {
+  "centre_id": "AWC-113",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-115": {
+  "centre_id": "AWC-115",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   }
+  ]
+ },
+ "AWC-116": {
+  "centre_id": "AWC-116",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   }
+  ]
+ },
+ "AWC-117": {
+  "centre_id": "AWC-117",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 2
+   }
+  ]
+ },
+ "AWC-118": {
+  "centre_id": "AWC-118",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 6
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 1,
+    "median_days_to_review": 5
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-119": {
+  "centre_id": "AWC-119",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 2,
+    "median_days_to_review": 3.0
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 4
+   }
+  ]
+ },
+ "AWC-120": {
+  "centre_id": "AWC-120",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   }
+  ]
+ },
+ "AWC-121": {
+  "centre_id": "AWC-121",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 3
+   }
+  ]
+ },
+ "AWC-122": {
+  "centre_id": "AWC-122",
+  "pending_reviews": 0,
+  "monthly": [
+   {
+    "month": "2026-05",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-06",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-07",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-08",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-09",
+    "reviews_completed": 0,
+    "median_days_to_review": null
+   },
+   {
+    "month": "2026-10",
+    "reviews_completed": 1,
+    "median_days_to_review": 7
+   }
+  ]
+ }
+}

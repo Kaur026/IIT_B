@@ -370,6 +370,8 @@ export interface PlausibilityEvaluationResult {
   flags: PlausibilityFlag[];
   qualityFlags: PlausibilityFlag[];
   clinicalFlags: PlausibilityFlag[];
+  /** Informational notices (not actionable data-quality issues) */
+  infoNotes: PlausibilityFlag[];
   daysElapsed: number;
   weightDeltaKg: number;
   heightDeltaCm: number;
@@ -438,6 +440,7 @@ export function evaluateMeasurementEntry(params: {
       flags: [inputFlag],
       qualityFlags: [inputFlag],
       clinicalFlags: [],
+      infoNotes: [],
       daysElapsed: 0,
       weightDeltaKg: 0,
       heightDeltaCm: 0,
@@ -493,6 +496,20 @@ export function evaluateMeasurementEntry(params: {
   let daysElapsed = 30;
   let velocityPerMonthKg = 0;
   let heightVelocityPerMonthCm = 0;
+
+  // A7: Informational flag when no prior measurement is available (cannot evaluate velocity)
+  if (!previousRecord || previousRecord.weight <= 0 || previousRecord.height <= 0) {
+    flags.push({
+      code: 'INFO-NO-HISTORY',
+      name: 'Insufficient Measurement History',
+      type: 'data_quality',
+      severity: 'Warning',
+      summary: 'No prior measurement found for this beneficiary. Growth velocity rules (RUL-01 to RUL-05) cannot be evaluated.',
+      triggerDetail: 'Velocity rules require at least one previous measurement to calculate change over time. This is an informational notice, not a data-quality alert.',
+      suggestedAction: 'This is the first recorded measurement. Velocity rules will apply from the next measurement onwards. No action required.',
+      isIllustrativeDemoRule: false,
+    });
+  }
 
   if (previousRecord && previousRecord.weight > 0 && previousRecord.height > 0) {
     daysElapsed = getDaysBetween(previousRecord.date, measurementDate);
@@ -639,15 +656,19 @@ export function evaluateMeasurementEntry(params: {
     }
   }
 
-  const qualityFlags = flags.filter((f) => f.type === 'data_quality');
-  const clinicalFlags = flags.filter((f) => f.type === 'clinical');
-  const isImplausible = flags.length > 0;
+  // Separate informational notices from actionable flags
+  const infoNotes = flags.filter((f) => f.code === 'INFO-NO-HISTORY');
+  const actionableFlags = flags.filter((f) => f.code !== 'INFO-NO-HISTORY');
 
-  // Determine overall triage priority
+  const qualityFlags = actionableFlags.filter((f) => f.type === 'data_quality');
+  const clinicalFlags = actionableFlags.filter((f) => f.type === 'clinical');
+  const isImplausible = actionableFlags.length > 0;
+
+  // Determine overall triage priority (based on actionable flags only)
   let primaryPriority: 'Urgent' | 'Needs Attention' | 'Referral Pending' | 'Resolved' = 'Resolved';
-  if (flags.some((f) => f.severity === 'Urgent')) {
+  if (actionableFlags.some((f) => f.severity === 'Urgent')) {
     primaryPriority = clinicalFlags.some((f) => f.severity === 'Urgent') ? 'Referral Pending' : 'Urgent';
-  } else if (flags.some((f) => f.severity === 'Needs Attention')) {
+  } else if (actionableFlags.some((f) => f.severity === 'Needs Attention')) {
     primaryPriority = 'Needs Attention';
   }
 
@@ -655,9 +676,10 @@ export function evaluateMeasurementEntry(params: {
     isValid: !isImpossible,
     isImpossible,
     isImplausible,
-    flags,
+    flags: actionableFlags,
     qualityFlags,
     clinicalFlags,
+    infoNotes,
     daysElapsed,
     weightDeltaKg,
     heightDeltaCm,

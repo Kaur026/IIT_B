@@ -1,0 +1,4 @@
+band_id,label,min_months,max_months,service_name,verified,status,synthetic_flag
+BAND-1,UNVERIFIED age band 1 (demo),0,6,UNVERIFIED service A (demo),false,draft,SYNTHETIC
+BAND-2,UNVERIFIED age band 2 (demo),6,36,UNVERIFIED service B (demo),false,draft,SYNTHETIC
+BAND-3,UNVERIFIED age band 3 (demo),36,72,UNVERIFIED service C (demo),false,draft,SYNTHETIC

@@ -1,0 +1,774 @@
+verification_id,beneficiary_id,centre_id,barrier_type,status,opened_on,resolved_on,resolution_note,synthetic_flag
+VER-00001,BEN-0001,AWC-001,pending_mobile_auth,resolved,2026-08-13,2026-08-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00002,BEN-0004,AWC-004,auth_failed,open,2026-09-27,,,SYNTHETIC
+VER-00003,BEN-0005,AWC-005,auth_failed,in_progress,2026-08-25,,,SYNTHETIC
+VER-00004,BEN-0008,AWC-008,document_missing,open,2026-07-16,,,SYNTHETIC
+VER-00005,BEN-0009,AWC-009,other,open,2026-09-25,,,SYNTHETIC
+VER-00006,BEN-0010,AWC-010,auth_failed,open,2026-10-02,,,SYNTHETIC
+VER-00007,BEN-0018,AWC-018,document_missing,resolved,2026-09-13,2026-09-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00008,BEN-0025,AWC-025,other,open,2026-07-24,,,SYNTHETIC
+VER-00009,BEN-0026,AWC-026,pending_mobile_auth,in_progress,2026-09-17,,,SYNTHETIC
+VER-00010,BEN-0032,AWC-032,auth_failed,open,2026-07-07,,,SYNTHETIC
+VER-00011,BEN-0034,AWC-034,document_missing,in_progress,2026-09-15,,,SYNTHETIC
+VER-00012,BEN-0039,AWC-039,document_missing,resolved,2026-09-01,2026-09-11,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00013,BEN-0044,AWC-044,pending_mobile_auth,open,2026-08-08,,,SYNTHETIC
+VER-00014,BEN-0049,AWC-049,auth_failed,open,2026-08-03,,,SYNTHETIC
+VER-00015,BEN-0053,AWC-053,document_missing,resolved,2026-09-12,2026-09-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00016,BEN-0058,AWC-058,document_missing,open,2026-08-29,,,SYNTHETIC
+VER-00017,BEN-0062,AWC-062,other,resolved,2026-08-02,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00018,BEN-0065,AWC-065,document_missing,resolved,2026-07-13,2026-07-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00019,BEN-0068,AWC-068,document_missing,open,2026-07-23,,,SYNTHETIC
+VER-00020,BEN-0072,AWC-072,auth_failed,open,2026-08-28,,,SYNTHETIC
+VER-00021,BEN-0074,AWC-074,other,resolved,2026-07-06,2026-07-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00022,BEN-0080,AWC-080,other,resolved,2026-09-14,2026-10-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00023,BEN-0083,AWC-083,other,resolved,2026-09-08,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00024,BEN-0087,AWC-087,document_missing,resolved,2026-09-01,2026-09-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00025,BEN-0094,AWC-094,document_missing,in_progress,2026-09-17,,,SYNTHETIC
+VER-00026,BEN-0095,AWC-095,document_missing,open,2026-07-23,,,SYNTHETIC
+VER-00027,BEN-0097,AWC-097,auth_failed,resolved,2026-07-30,2026-08-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00028,BEN-0098,AWC-098,auth_failed,resolved,2026-07-01,2026-07-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00029,BEN-0107,AWC-107,other,in_progress,2026-07-23,,,SYNTHETIC
+VER-00030,BEN-0109,AWC-109,pending_mobile_auth,in_progress,2026-07-25,,,SYNTHETIC
+VER-00031,BEN-0110,AWC-110,document_missing,resolved,2026-07-02,2026-07-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00032,BEN-0113,AWC-113,other,resolved,2026-08-08,2026-08-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00033,BEN-0117,AWC-117,pending_mobile_auth,open,2026-07-19,,,SYNTHETIC
+VER-00034,BEN-0126,AWC-026,other,in_progress,2026-06-28,,,SYNTHETIC
+VER-00035,BEN-0128,AWC-057,other,in_progress,2026-09-08,,,SYNTHETIC
+VER-00036,BEN-0130,AWC-078,other,open,2026-08-21,,,SYNTHETIC
+VER-00037,BEN-0135,AWC-057,pending_mobile_auth,open,2026-08-14,,,SYNTHETIC
+VER-00038,BEN-0137,AWC-121,other,resolved,2026-09-15,2026-10-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00039,BEN-0146,AWC-046,document_missing,resolved,2026-06-26,2026-06-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00040,BEN-0150,AWC-040,other,in_progress,2026-10-16,,,SYNTHETIC
+VER-00041,BEN-0152,AWC-122,document_missing,resolved,2026-09-30,2026-10-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00042,BEN-0159,AWC-046,other,open,2026-10-04,,,SYNTHETIC
+VER-00043,BEN-0162,AWC-049,auth_failed,in_progress,2026-06-27,,,SYNTHETIC
+VER-00044,BEN-0164,AWC-076,other,resolved,2026-10-17,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00045,BEN-0169,AWC-076,document_missing,in_progress,2026-08-20,,,SYNTHETIC
+VER-00046,BEN-0174,AWC-029,document_missing,open,2026-07-22,,,SYNTHETIC
+VER-00047,BEN-0176,AWC-107,auth_failed,resolved,2026-08-22,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00048,BEN-0180,AWC-097,auth_failed,in_progress,2026-07-08,,,SYNTHETIC
+VER-00049,BEN-0186,AWC-040,pending_mobile_auth,resolved,2026-10-02,2026-10-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00050,BEN-0187,AWC-020,pending_mobile_auth,resolved,2026-10-01,2026-10-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00051,BEN-0196,AWC-009,auth_failed,open,2026-07-05,,,SYNTHETIC
+VER-00052,BEN-0198,AWC-031,document_missing,open,2026-10-15,,,SYNTHETIC
+VER-00053,BEN-0201,AWC-080,pending_mobile_auth,open,2026-10-05,,,SYNTHETIC
+VER-00054,BEN-0204,AWC-009,auth_failed,open,2026-09-10,,,SYNTHETIC
+VER-00055,BEN-0205,AWC-004,auth_failed,open,2026-10-05,,,SYNTHETIC
+VER-00056,BEN-0214,AWC-102,pending_mobile_auth,in_progress,2026-08-28,,,SYNTHETIC
+VER-00057,BEN-0216,AWC-017,pending_mobile_auth,resolved,2026-07-13,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00058,BEN-0218,AWC-007,document_missing,resolved,2026-07-04,2026-07-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00059,BEN-0220,AWC-025,other,open,2026-09-08,,,SYNTHETIC
+VER-00060,BEN-0232,AWC-020,document_missing,open,2026-07-13,,,SYNTHETIC
+VER-00061,BEN-0234,AWC-050,document_missing,open,2026-09-02,,,SYNTHETIC
+VER-00062,BEN-0243,AWC-122,pending_mobile_auth,in_progress,2026-08-05,,,SYNTHETIC
+VER-00063,BEN-0256,AWC-046,auth_failed,open,2026-08-29,,,SYNTHETIC
+VER-00064,BEN-0257,AWC-022,document_missing,in_progress,2026-08-11,,,SYNTHETIC
+VER-00065,BEN-0263,AWC-059,document_missing,resolved,2026-09-26,2026-10-13,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00066,BEN-0269,AWC-091,pending_mobile_auth,in_progress,2026-10-10,,,SYNTHETIC
+VER-00067,BEN-0272,AWC-076,document_missing,open,2026-09-15,,,SYNTHETIC
+VER-00068,BEN-0286,AWC-096,auth_failed,resolved,2026-09-22,2026-10-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00069,BEN-0288,AWC-106,auth_failed,open,2026-07-03,,,SYNTHETIC
+VER-00070,BEN-0289,AWC-045,document_missing,resolved,2026-09-28,2026-10-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00071,BEN-0304,AWC-013,document_missing,in_progress,2026-09-06,,,SYNTHETIC
+VER-00072,BEN-0310,AWC-121,auth_failed,resolved,2026-07-18,2026-07-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00073,BEN-0311,AWC-040,pending_mobile_auth,in_progress,2026-07-01,,,SYNTHETIC
+VER-00074,BEN-0326,AWC-018,pending_mobile_auth,in_progress,2026-07-31,,,SYNTHETIC
+VER-00075,BEN-0332,AWC-076,pending_mobile_auth,open,2026-08-05,,,SYNTHETIC
+VER-00076,BEN-0336,AWC-061,pending_mobile_auth,resolved,2026-08-25,2026-08-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00077,BEN-0338,AWC-083,document_missing,in_progress,2026-08-08,,,SYNTHETIC
+VER-00078,BEN-0342,AWC-104,auth_failed,resolved,2026-07-09,2026-07-28,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00079,BEN-0346,AWC-105,document_missing,resolved,2026-08-30,2026-09-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00080,BEN-0352,AWC-009,other,resolved,2026-10-04,2026-10-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00081,BEN-0355,AWC-070,auth_failed,in_progress,2026-09-26,,,SYNTHETIC
+VER-00082,BEN-0369,AWC-019,document_missing,in_progress,2026-08-26,,,SYNTHETIC
+VER-00083,BEN-0373,AWC-122,auth_failed,resolved,2026-10-16,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00084,BEN-0374,AWC-005,auth_failed,open,2026-09-06,,,SYNTHETIC
+VER-00085,BEN-0379,AWC-087,auth_failed,open,2026-07-15,,,SYNTHETIC
+VER-00086,BEN-0383,AWC-009,pending_mobile_auth,resolved,2026-07-20,2026-07-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00087,BEN-0384,AWC-075,pending_mobile_auth,resolved,2026-09-02,2026-09-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00088,BEN-0390,AWC-081,auth_failed,open,2026-07-15,,,SYNTHETIC
+VER-00089,BEN-0395,AWC-119,pending_mobile_auth,open,2026-07-23,,,SYNTHETIC
+VER-00090,BEN-0403,AWC-040,auth_failed,resolved,2026-08-16,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00091,BEN-0404,AWC-006,pending_mobile_auth,open,2026-09-15,,,SYNTHETIC
+VER-00092,BEN-0411,AWC-070,auth_failed,resolved,2026-08-15,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00093,BEN-0425,AWC-107,other,resolved,2026-08-17,2026-08-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00094,BEN-0426,AWC-066,pending_mobile_auth,resolved,2026-10-04,2026-10-11,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00095,BEN-0428,AWC-044,pending_mobile_auth,in_progress,2026-10-15,,,SYNTHETIC
+VER-00096,BEN-0433,AWC-076,other,resolved,2026-10-21,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00097,BEN-0435,AWC-046,auth_failed,resolved,2026-07-10,2026-07-11,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00098,BEN-0440,AWC-045,other,resolved,2026-08-12,2026-08-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00099,BEN-0442,AWC-041,pending_mobile_auth,resolved,2026-09-07,2026-09-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00100,BEN-0445,AWC-017,document_missing,resolved,2026-08-29,2026-09-11,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00101,BEN-0452,AWC-048,other,in_progress,2026-09-10,,,SYNTHETIC
+VER-00102,BEN-0455,AWC-004,other,open,2026-08-15,,,SYNTHETIC
+VER-00103,BEN-0456,AWC-094,pending_mobile_auth,resolved,2026-07-13,2026-07-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00104,BEN-0457,AWC-073,auth_failed,resolved,2026-08-10,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00105,BEN-0463,AWC-035,auth_failed,resolved,2026-09-19,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00106,BEN-0465,AWC-031,auth_failed,open,2026-08-15,,,SYNTHETIC
+VER-00107,BEN-0478,AWC-098,pending_mobile_auth,resolved,2026-07-23,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00108,BEN-0480,AWC-024,pending_mobile_auth,resolved,2026-07-18,2026-07-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00109,BEN-0483,AWC-118,pending_mobile_auth,open,2026-09-24,,,SYNTHETIC
+VER-00110,BEN-0484,AWC-034,auth_failed,open,2026-08-01,,,SYNTHETIC
+VER-00111,BEN-0486,AWC-047,document_missing,resolved,2026-09-07,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00112,BEN-0487,AWC-117,auth_failed,open,2026-07-15,,,SYNTHETIC
+VER-00113,BEN-0489,AWC-083,auth_failed,resolved,2026-08-22,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00114,BEN-0490,AWC-086,auth_failed,resolved,2026-07-12,2026-07-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00115,BEN-0491,AWC-036,other,resolved,2026-09-21,2026-10-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00116,BEN-0503,AWC-065,document_missing,resolved,2026-08-12,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00117,BEN-0511,AWC-016,auth_failed,open,2026-06-26,,,SYNTHETIC
+VER-00118,BEN-0513,AWC-013,document_missing,resolved,2026-08-17,2026-09-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00119,BEN-0515,AWC-117,auth_failed,open,2026-08-06,,,SYNTHETIC
+VER-00120,BEN-0517,AWC-120,document_missing,in_progress,2026-08-02,,,SYNTHETIC
+VER-00121,BEN-0523,AWC-016,pending_mobile_auth,in_progress,2026-07-07,,,SYNTHETIC
+VER-00122,BEN-0531,AWC-048,other,in_progress,2026-09-10,,,SYNTHETIC
+VER-00123,BEN-0538,AWC-012,other,in_progress,2026-10-22,,,SYNTHETIC
+VER-00124,BEN-0540,AWC-106,other,resolved,2026-08-26,2026-09-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00125,BEN-0541,AWC-119,pending_mobile_auth,open,2026-08-25,,,SYNTHETIC
+VER-00126,BEN-0545,AWC-111,other,in_progress,2026-08-09,,,SYNTHETIC
+VER-00127,BEN-0549,AWC-023,other,resolved,2026-06-26,2026-06-28,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00128,BEN-0550,AWC-031,pending_mobile_auth,in_progress,2026-08-16,,,SYNTHETIC
+VER-00129,BEN-0554,AWC-078,auth_failed,in_progress,2026-08-19,,,SYNTHETIC
+VER-00130,BEN-0561,AWC-073,auth_failed,in_progress,2026-07-09,,,SYNTHETIC
+VER-00131,BEN-0565,AWC-081,pending_mobile_auth,open,2026-07-22,,,SYNTHETIC
+VER-00132,BEN-0566,AWC-070,document_missing,in_progress,2026-08-04,,,SYNTHETIC
+VER-00133,BEN-0567,AWC-069,other,open,2026-07-05,,,SYNTHETIC
+VER-00134,BEN-0573,AWC-075,other,resolved,2026-09-20,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00135,BEN-0574,AWC-040,document_missing,resolved,2026-07-22,2026-08-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00136,BEN-0575,AWC-015,other,resolved,2026-10-16,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00137,BEN-0576,AWC-042,auth_failed,open,2026-09-29,,,SYNTHETIC
+VER-00138,BEN-0577,AWC-002,auth_failed,open,2026-08-18,,,SYNTHETIC
+VER-00139,BEN-0579,AWC-014,auth_failed,resolved,2026-09-24,2026-09-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00140,BEN-0588,AWC-032,other,in_progress,2026-07-20,,,SYNTHETIC
+VER-00141,BEN-0592,AWC-102,auth_failed,open,2026-08-25,,,SYNTHETIC
+VER-00142,BEN-0593,AWC-043,auth_failed,resolved,2026-08-10,2026-08-18,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00143,BEN-0603,AWC-103,auth_failed,open,2026-07-24,,,SYNTHETIC
+VER-00144,BEN-0604,AWC-033,auth_failed,in_progress,2026-07-27,,,SYNTHETIC
+VER-00145,BEN-0615,AWC-004,pending_mobile_auth,resolved,2026-08-27,2026-09-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00146,BEN-0625,AWC-008,pending_mobile_auth,in_progress,2026-09-05,,,SYNTHETIC
+VER-00147,BEN-0629,AWC-074,document_missing,open,2026-08-16,,,SYNTHETIC
+VER-00148,BEN-0631,AWC-116,pending_mobile_auth,in_progress,2026-08-11,,,SYNTHETIC
+VER-00149,BEN-0632,AWC-071,auth_failed,in_progress,2026-08-12,,,SYNTHETIC
+VER-00150,BEN-0634,AWC-055,other,open,2026-09-01,,,SYNTHETIC
+VER-00151,BEN-0638,AWC-064,document_missing,in_progress,2026-07-12,,,SYNTHETIC
+VER-00152,BEN-0641,AWC-108,auth_failed,open,2026-08-13,,,SYNTHETIC
+VER-00153,BEN-0643,AWC-054,auth_failed,resolved,2026-09-02,2026-09-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00154,BEN-0648,AWC-030,auth_failed,resolved,2026-09-23,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00155,BEN-0649,AWC-117,other,resolved,2026-08-28,2026-09-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00156,BEN-0662,AWC-072,other,open,2026-07-24,,,SYNTHETIC
+VER-00157,BEN-0671,AWC-035,document_missing,resolved,2026-06-27,2026-06-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00158,BEN-0674,AWC-036,other,open,2026-07-13,,,SYNTHETIC
+VER-00159,BEN-0679,AWC-016,other,open,2026-08-20,,,SYNTHETIC
+VER-00160,BEN-0681,AWC-057,document_missing,in_progress,2026-08-23,,,SYNTHETIC
+VER-00161,BEN-0685,AWC-100,other,resolved,2026-09-18,2026-10-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00162,BEN-0687,AWC-122,pending_mobile_auth,resolved,2026-09-28,2026-10-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00163,BEN-0690,AWC-107,other,in_progress,2026-07-19,,,SYNTHETIC
+VER-00164,BEN-0694,AWC-054,auth_failed,in_progress,2026-10-14,,,SYNTHETIC
+VER-00165,BEN-0698,AWC-071,other,open,2026-07-03,,,SYNTHETIC
+VER-00166,BEN-0704,AWC-113,other,open,2026-08-21,,,SYNTHETIC
+VER-00167,BEN-0718,AWC-057,auth_failed,open,2026-10-03,,,SYNTHETIC
+VER-00168,BEN-0733,AWC-069,auth_failed,in_progress,2026-09-23,,,SYNTHETIC
+VER-00169,BEN-0739,AWC-073,pending_mobile_auth,open,2026-09-25,,,SYNTHETIC
+VER-00170,BEN-0747,AWC-058,document_missing,open,2026-08-10,,,SYNTHETIC
+VER-00171,BEN-0748,AWC-079,auth_failed,resolved,2026-10-19,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00172,BEN-0749,AWC-057,pending_mobile_auth,open,2026-10-20,,,SYNTHETIC
+VER-00173,BEN-0752,AWC-117,auth_failed,in_progress,2026-08-29,,,SYNTHETIC
+VER-00174,BEN-0757,AWC-096,other,resolved,2026-07-27,2026-08-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00175,BEN-0761,AWC-088,other,open,2026-10-18,,,SYNTHETIC
+VER-00176,BEN-0763,AWC-022,auth_failed,resolved,2026-08-30,2026-09-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00177,BEN-0765,AWC-031,auth_failed,resolved,2026-09-11,2026-10-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00178,BEN-0767,AWC-089,document_missing,in_progress,2026-09-01,,,SYNTHETIC
+VER-00179,BEN-0768,AWC-001,document_missing,resolved,2026-06-29,2026-07-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00180,BEN-0795,AWC-050,other,open,2026-10-21,,,SYNTHETIC
+VER-00181,BEN-0798,AWC-046,document_missing,in_progress,2026-07-25,,,SYNTHETIC
+VER-00182,BEN-0811,AWC-037,other,open,2026-09-27,,,SYNTHETIC
+VER-00183,BEN-0817,AWC-108,pending_mobile_auth,resolved,2026-10-10,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00184,BEN-0819,AWC-077,other,in_progress,2026-07-26,,,SYNTHETIC
+VER-00185,BEN-0825,AWC-052,other,open,2026-08-13,,,SYNTHETIC
+VER-00186,BEN-0827,AWC-103,auth_failed,open,2026-09-22,,,SYNTHETIC
+VER-00187,BEN-0831,AWC-015,auth_failed,resolved,2026-08-17,2026-09-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00188,BEN-0833,AWC-062,auth_failed,open,2026-07-29,,,SYNTHETIC
+VER-00189,BEN-0836,AWC-031,auth_failed,open,2026-08-18,,,SYNTHETIC
+VER-00190,BEN-0838,AWC-030,document_missing,resolved,2026-09-30,2026-10-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00191,BEN-0839,AWC-017,document_missing,resolved,2026-08-07,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00192,BEN-0843,AWC-075,other,in_progress,2026-08-14,,,SYNTHETIC
+VER-00193,BEN-0848,AWC-099,other,in_progress,2026-07-26,,,SYNTHETIC
+VER-00194,BEN-0849,AWC-081,document_missing,resolved,2026-08-12,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00195,BEN-0853,AWC-047,pending_mobile_auth,open,2026-08-30,,,SYNTHETIC
+VER-00196,BEN-0858,AWC-061,auth_failed,resolved,2026-07-30,2026-08-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00197,BEN-0859,AWC-026,pending_mobile_auth,resolved,2026-08-28,2026-09-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00198,BEN-0866,AWC-004,other,in_progress,2026-09-06,,,SYNTHETIC
+VER-00199,BEN-0873,AWC-046,document_missing,resolved,2026-07-01,2026-07-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00200,BEN-0879,AWC-005,auth_failed,open,2026-09-29,,,SYNTHETIC
+VER-00201,BEN-0881,AWC-109,pending_mobile_auth,resolved,2026-08-23,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00202,BEN-0882,AWC-116,other,open,2026-08-24,,,SYNTHETIC
+VER-00203,BEN-0883,AWC-121,other,open,2026-07-09,,,SYNTHETIC
+VER-00204,BEN-0890,AWC-046,other,in_progress,2026-07-27,,,SYNTHETIC
+VER-00205,BEN-0894,AWC-120,pending_mobile_auth,open,2026-09-03,,,SYNTHETIC
+VER-00206,BEN-0896,AWC-119,other,open,2026-09-13,,,SYNTHETIC
+VER-00207,BEN-0897,AWC-113,document_missing,open,2026-08-13,,,SYNTHETIC
+VER-00208,BEN-0907,AWC-101,pending_mobile_auth,in_progress,2026-07-19,,,SYNTHETIC
+VER-00209,BEN-0908,AWC-089,pending_mobile_auth,open,2026-08-14,,,SYNTHETIC
+VER-00210,BEN-0910,AWC-053,other,in_progress,2026-09-08,,,SYNTHETIC
+VER-00211,BEN-0911,AWC-121,pending_mobile_auth,open,2026-10-21,,,SYNTHETIC
+VER-00212,BEN-0918,AWC-121,pending_mobile_auth,open,2026-07-06,,,SYNTHETIC
+VER-00213,BEN-0920,AWC-117,other,resolved,2026-10-17,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00214,BEN-0921,AWC-064,other,in_progress,2026-09-19,,,SYNTHETIC
+VER-00215,BEN-0923,AWC-079,other,resolved,2026-10-07,2026-10-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00216,BEN-0927,AWC-045,document_missing,resolved,2026-09-19,2026-09-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00217,BEN-0930,AWC-056,auth_failed,resolved,2026-08-18,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00218,BEN-0937,AWC-118,pending_mobile_auth,open,2026-07-16,,,SYNTHETIC
+VER-00219,BEN-0938,AWC-051,pending_mobile_auth,open,2026-08-03,,,SYNTHETIC
+VER-00220,BEN-0943,AWC-049,other,open,2026-07-08,,,SYNTHETIC
+VER-00221,BEN-0946,AWC-066,document_missing,open,2026-07-06,,,SYNTHETIC
+VER-00222,BEN-0950,AWC-041,auth_failed,resolved,2026-10-20,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00223,BEN-0952,AWC-036,document_missing,in_progress,2026-07-10,,,SYNTHETIC
+VER-00224,BEN-0953,AWC-052,pending_mobile_auth,resolved,2026-08-20,2026-09-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00225,BEN-0955,AWC-084,auth_failed,in_progress,2026-06-28,,,SYNTHETIC
+VER-00226,BEN-0956,AWC-077,pending_mobile_auth,resolved,2026-08-07,2026-08-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00227,BEN-0959,AWC-017,pending_mobile_auth,open,2026-07-03,,,SYNTHETIC
+VER-00228,BEN-0962,AWC-011,document_missing,in_progress,2026-08-26,,,SYNTHETIC
+VER-00229,BEN-0964,AWC-052,document_missing,resolved,2026-07-29,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00230,BEN-0983,AWC-106,other,in_progress,2026-06-27,,,SYNTHETIC
+VER-00231,BEN-0986,AWC-082,document_missing,open,2026-07-06,,,SYNTHETIC
+VER-00232,BEN-0990,AWC-007,other,open,2026-08-17,,,SYNTHETIC
+VER-00233,BEN-0999,AWC-032,document_missing,resolved,2026-09-02,2026-09-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00234,BEN-1009,AWC-063,document_missing,in_progress,2026-07-02,,,SYNTHETIC
+VER-00235,BEN-1010,AWC-106,other,open,2026-07-12,,,SYNTHETIC
+VER-00236,BEN-1011,AWC-007,document_missing,resolved,2026-08-18,2026-09-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00237,BEN-1012,AWC-077,auth_failed,open,2026-07-03,,,SYNTHETIC
+VER-00238,BEN-1020,AWC-055,document_missing,in_progress,2026-09-22,,,SYNTHETIC
+VER-00239,BEN-1023,AWC-121,pending_mobile_auth,in_progress,2026-08-31,,,SYNTHETIC
+VER-00240,BEN-1025,AWC-014,pending_mobile_auth,in_progress,2026-09-25,,,SYNTHETIC
+VER-00241,BEN-1026,AWC-066,auth_failed,open,2026-09-29,,,SYNTHETIC
+VER-00242,BEN-1029,AWC-095,auth_failed,open,2026-08-11,,,SYNTHETIC
+VER-00243,BEN-1047,AWC-009,other,in_progress,2026-09-21,,,SYNTHETIC
+VER-00244,BEN-1052,AWC-070,pending_mobile_auth,resolved,2026-07-05,2026-07-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00245,BEN-1054,AWC-069,auth_failed,resolved,2026-08-04,2026-08-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00246,BEN-1059,AWC-043,document_missing,in_progress,2026-10-11,,,SYNTHETIC
+VER-00247,BEN-1063,AWC-091,document_missing,resolved,2026-07-11,2026-07-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00248,BEN-1065,AWC-006,pending_mobile_auth,open,2026-07-11,,,SYNTHETIC
+VER-00249,BEN-1066,AWC-020,document_missing,resolved,2026-10-11,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00250,BEN-1070,AWC-046,pending_mobile_auth,resolved,2026-07-20,2026-08-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00251,BEN-1071,AWC-021,other,in_progress,2026-08-28,,,SYNTHETIC
+VER-00252,BEN-1072,AWC-095,other,open,2026-09-04,,,SYNTHETIC
+VER-00253,BEN-1073,AWC-050,other,in_progress,2026-09-07,,,SYNTHETIC
+VER-00254,BEN-1078,AWC-083,pending_mobile_auth,in_progress,2026-08-12,,,SYNTHETIC
+VER-00255,BEN-1085,AWC-074,auth_failed,resolved,2026-08-27,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00256,BEN-1087,AWC-044,other,resolved,2026-07-08,2026-07-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00257,BEN-1088,AWC-075,document_missing,open,2026-10-01,,,SYNTHETIC
+VER-00258,BEN-1089,AWC-003,auth_failed,resolved,2026-10-05,2026-10-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00259,BEN-1091,AWC-026,document_missing,open,2026-09-03,,,SYNTHETIC
+VER-00260,BEN-1095,AWC-070,other,open,2026-08-12,,,SYNTHETIC
+VER-00261,BEN-1098,AWC-073,document_missing,resolved,2026-09-22,2026-09-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00262,BEN-1100,AWC-092,other,open,2026-08-05,,,SYNTHETIC
+VER-00263,BEN-1113,AWC-063,auth_failed,resolved,2026-07-30,2026-08-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00264,BEN-1114,AWC-070,auth_failed,resolved,2026-10-22,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00265,BEN-1115,AWC-107,auth_failed,resolved,2026-07-15,2026-08-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00266,BEN-1117,AWC-067,other,resolved,2026-07-15,2026-07-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00267,BEN-1123,AWC-094,auth_failed,in_progress,2026-09-08,,,SYNTHETIC
+VER-00268,BEN-1127,AWC-046,document_missing,resolved,2026-09-07,2026-09-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00269,BEN-1129,AWC-004,document_missing,in_progress,2026-10-13,,,SYNTHETIC
+VER-00270,BEN-1136,AWC-058,auth_failed,open,2026-07-09,,,SYNTHETIC
+VER-00271,BEN-1140,AWC-116,auth_failed,resolved,2026-09-22,2026-09-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00272,BEN-1141,AWC-067,pending_mobile_auth,resolved,2026-07-28,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00273,BEN-1142,AWC-022,other,open,2026-07-27,,,SYNTHETIC
+VER-00274,BEN-1150,AWC-038,auth_failed,in_progress,2026-07-15,,,SYNTHETIC
+VER-00275,BEN-1151,AWC-114,pending_mobile_auth,open,2026-07-18,,,SYNTHETIC
+VER-00276,BEN-1152,AWC-081,other,in_progress,2026-08-04,,,SYNTHETIC
+VER-00277,BEN-1154,AWC-024,document_missing,resolved,2026-09-23,2026-10-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00278,BEN-1155,AWC-015,document_missing,open,2026-09-16,,,SYNTHETIC
+VER-00279,BEN-1156,AWC-011,document_missing,resolved,2026-10-13,2026-10-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00280,BEN-1158,AWC-045,auth_failed,resolved,2026-10-17,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00281,BEN-1168,AWC-051,auth_failed,resolved,2026-07-09,2026-07-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00282,BEN-1172,AWC-012,pending_mobile_auth,in_progress,2026-09-18,,,SYNTHETIC
+VER-00283,BEN-1174,AWC-037,other,open,2026-09-15,,,SYNTHETIC
+VER-00284,BEN-1175,AWC-008,document_missing,in_progress,2026-09-09,,,SYNTHETIC
+VER-00285,BEN-1183,AWC-030,other,in_progress,2026-09-23,,,SYNTHETIC
+VER-00286,BEN-1189,AWC-069,document_missing,resolved,2026-07-25,2026-08-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00287,BEN-1190,AWC-100,other,resolved,2026-07-10,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00288,BEN-1191,AWC-054,pending_mobile_auth,open,2026-07-17,,,SYNTHETIC
+VER-00289,BEN-1192,AWC-021,other,in_progress,2026-09-24,,,SYNTHETIC
+VER-00290,BEN-1198,AWC-009,other,open,2026-06-27,,,SYNTHETIC
+VER-00291,BEN-1201,AWC-062,auth_failed,in_progress,2026-10-04,,,SYNTHETIC
+VER-00292,BEN-1202,AWC-063,other,resolved,2026-09-27,2026-10-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00293,BEN-1203,AWC-065,other,in_progress,2026-07-11,,,SYNTHETIC
+VER-00294,BEN-1204,AWC-089,other,resolved,2026-09-21,2026-10-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00295,BEN-1207,AWC-113,document_missing,resolved,2026-07-19,2026-08-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00296,BEN-1210,AWC-109,document_missing,resolved,2026-09-17,2026-09-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00297,BEN-1212,AWC-113,auth_failed,resolved,2026-07-30,2026-08-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00298,BEN-1215,AWC-048,auth_failed,in_progress,2026-09-12,,,SYNTHETIC
+VER-00299,BEN-1221,AWC-065,other,resolved,2026-08-09,2026-08-13,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00300,BEN-1222,AWC-002,pending_mobile_auth,open,2026-09-21,,,SYNTHETIC
+VER-00301,BEN-1228,AWC-032,auth_failed,open,2026-09-06,,,SYNTHETIC
+VER-00302,BEN-1234,AWC-088,auth_failed,in_progress,2026-08-04,,,SYNTHETIC
+VER-00303,BEN-1249,AWC-082,other,open,2026-09-22,,,SYNTHETIC
+VER-00304,BEN-1253,AWC-099,auth_failed,open,2026-09-20,,,SYNTHETIC
+VER-00305,BEN-1260,AWC-119,auth_failed,resolved,2026-10-20,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00306,BEN-1268,AWC-047,pending_mobile_auth,open,2026-10-09,,,SYNTHETIC
+VER-00307,BEN-1272,AWC-055,document_missing,in_progress,2026-07-29,,,SYNTHETIC
+VER-00308,BEN-1273,AWC-046,auth_failed,resolved,2026-08-13,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00309,BEN-1275,AWC-050,auth_failed,open,2026-08-26,,,SYNTHETIC
+VER-00310,BEN-1278,AWC-097,auth_failed,open,2026-07-07,,,SYNTHETIC
+VER-00311,BEN-1284,AWC-026,other,resolved,2026-08-31,2026-09-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00312,BEN-1291,AWC-011,auth_failed,resolved,2026-08-25,2026-09-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00313,BEN-1292,AWC-053,other,open,2026-09-04,,,SYNTHETIC
+VER-00314,BEN-1295,AWC-040,document_missing,open,2026-07-09,,,SYNTHETIC
+VER-00315,BEN-1298,AWC-007,pending_mobile_auth,open,2026-07-21,,,SYNTHETIC
+VER-00316,BEN-1301,AWC-025,auth_failed,open,2026-10-10,,,SYNTHETIC
+VER-00317,BEN-1302,AWC-044,pending_mobile_auth,in_progress,2026-07-30,,,SYNTHETIC
+VER-00318,BEN-1307,AWC-029,document_missing,resolved,2026-08-09,2026-08-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00319,BEN-1308,AWC-111,auth_failed,resolved,2026-07-06,2026-07-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00320,BEN-1309,AWC-067,pending_mobile_auth,open,2026-09-20,,,SYNTHETIC
+VER-00321,BEN-1317,AWC-018,pending_mobile_auth,resolved,2026-10-07,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00322,BEN-1323,AWC-075,other,open,2026-07-02,,,SYNTHETIC
+VER-00323,BEN-1324,AWC-101,other,in_progress,2026-09-20,,,SYNTHETIC
+VER-00324,BEN-1328,AWC-062,auth_failed,resolved,2026-09-13,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00325,BEN-1332,AWC-024,auth_failed,open,2026-10-04,,,SYNTHETIC
+VER-00326,BEN-1337,AWC-027,pending_mobile_auth,resolved,2026-08-31,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00327,BEN-1341,AWC-013,auth_failed,resolved,2026-07-16,2026-08-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00328,BEN-1343,AWC-116,other,open,2026-07-14,,,SYNTHETIC
+VER-00329,BEN-1348,AWC-113,other,open,2026-09-01,,,SYNTHETIC
+VER-00330,BEN-1350,AWC-077,document_missing,open,2026-09-30,,,SYNTHETIC
+VER-00331,BEN-1355,AWC-016,pending_mobile_auth,open,2026-07-27,,,SYNTHETIC
+VER-00332,BEN-1357,AWC-002,pending_mobile_auth,in_progress,2026-08-18,,,SYNTHETIC
+VER-00333,BEN-1359,AWC-004,auth_failed,resolved,2026-08-30,2026-09-10,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00334,BEN-1364,AWC-003,pending_mobile_auth,open,2026-09-16,,,SYNTHETIC
+VER-00335,BEN-1368,AWC-105,pending_mobile_auth,open,2026-07-19,,,SYNTHETIC
+VER-00336,BEN-1369,AWC-070,other,resolved,2026-09-15,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00337,BEN-1371,AWC-037,document_missing,open,2026-07-08,,,SYNTHETIC
+VER-00338,BEN-1373,AWC-015,other,resolved,2026-07-02,2026-07-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00339,BEN-1375,AWC-056,other,open,2026-09-28,,,SYNTHETIC
+VER-00340,BEN-1386,AWC-100,document_missing,in_progress,2026-08-29,,,SYNTHETIC
+VER-00341,BEN-1390,AWC-093,document_missing,resolved,2026-10-10,2026-10-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00342,BEN-1392,AWC-063,document_missing,open,2026-07-20,,,SYNTHETIC
+VER-00343,BEN-1406,AWC-063,auth_failed,open,2026-07-25,,,SYNTHETIC
+VER-00344,BEN-1409,AWC-014,pending_mobile_auth,open,2026-10-21,,,SYNTHETIC
+VER-00345,BEN-1410,AWC-033,other,open,2026-08-27,,,SYNTHETIC
+VER-00346,BEN-1411,AWC-098,auth_failed,in_progress,2026-10-09,,,SYNTHETIC
+VER-00347,BEN-1416,AWC-047,other,open,2026-07-29,,,SYNTHETIC
+VER-00348,BEN-1417,AWC-088,auth_failed,open,2026-08-30,,,SYNTHETIC
+VER-00349,BEN-1418,AWC-042,pending_mobile_auth,open,2026-10-11,,,SYNTHETIC
+VER-00350,BEN-1422,AWC-003,document_missing,resolved,2026-09-23,2026-09-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00351,BEN-1426,AWC-070,auth_failed,resolved,2026-08-12,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00352,BEN-1427,AWC-052,document_missing,in_progress,2026-08-17,,,SYNTHETIC
+VER-00353,BEN-1428,AWC-031,pending_mobile_auth,open,2026-07-17,,,SYNTHETIC
+VER-00354,BEN-1429,AWC-004,other,open,2026-07-01,,,SYNTHETIC
+VER-00355,BEN-1433,AWC-099,other,resolved,2026-07-24,2026-08-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00356,BEN-1434,AWC-018,pending_mobile_auth,in_progress,2026-07-24,,,SYNTHETIC
+VER-00357,BEN-1437,AWC-098,other,resolved,2026-09-09,2026-09-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00358,BEN-1439,AWC-005,auth_failed,in_progress,2026-08-07,,,SYNTHETIC
+VER-00359,BEN-1450,AWC-099,document_missing,in_progress,2026-09-06,,,SYNTHETIC
+VER-00360,BEN-1454,AWC-006,other,resolved,2026-09-22,2026-09-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00361,BEN-1456,AWC-068,other,resolved,2026-06-29,2026-07-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00362,BEN-1459,AWC-027,auth_failed,open,2026-10-16,,,SYNTHETIC
+VER-00363,BEN-1464,AWC-076,document_missing,open,2026-07-12,,,SYNTHETIC
+VER-00364,BEN-1468,AWC-026,document_missing,resolved,2026-07-30,2026-08-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00365,BEN-1469,AWC-069,document_missing,in_progress,2026-09-22,,,SYNTHETIC
+VER-00366,BEN-1470,AWC-032,auth_failed,open,2026-10-04,,,SYNTHETIC
+VER-00367,BEN-1471,AWC-071,auth_failed,open,2026-09-16,,,SYNTHETIC
+VER-00368,BEN-1483,AWC-120,document_missing,in_progress,2026-10-05,,,SYNTHETIC
+VER-00369,BEN-1487,AWC-040,document_missing,open,2026-08-22,,,SYNTHETIC
+VER-00370,BEN-1494,AWC-042,auth_failed,open,2026-08-08,,,SYNTHETIC
+VER-00371,BEN-1503,AWC-025,document_missing,in_progress,2026-08-25,,,SYNTHETIC
+VER-00372,BEN-1504,AWC-064,pending_mobile_auth,in_progress,2026-08-25,,,SYNTHETIC
+VER-00373,BEN-1508,AWC-043,other,open,2026-07-15,,,SYNTHETIC
+VER-00374,BEN-1510,AWC-078,other,open,2026-07-23,,,SYNTHETIC
+VER-00375,BEN-1517,AWC-056,other,resolved,2026-08-05,2026-08-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00376,BEN-1524,AWC-056,document_missing,resolved,2026-08-20,2026-08-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00377,BEN-1525,AWC-074,pending_mobile_auth,resolved,2026-09-02,2026-09-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00378,BEN-1538,AWC-036,pending_mobile_auth,open,2026-07-27,,,SYNTHETIC
+VER-00379,BEN-1539,AWC-002,other,in_progress,2026-09-06,,,SYNTHETIC
+VER-00380,BEN-1540,AWC-003,auth_failed,open,2026-08-03,,,SYNTHETIC
+VER-00381,BEN-1542,AWC-049,pending_mobile_auth,open,2026-09-27,,,SYNTHETIC
+VER-00382,BEN-1545,AWC-019,auth_failed,resolved,2026-08-17,2026-08-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00383,BEN-1547,AWC-096,other,in_progress,2026-10-15,,,SYNTHETIC
+VER-00384,BEN-1553,AWC-111,auth_failed,resolved,2026-08-04,2026-08-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00385,BEN-1557,AWC-020,document_missing,open,2026-07-18,,,SYNTHETIC
+VER-00386,BEN-1562,AWC-011,other,open,2026-07-08,,,SYNTHETIC
+VER-00387,BEN-1571,AWC-077,auth_failed,resolved,2026-09-02,2026-09-22,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00388,BEN-1579,AWC-051,pending_mobile_auth,open,2026-08-20,,,SYNTHETIC
+VER-00389,BEN-1583,AWC-025,other,resolved,2026-09-25,2026-10-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00390,BEN-1587,AWC-004,pending_mobile_auth,resolved,2026-07-05,2026-07-28,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00391,BEN-1588,AWC-090,auth_failed,in_progress,2026-07-01,,,SYNTHETIC
+VER-00392,BEN-1591,AWC-006,other,resolved,2026-07-20,2026-08-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00393,BEN-1595,AWC-020,auth_failed,resolved,2026-07-02,2026-07-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00394,BEN-1602,AWC-116,document_missing,in_progress,2026-09-01,,,SYNTHETIC
+VER-00395,BEN-1607,AWC-111,document_missing,open,2026-07-30,,,SYNTHETIC
+VER-00396,BEN-1609,AWC-111,auth_failed,in_progress,2026-09-22,,,SYNTHETIC
+VER-00397,BEN-1623,AWC-063,auth_failed,resolved,2026-07-27,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00398,BEN-1625,AWC-006,pending_mobile_auth,resolved,2026-07-02,2026-07-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00399,BEN-1626,AWC-107,other,resolved,2026-07-10,2026-07-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00400,BEN-1627,AWC-091,other,resolved,2026-07-26,2026-07-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00401,BEN-1633,AWC-054,pending_mobile_auth,resolved,2026-07-17,2026-07-22,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00402,BEN-1639,AWC-072,other,resolved,2026-10-18,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00403,BEN-1649,AWC-113,other,open,2026-09-10,,,SYNTHETIC
+VER-00404,BEN-1653,AWC-041,auth_failed,resolved,2026-09-13,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00405,BEN-1656,AWC-062,document_missing,in_progress,2026-08-30,,,SYNTHETIC
+VER-00406,BEN-1665,AWC-099,auth_failed,resolved,2026-08-23,2026-09-13,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00407,BEN-1677,AWC-118,other,open,2026-10-22,,,SYNTHETIC
+VER-00408,BEN-1678,AWC-119,pending_mobile_auth,open,2026-07-03,,,SYNTHETIC
+VER-00409,BEN-1680,AWC-117,document_missing,open,2026-08-10,,,SYNTHETIC
+VER-00410,BEN-1693,AWC-050,pending_mobile_auth,open,2026-07-14,,,SYNTHETIC
+VER-00411,BEN-1701,AWC-013,other,resolved,2026-09-14,2026-09-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00412,BEN-1703,AWC-095,other,resolved,2026-06-30,2026-07-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00413,BEN-1704,AWC-002,document_missing,open,2026-07-22,,,SYNTHETIC
+VER-00414,BEN-1709,AWC-067,other,in_progress,2026-10-02,,,SYNTHETIC
+VER-00415,BEN-1719,AWC-020,document_missing,open,2026-10-18,,,SYNTHETIC
+VER-00416,BEN-1721,AWC-065,auth_failed,resolved,2026-07-19,2026-07-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00417,BEN-1722,AWC-059,other,in_progress,2026-10-15,,,SYNTHETIC
+VER-00418,BEN-1732,AWC-084,other,resolved,2026-10-04,2026-10-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00419,BEN-1733,AWC-045,pending_mobile_auth,resolved,2026-10-08,2026-10-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00420,BEN-1737,AWC-059,pending_mobile_auth,resolved,2026-10-16,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00421,BEN-1739,AWC-086,pending_mobile_auth,resolved,2026-08-17,2026-09-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00422,BEN-1741,AWC-116,other,resolved,2026-07-28,2026-07-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00423,BEN-1743,AWC-112,other,open,2026-09-06,,,SYNTHETIC
+VER-00424,BEN-1745,AWC-076,auth_failed,resolved,2026-09-01,2026-09-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00425,BEN-1747,AWC-027,other,resolved,2026-06-26,2026-07-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00426,BEN-1750,AWC-063,other,open,2026-10-01,,,SYNTHETIC
+VER-00427,BEN-1766,AWC-028,auth_failed,resolved,2026-09-18,2026-10-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00428,BEN-1772,AWC-022,pending_mobile_auth,open,2026-09-11,,,SYNTHETIC
+VER-00429,BEN-1775,AWC-030,auth_failed,open,2026-08-08,,,SYNTHETIC
+VER-00430,BEN-1776,AWC-106,other,open,2026-06-29,,,SYNTHETIC
+VER-00431,BEN-1778,AWC-060,pending_mobile_auth,open,2026-10-02,,,SYNTHETIC
+VER-00432,BEN-1783,AWC-097,auth_failed,resolved,2026-06-26,2026-07-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00433,BEN-1785,AWC-073,other,resolved,2026-09-23,2026-09-30,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00434,BEN-1787,AWC-038,document_missing,resolved,2026-10-16,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00435,BEN-1790,AWC-043,other,resolved,2026-10-07,2026-10-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00436,BEN-1794,AWC-105,other,open,2026-09-06,,,SYNTHETIC
+VER-00437,BEN-1801,AWC-084,pending_mobile_auth,open,2026-09-18,,,SYNTHETIC
+VER-00438,BEN-1802,AWC-051,document_missing,open,2026-08-31,,,SYNTHETIC
+VER-00439,BEN-1804,AWC-052,other,open,2026-10-02,,,SYNTHETIC
+VER-00440,BEN-1805,AWC-058,other,resolved,2026-08-25,2026-09-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00441,BEN-1810,AWC-066,pending_mobile_auth,in_progress,2026-09-28,,,SYNTHETIC
+VER-00442,BEN-1811,AWC-099,document_missing,in_progress,2026-10-12,,,SYNTHETIC
+VER-00443,BEN-1814,AWC-103,pending_mobile_auth,open,2026-10-12,,,SYNTHETIC
+VER-00444,BEN-1815,AWC-008,other,in_progress,2026-09-10,,,SYNTHETIC
+VER-00445,BEN-1816,AWC-053,auth_failed,resolved,2026-10-08,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00446,BEN-1829,AWC-114,document_missing,open,2026-07-23,,,SYNTHETIC
+VER-00447,BEN-1834,AWC-048,pending_mobile_auth,resolved,2026-10-16,2026-10-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00448,BEN-1835,AWC-116,document_missing,resolved,2026-10-18,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00449,BEN-1836,AWC-091,auth_failed,resolved,2026-08-05,2026-08-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00450,BEN-1839,AWC-051,pending_mobile_auth,resolved,2026-09-08,2026-09-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00451,BEN-1842,AWC-082,auth_failed,resolved,2026-07-27,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00452,BEN-1845,AWC-121,other,open,2026-07-14,,,SYNTHETIC
+VER-00453,BEN-1850,AWC-106,pending_mobile_auth,open,2026-08-05,,,SYNTHETIC
+VER-00454,BEN-1860,AWC-088,auth_failed,resolved,2026-07-13,2026-07-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00455,BEN-1861,AWC-097,pending_mobile_auth,in_progress,2026-09-03,,,SYNTHETIC
+VER-00456,BEN-1874,AWC-088,auth_failed,resolved,2026-07-12,2026-07-18,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00457,BEN-1892,AWC-003,document_missing,resolved,2026-07-22,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00458,BEN-1893,AWC-064,document_missing,resolved,2026-09-03,2026-09-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00459,BEN-1896,AWC-017,auth_failed,open,2026-07-18,,,SYNTHETIC
+VER-00460,BEN-1902,AWC-100,document_missing,in_progress,2026-07-27,,,SYNTHETIC
+VER-00461,BEN-1916,AWC-026,document_missing,open,2026-07-10,,,SYNTHETIC
+VER-00462,BEN-1919,AWC-039,other,open,2026-07-23,,,SYNTHETIC
+VER-00463,BEN-1920,AWC-121,pending_mobile_auth,open,2026-08-23,,,SYNTHETIC
+VER-00464,BEN-1922,AWC-114,other,open,2026-08-28,,,SYNTHETIC
+VER-00465,BEN-1933,AWC-064,pending_mobile_auth,in_progress,2026-07-05,,,SYNTHETIC
+VER-00466,BEN-1934,AWC-008,auth_failed,resolved,2026-07-07,2026-07-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00467,BEN-1936,AWC-022,pending_mobile_auth,resolved,2026-08-03,2026-08-10,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00468,BEN-1937,AWC-116,pending_mobile_auth,in_progress,2026-10-08,,,SYNTHETIC
+VER-00469,BEN-1938,AWC-011,other,open,2026-10-13,,,SYNTHETIC
+VER-00470,BEN-1943,AWC-014,pending_mobile_auth,open,2026-07-09,,,SYNTHETIC
+VER-00471,BEN-1950,AWC-102,other,in_progress,2026-09-29,,,SYNTHETIC
+VER-00472,BEN-1955,AWC-070,auth_failed,resolved,2026-09-02,2026-09-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00473,BEN-1956,AWC-039,document_missing,resolved,2026-08-14,2026-09-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00474,BEN-1960,AWC-071,other,open,2026-10-22,,,SYNTHETIC
+VER-00475,BEN-1971,AWC-028,pending_mobile_auth,resolved,2026-09-10,2026-09-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00476,BEN-1972,AWC-081,pending_mobile_auth,resolved,2026-09-24,2026-10-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00477,BEN-1980,AWC-003,document_missing,in_progress,2026-09-27,,,SYNTHETIC
+VER-00478,BEN-1985,AWC-087,document_missing,resolved,2026-07-28,2026-08-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00479,BEN-1988,AWC-020,document_missing,resolved,2026-07-03,2026-07-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00480,BEN-1990,AWC-009,pending_mobile_auth,open,2026-07-18,,,SYNTHETIC
+VER-00481,BEN-1992,AWC-108,pending_mobile_auth,open,2026-08-13,,,SYNTHETIC
+VER-00482,BEN-1996,AWC-101,other,resolved,2026-08-25,2026-09-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00483,BEN-1998,AWC-098,auth_failed,resolved,2026-10-16,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00484,BEN-2001,AWC-103,auth_failed,open,2026-10-13,,,SYNTHETIC
+VER-00485,BEN-2003,AWC-048,pending_mobile_auth,open,2026-09-27,,,SYNTHETIC
+VER-00486,BEN-2005,AWC-042,other,in_progress,2026-10-17,,,SYNTHETIC
+VER-00487,BEN-2006,AWC-096,auth_failed,open,2026-07-25,,,SYNTHETIC
+VER-00488,BEN-2007,AWC-059,document_missing,resolved,2026-08-19,2026-08-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00489,BEN-2010,AWC-052,pending_mobile_auth,resolved,2026-07-31,2026-08-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00490,BEN-2024,AWC-102,auth_failed,open,2026-08-11,,,SYNTHETIC
+VER-00491,BEN-2028,AWC-122,auth_failed,resolved,2026-07-26,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00492,BEN-2029,AWC-122,auth_failed,open,2026-08-06,,,SYNTHETIC
+VER-00493,BEN-2037,AWC-102,auth_failed,in_progress,2026-07-16,,,SYNTHETIC
+VER-00494,BEN-2038,AWC-069,auth_failed,in_progress,2026-06-30,,,SYNTHETIC
+VER-00495,BEN-2042,AWC-010,pending_mobile_auth,open,2026-08-23,,,SYNTHETIC
+VER-00496,BEN-2044,AWC-023,document_missing,in_progress,2026-10-16,,,SYNTHETIC
+VER-00497,BEN-2048,AWC-101,pending_mobile_auth,open,2026-10-13,,,SYNTHETIC
+VER-00498,BEN-2050,AWC-054,document_missing,open,2026-07-19,,,SYNTHETIC
+VER-00499,BEN-2055,AWC-094,document_missing,resolved,2026-08-05,2026-08-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00500,BEN-2056,AWC-093,document_missing,open,2026-07-19,,,SYNTHETIC
+VER-00501,BEN-2059,AWC-115,document_missing,resolved,2026-07-04,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00502,BEN-2061,AWC-019,other,resolved,2026-09-07,2026-09-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00503,BEN-2066,AWC-070,auth_failed,resolved,2026-07-18,2026-07-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00504,BEN-2080,AWC-093,document_missing,open,2026-10-11,,,SYNTHETIC
+VER-00505,BEN-2082,AWC-002,other,open,2026-07-03,,,SYNTHETIC
+VER-00506,BEN-2086,AWC-039,document_missing,resolved,2026-09-11,2026-09-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00507,BEN-2089,AWC-017,auth_failed,in_progress,2026-07-02,,,SYNTHETIC
+VER-00508,BEN-2092,AWC-036,other,open,2026-07-17,,,SYNTHETIC
+VER-00509,BEN-2094,AWC-120,other,resolved,2026-08-28,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00510,BEN-2098,AWC-029,auth_failed,resolved,2026-08-15,2026-08-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00511,BEN-2099,AWC-033,document_missing,in_progress,2026-07-29,,,SYNTHETIC
+VER-00512,BEN-2105,AWC-080,auth_failed,open,2026-10-16,,,SYNTHETIC
+VER-00513,BEN-2106,AWC-083,document_missing,in_progress,2026-10-21,,,SYNTHETIC
+VER-00514,BEN-2108,AWC-118,pending_mobile_auth,resolved,2026-07-07,2026-08-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00515,BEN-2114,AWC-091,auth_failed,resolved,2026-09-21,2026-10-02,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00516,BEN-2116,AWC-063,pending_mobile_auth,open,2026-08-04,,,SYNTHETIC
+VER-00517,BEN-2125,AWC-051,auth_failed,resolved,2026-09-18,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00518,BEN-2139,AWC-075,document_missing,in_progress,2026-08-11,,,SYNTHETIC
+VER-00519,BEN-2145,AWC-001,document_missing,open,2026-09-06,,,SYNTHETIC
+VER-00520,BEN-2149,AWC-106,other,open,2026-10-12,,,SYNTHETIC
+VER-00521,BEN-2153,AWC-116,auth_failed,open,2026-08-17,,,SYNTHETIC
+VER-00522,BEN-2154,AWC-054,other,resolved,2026-07-14,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00523,BEN-2156,AWC-021,other,in_progress,2026-07-07,,,SYNTHETIC
+VER-00524,BEN-2157,AWC-095,auth_failed,open,2026-07-20,,,SYNTHETIC
+VER-00525,BEN-2165,AWC-026,auth_failed,resolved,2026-08-29,2026-09-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00526,BEN-2168,AWC-092,pending_mobile_auth,resolved,2026-06-27,2026-07-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00527,BEN-2175,AWC-006,pending_mobile_auth,resolved,2026-08-30,2026-09-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00528,BEN-2178,AWC-121,document_missing,resolved,2026-08-18,2026-08-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00529,BEN-2184,AWC-077,pending_mobile_auth,resolved,2026-07-13,2026-07-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00530,BEN-2193,AWC-101,pending_mobile_auth,resolved,2026-08-17,2026-09-10,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00531,BEN-2194,AWC-056,pending_mobile_auth,open,2026-08-08,,,SYNTHETIC
+VER-00532,BEN-2200,AWC-067,auth_failed,resolved,2026-09-08,2026-09-10,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00533,BEN-2201,AWC-008,document_missing,in_progress,2026-07-15,,,SYNTHETIC
+VER-00534,BEN-2204,AWC-041,document_missing,open,2026-07-09,,,SYNTHETIC
+VER-00535,BEN-2205,AWC-026,document_missing,open,2026-10-17,,,SYNTHETIC
+VER-00536,BEN-2208,AWC-051,other,open,2026-08-25,,,SYNTHETIC
+VER-00537,BEN-2219,AWC-051,auth_failed,open,2026-08-24,,,SYNTHETIC
+VER-00538,BEN-2223,AWC-101,other,open,2026-09-09,,,SYNTHETIC
+VER-00539,BEN-2229,AWC-042,auth_failed,in_progress,2026-09-29,,,SYNTHETIC
+VER-00540,BEN-2236,AWC-023,auth_failed,in_progress,2026-08-22,,,SYNTHETIC
+VER-00541,BEN-2238,AWC-064,auth_failed,resolved,2026-09-15,2026-09-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00542,BEN-2240,AWC-056,document_missing,open,2026-08-20,,,SYNTHETIC
+VER-00543,BEN-2254,AWC-120,pending_mobile_auth,resolved,2026-10-10,2026-10-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00544,BEN-2258,AWC-030,document_missing,open,2026-09-19,,,SYNTHETIC
+VER-00545,BEN-2261,AWC-025,auth_failed,open,2026-09-04,,,SYNTHETIC
+VER-00546,BEN-2262,AWC-116,auth_failed,in_progress,2026-09-25,,,SYNTHETIC
+VER-00547,BEN-2265,AWC-050,auth_failed,open,2026-07-04,,,SYNTHETIC
+VER-00548,BEN-2267,AWC-014,auth_failed,open,2026-09-04,,,SYNTHETIC
+VER-00549,BEN-2268,AWC-021,other,open,2026-09-23,,,SYNTHETIC
+VER-00550,BEN-2272,AWC-012,other,open,2026-09-30,,,SYNTHETIC
+VER-00551,BEN-2274,AWC-057,pending_mobile_auth,open,2026-08-02,,,SYNTHETIC
+VER-00552,BEN-2277,AWC-067,other,resolved,2026-09-03,2026-09-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00553,BEN-2282,AWC-013,document_missing,open,2026-09-27,,,SYNTHETIC
+VER-00554,BEN-2283,AWC-105,document_missing,open,2026-07-27,,,SYNTHETIC
+VER-00555,BEN-2286,AWC-097,auth_failed,open,2026-08-19,,,SYNTHETIC
+VER-00556,BEN-2288,AWC-087,document_missing,open,2026-07-21,,,SYNTHETIC
+VER-00557,BEN-2289,AWC-122,document_missing,resolved,2026-09-08,2026-09-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00558,BEN-2293,AWC-094,document_missing,open,2026-10-20,,,SYNTHETIC
+VER-00559,BEN-2295,AWC-082,document_missing,open,2026-07-06,,,SYNTHETIC
+VER-00560,BEN-2296,AWC-047,other,in_progress,2026-10-05,,,SYNTHETIC
+VER-00561,BEN-2299,AWC-083,auth_failed,in_progress,2026-08-12,,,SYNTHETIC
+VER-00562,BEN-2300,AWC-099,pending_mobile_auth,resolved,2026-09-10,2026-09-27,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00563,BEN-2301,AWC-049,other,resolved,2026-10-03,2026-10-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00564,BEN-2307,AWC-063,document_missing,open,2026-07-21,,,SYNTHETIC
+VER-00565,BEN-2311,AWC-045,document_missing,resolved,2026-09-25,2026-09-28,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00566,BEN-2315,AWC-108,pending_mobile_auth,open,2026-06-26,,,SYNTHETIC
+VER-00567,BEN-2316,AWC-047,pending_mobile_auth,open,2026-08-16,,,SYNTHETIC
+VER-00568,BEN-2319,AWC-103,other,resolved,2026-09-19,2026-10-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00569,BEN-2321,AWC-102,auth_failed,resolved,2026-10-18,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00570,BEN-2322,AWC-086,auth_failed,open,2026-07-13,,,SYNTHETIC
+VER-00571,BEN-2325,AWC-105,auth_failed,in_progress,2026-09-14,,,SYNTHETIC
+VER-00572,BEN-2326,AWC-029,other,resolved,2026-10-03,2026-10-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00573,BEN-2327,AWC-039,pending_mobile_auth,open,2026-07-11,,,SYNTHETIC
+VER-00574,BEN-2334,AWC-053,document_missing,open,2026-10-22,,,SYNTHETIC
+VER-00575,BEN-2337,AWC-094,auth_failed,open,2026-10-16,,,SYNTHETIC
+VER-00576,BEN-2339,AWC-096,auth_failed,open,2026-08-29,,,SYNTHETIC
+VER-00577,BEN-2344,AWC-082,pending_mobile_auth,open,2026-09-09,,,SYNTHETIC
+VER-00578,BEN-2348,AWC-061,pending_mobile_auth,resolved,2026-10-03,2026-10-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00579,BEN-2351,AWC-043,document_missing,open,2026-09-13,,,SYNTHETIC
+VER-00580,BEN-2352,AWC-016,auth_failed,open,2026-07-16,,,SYNTHETIC
+VER-00581,BEN-2353,AWC-075,document_missing,in_progress,2026-08-18,,,SYNTHETIC
+VER-00582,BEN-2354,AWC-052,auth_failed,resolved,2026-09-07,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00583,BEN-2355,AWC-096,pending_mobile_auth,open,2026-07-12,,,SYNTHETIC
+VER-00584,BEN-2358,AWC-051,pending_mobile_auth,open,2026-10-10,,,SYNTHETIC
+VER-00585,BEN-2359,AWC-049,other,in_progress,2026-09-20,,,SYNTHETIC
+VER-00586,BEN-2363,AWC-070,document_missing,in_progress,2026-08-11,,,SYNTHETIC
+VER-00587,BEN-2368,AWC-054,pending_mobile_auth,in_progress,2026-07-03,,,SYNTHETIC
+VER-00588,BEN-2369,AWC-078,pending_mobile_auth,in_progress,2026-09-18,,,SYNTHETIC
+VER-00589,BEN-2371,AWC-052,document_missing,resolved,2026-08-01,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00590,BEN-2375,AWC-045,pending_mobile_auth,in_progress,2026-10-09,,,SYNTHETIC
+VER-00591,BEN-2377,AWC-043,document_missing,open,2026-07-03,,,SYNTHETIC
+VER-00592,BEN-2380,AWC-059,pending_mobile_auth,open,2026-09-11,,,SYNTHETIC
+VER-00593,BEN-2383,AWC-120,other,in_progress,2026-09-15,,,SYNTHETIC
+VER-00594,BEN-2385,AWC-043,auth_failed,resolved,2026-09-08,2026-10-01,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00595,BEN-2389,AWC-072,other,resolved,2026-10-07,2026-10-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00596,BEN-2392,AWC-114,document_missing,open,2026-07-15,,,SYNTHETIC
+VER-00597,BEN-2407,AWC-092,other,resolved,2026-09-16,2026-09-18,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00598,BEN-2408,AWC-004,pending_mobile_auth,resolved,2026-08-01,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00599,BEN-2409,AWC-003,pending_mobile_auth,in_progress,2026-08-16,,,SYNTHETIC
+VER-00600,BEN-2411,AWC-069,other,resolved,2026-09-16,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00601,BEN-2413,AWC-075,other,open,2026-07-24,,,SYNTHETIC
+VER-00602,BEN-2414,AWC-040,document_missing,in_progress,2026-09-18,,,SYNTHETIC
+VER-00603,BEN-2418,AWC-071,pending_mobile_auth,open,2026-09-11,,,SYNTHETIC
+VER-00604,BEN-2420,AWC-072,pending_mobile_auth,open,2026-10-02,,,SYNTHETIC
+VER-00605,BEN-2423,AWC-103,auth_failed,open,2026-07-15,,,SYNTHETIC
+VER-00606,BEN-2426,AWC-025,auth_failed,in_progress,2026-08-08,,,SYNTHETIC
+VER-00607,BEN-2428,AWC-029,document_missing,resolved,2026-08-19,2026-09-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00608,BEN-2429,AWC-061,auth_failed,open,2026-08-26,,,SYNTHETIC
+VER-00609,BEN-2430,AWC-056,other,in_progress,2026-07-08,,,SYNTHETIC
+VER-00610,BEN-2431,AWC-006,auth_failed,resolved,2026-06-30,2026-07-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00611,BEN-2432,AWC-030,auth_failed,in_progress,2026-07-04,,,SYNTHETIC
+VER-00612,BEN-2434,AWC-086,pending_mobile_auth,open,2026-09-12,,,SYNTHETIC
+VER-00613,BEN-2435,AWC-054,pending_mobile_auth,open,2026-08-04,,,SYNTHETIC
+VER-00614,BEN-2436,AWC-121,pending_mobile_auth,resolved,2026-10-03,2026-10-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00615,BEN-2437,AWC-039,pending_mobile_auth,in_progress,2026-08-10,,,SYNTHETIC
+VER-00616,BEN-2441,AWC-082,auth_failed,open,2026-09-04,,,SYNTHETIC
+VER-00617,BEN-2443,AWC-071,pending_mobile_auth,open,2026-09-13,,,SYNTHETIC
+VER-00618,BEN-2445,AWC-079,other,open,2026-08-25,,,SYNTHETIC
+VER-00619,BEN-2449,AWC-066,auth_failed,resolved,2026-10-16,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00620,BEN-2450,AWC-074,other,resolved,2026-08-23,2026-09-10,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00621,BEN-2451,AWC-109,auth_failed,open,2026-08-10,,,SYNTHETIC
+VER-00622,BEN-2457,AWC-023,document_missing,in_progress,2026-09-16,,,SYNTHETIC
+VER-00623,BEN-2465,AWC-039,document_missing,in_progress,2026-10-17,,,SYNTHETIC
+VER-00624,BEN-2467,AWC-115,pending_mobile_auth,resolved,2026-07-23,2026-08-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00625,BEN-2468,AWC-004,other,open,2026-10-08,,,SYNTHETIC
+VER-00626,BEN-2473,AWC-029,other,open,2026-07-11,,,SYNTHETIC
+VER-00627,BEN-2478,AWC-087,pending_mobile_auth,resolved,2026-09-11,2026-09-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00628,BEN-2479,AWC-101,other,resolved,2026-09-03,2026-09-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00629,BEN-2485,AWC-028,auth_failed,resolved,2026-10-19,2026-10-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00630,BEN-2489,AWC-087,document_missing,resolved,2026-08-11,2026-08-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00631,BEN-2491,AWC-094,other,open,2026-08-24,,,SYNTHETIC
+VER-00632,BEN-2493,AWC-109,document_missing,open,2026-07-07,,,SYNTHETIC
+VER-00633,BEN-2495,AWC-029,auth_failed,in_progress,2026-10-20,,,SYNTHETIC
+VER-00634,BEN-2500,AWC-021,pending_mobile_auth,in_progress,2026-10-19,,,SYNTHETIC
+VER-00635,BEN-2505,AWC-020,auth_failed,open,2026-07-08,,,SYNTHETIC
+VER-00636,BEN-2509,AWC-065,auth_failed,in_progress,2026-08-01,,,SYNTHETIC
+VER-00637,BEN-2511,AWC-071,other,open,2026-08-24,,,SYNTHETIC
+VER-00638,BEN-2512,AWC-079,other,open,2026-08-06,,,SYNTHETIC
+VER-00639,BEN-2516,AWC-045,pending_mobile_auth,open,2026-09-09,,,SYNTHETIC
+VER-00640,BEN-2517,AWC-020,other,in_progress,2026-10-07,,,SYNTHETIC
+VER-00641,BEN-2522,AWC-062,other,open,2026-07-09,,,SYNTHETIC
+VER-00642,BEN-2525,AWC-020,document_missing,resolved,2026-08-22,2026-09-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00643,BEN-2526,AWC-104,pending_mobile_auth,resolved,2026-07-02,2026-07-07,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00644,BEN-2535,AWC-061,auth_failed,resolved,2026-07-30,2026-08-23,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00645,BEN-2537,AWC-091,other,open,2026-09-08,,,SYNTHETIC
+VER-00646,BEN-2544,AWC-069,pending_mobile_auth,resolved,2026-10-19,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00647,BEN-2546,AWC-070,document_missing,in_progress,2026-09-24,,,SYNTHETIC
+VER-00648,BEN-2548,AWC-060,other,resolved,2026-10-05,2026-10-22,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00649,BEN-2555,AWC-081,other,resolved,2026-09-15,2026-09-29,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00650,BEN-2556,AWC-002,other,in_progress,2026-07-06,,,SYNTHETIC
+VER-00651,BEN-2563,AWC-109,document_missing,resolved,2026-07-24,2026-08-13,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00652,BEN-2564,AWC-066,pending_mobile_auth,open,2026-08-09,,,SYNTHETIC
+VER-00653,BEN-2566,AWC-005,pending_mobile_auth,in_progress,2026-08-21,,,SYNTHETIC
+VER-00654,BEN-2567,AWC-005,auth_failed,open,2026-07-27,,,SYNTHETIC
+VER-00655,BEN-2568,AWC-079,other,resolved,2026-08-01,2026-08-19,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00656,BEN-2575,AWC-030,pending_mobile_auth,in_progress,2026-08-27,,,SYNTHETIC
+VER-00657,BEN-2576,AWC-037,document_missing,resolved,2026-10-06,2026-10-16,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00658,BEN-2578,AWC-004,other,in_progress,2026-10-21,,,SYNTHETIC
+VER-00659,BEN-2582,AWC-050,document_missing,open,2026-09-16,,,SYNTHETIC
+VER-00660,BEN-2586,AWC-086,document_missing,resolved,2026-07-16,2026-07-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00661,BEN-2588,AWC-094,auth_failed,open,2026-07-01,,,SYNTHETIC
+VER-00662,BEN-2592,AWC-002,document_missing,resolved,2026-09-12,2026-09-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00663,BEN-2593,AWC-066,document_missing,open,2026-09-07,,,SYNTHETIC
+VER-00664,BEN-2604,AWC-101,document_missing,resolved,2026-08-19,2026-08-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00665,BEN-2608,AWC-069,pending_mobile_auth,resolved,2026-10-22,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00666,BEN-2611,AWC-103,pending_mobile_auth,resolved,2026-08-19,2026-09-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00667,BEN-2616,AWC-096,other,in_progress,2026-07-10,,,SYNTHETIC
+VER-00668,BEN-2622,AWC-004,pending_mobile_auth,open,2026-08-02,,,SYNTHETIC
+VER-00669,BEN-2628,AWC-093,other,open,2026-09-14,,,SYNTHETIC
+VER-00670,BEN-2632,AWC-011,other,in_progress,2026-08-12,,,SYNTHETIC
+VER-00671,BEN-2638,AWC-095,auth_failed,open,2026-07-25,,,SYNTHETIC
+VER-00672,BEN-2643,AWC-043,auth_failed,in_progress,2026-07-09,,,SYNTHETIC
+VER-00673,BEN-2645,AWC-120,auth_failed,open,2026-08-21,,,SYNTHETIC
+VER-00674,BEN-2647,AWC-055,pending_mobile_auth,in_progress,2026-07-20,,,SYNTHETIC
+VER-00675,BEN-2651,AWC-031,auth_failed,open,2026-07-07,,,SYNTHETIC
+VER-00676,BEN-2652,AWC-029,pending_mobile_auth,in_progress,2026-10-04,,,SYNTHETIC
+VER-00677,BEN-2665,AWC-111,other,in_progress,2026-07-23,,,SYNTHETIC
+VER-00678,BEN-2669,AWC-041,other,in_progress,2026-08-30,,,SYNTHETIC
+VER-00679,BEN-2671,AWC-001,document_missing,open,2026-07-27,,,SYNTHETIC
+VER-00680,BEN-2680,AWC-049,other,resolved,2026-07-23,2026-08-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00681,BEN-2688,AWC-047,document_missing,open,2026-10-21,,,SYNTHETIC
+VER-00682,BEN-2697,AWC-120,document_missing,open,2026-10-19,,,SYNTHETIC
+VER-00683,BEN-2701,AWC-037,auth_failed,resolved,2026-10-08,2026-10-09,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00684,BEN-2703,AWC-092,auth_failed,resolved,2026-10-04,2026-10-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00685,BEN-2704,AWC-033,auth_failed,open,2026-07-31,,,SYNTHETIC
+VER-00686,BEN-2706,AWC-076,document_missing,open,2026-07-05,,,SYNTHETIC
+VER-00687,BEN-2709,AWC-109,pending_mobile_auth,open,2026-07-28,,,SYNTHETIC
+VER-00688,BEN-2714,AWC-114,document_missing,resolved,2026-08-29,2026-09-21,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00689,BEN-2719,AWC-068,other,in_progress,2026-09-28,,,SYNTHETIC
+VER-00690,BEN-2720,AWC-048,pending_mobile_auth,resolved,2026-07-19,2026-08-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00691,BEN-2721,AWC-088,document_missing,resolved,2026-09-23,2026-09-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00692,BEN-2723,AWC-092,other,in_progress,2026-09-08,,,SYNTHETIC
+VER-00693,BEN-2725,AWC-009,other,resolved,2026-08-12,2026-09-05,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00694,BEN-2726,AWC-069,document_missing,resolved,2026-07-16,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00695,BEN-2728,AWC-028,pending_mobile_auth,open,2026-08-27,,,SYNTHETIC
+VER-00696,BEN-2730,AWC-017,document_missing,in_progress,2026-08-15,,,SYNTHETIC
+VER-00697,BEN-2732,AWC-026,other,resolved,2026-07-17,2026-08-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00698,BEN-2736,AWC-019,other,open,2026-09-23,,,SYNTHETIC
+VER-00699,BEN-2740,AWC-122,pending_mobile_auth,open,2026-09-14,,,SYNTHETIC
+VER-00700,BEN-2743,AWC-002,pending_mobile_auth,resolved,2026-08-25,2026-09-11,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00701,BEN-2746,AWC-077,auth_failed,resolved,2026-07-04,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00702,BEN-2751,AWC-037,document_missing,open,2026-08-20,,,SYNTHETIC
+VER-00703,BEN-2754,AWC-071,auth_failed,resolved,2026-07-31,2026-08-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00704,BEN-2760,AWC-091,pending_mobile_auth,resolved,2026-08-15,2026-09-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00705,BEN-2764,AWC-002,pending_mobile_auth,open,2026-10-21,,,SYNTHETIC
+VER-00706,BEN-2768,AWC-060,pending_mobile_auth,open,2026-07-13,,,SYNTHETIC
+VER-00707,BEN-2771,AWC-026,pending_mobile_auth,open,2026-09-09,,,SYNTHETIC
+VER-00708,BEN-2773,AWC-047,pending_mobile_auth,in_progress,2026-08-03,,,SYNTHETIC
+VER-00709,BEN-2784,AWC-110,document_missing,resolved,2026-08-30,2026-09-03,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00710,BEN-2787,AWC-042,auth_failed,resolved,2026-06-27,2026-07-04,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00711,BEN-2788,AWC-063,document_missing,resolved,2026-07-19,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00712,BEN-2791,AWC-120,document_missing,in_progress,2026-10-20,,,SYNTHETIC
+VER-00713,BEN-2795,AWC-085,other,open,2026-10-17,,,SYNTHETIC
+VER-00714,BEN-2798,AWC-109,auth_failed,resolved,2026-10-16,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00715,BEN-2800,AWC-048,pending_mobile_auth,open,2026-08-17,,,SYNTHETIC
+VER-00716,BEN-2808,AWC-013,other,resolved,2026-10-14,2026-10-22,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00717,BEN-2809,AWC-039,auth_failed,open,2026-08-09,,,SYNTHETIC
+VER-00718,BEN-2810,AWC-008,document_missing,resolved,2026-07-19,2026-07-20,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00719,BEN-2812,AWC-036,document_missing,open,2026-08-13,,,SYNTHETIC
+VER-00720,BEN-2814,AWC-085,other,open,2026-08-03,,,SYNTHETIC
+VER-00721,BEN-2818,AWC-099,document_missing,open,2026-09-10,,,SYNTHETIC
+VER-00722,BEN-2828,AWC-050,document_missing,resolved,2026-09-11,2026-09-14,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00723,BEN-2829,AWC-096,auth_failed,resolved,2026-08-01,2026-08-06,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00724,BEN-2830,AWC-101,document_missing,open,2026-10-02,,,SYNTHETIC
+VER-00725,BEN-2831,AWC-053,auth_failed,resolved,2026-10-13,2026-10-15,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00726,BEN-2839,AWC-084,other,in_progress,2026-09-22,,,SYNTHETIC
+VER-00727,BEN-2842,AWC-110,pending_mobile_auth,in_progress,2026-07-06,,,SYNTHETIC
+VER-00728,BEN-2844,AWC-033,auth_failed,resolved,2026-07-03,2026-07-22,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00729,BEN-2847,AWC-064,pending_mobile_auth,in_progress,2026-07-12,,,SYNTHETIC
+VER-00730,BEN-2854,AWC-108,auth_failed,in_progress,2026-09-02,,,SYNTHETIC
+VER-00731,BEN-2863,AWC-061,other,open,2026-07-07,,,SYNTHETIC
+VER-00732,BEN-2867,AWC-011,document_missing,open,2026-10-05,,,SYNTHETIC
+VER-00733,BEN-2868,AWC-050,auth_failed,open,2026-07-06,,,SYNTHETIC
+VER-00734,BEN-2871,AWC-112,other,in_progress,2026-09-07,,,SYNTHETIC
+VER-00735,BEN-2872,AWC-067,other,in_progress,2026-07-17,,,SYNTHETIC
+VER-00736,BEN-2875,AWC-050,document_missing,resolved,2026-10-19,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00737,BEN-2879,AWC-080,other,open,2026-10-12,,,SYNTHETIC
+VER-00738,BEN-2885,AWC-101,auth_failed,open,2026-10-16,,,SYNTHETIC
+VER-00739,BEN-2888,AWC-097,document_missing,resolved,2026-07-26,2026-08-08,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00740,BEN-2890,AWC-046,other,in_progress,2026-08-22,,,SYNTHETIC
+VER-00741,BEN-2891,AWC-051,document_missing,open,2026-08-30,,,SYNTHETIC
+VER-00742,BEN-2896,AWC-002,auth_failed,open,2026-09-03,,,SYNTHETIC
+VER-00743,BEN-2897,AWC-032,document_missing,in_progress,2026-07-13,,,SYNTHETIC
+VER-00744,BEN-2898,AWC-016,document_missing,open,2026-08-03,,,SYNTHETIC
+VER-00745,BEN-2899,AWC-012,auth_failed,in_progress,2026-10-21,,,SYNTHETIC
+VER-00746,BEN-2901,AWC-092,other,in_progress,2026-08-07,,,SYNTHETIC
+VER-00747,BEN-2907,AWC-003,document_missing,open,2026-10-04,,,SYNTHETIC
+VER-00748,BEN-2911,AWC-075,auth_failed,resolved,2026-08-01,2026-08-17,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00749,BEN-2914,AWC-007,auth_failed,open,2026-07-01,,,SYNTHETIC
+VER-00750,BEN-2922,AWC-106,pending_mobile_auth,open,2026-09-14,,,SYNTHETIC
+VER-00751,BEN-2925,AWC-032,document_missing,resolved,2026-09-09,2026-09-12,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00752,BEN-2926,AWC-112,document_missing,open,2026-08-07,,,SYNTHETIC
+VER-00753,BEN-2931,AWC-025,document_missing,in_progress,2026-10-14,,,SYNTHETIC
+VER-00754,BEN-2932,AWC-045,pending_mobile_auth,in_progress,2026-10-14,,,SYNTHETIC
+VER-00755,BEN-2933,AWC-022,other,in_progress,2026-08-18,,,SYNTHETIC
+VER-00756,BEN-2937,AWC-019,auth_failed,in_progress,2026-09-01,,,SYNTHETIC
+VER-00757,BEN-2938,AWC-118,pending_mobile_auth,resolved,2026-09-14,2026-09-26,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00758,BEN-2939,AWC-054,document_missing,open,2026-10-11,,,SYNTHETIC
+VER-00759,BEN-2946,AWC-046,other,in_progress,2026-10-21,,,SYNTHETIC
+VER-00760,BEN-2951,AWC-031,document_missing,open,2026-10-18,,,SYNTHETIC
+VER-00761,BEN-2952,AWC-053,auth_failed,open,2026-07-15,,,SYNTHETIC
+VER-00762,BEN-2956,AWC-072,auth_failed,open,2026-08-22,,,SYNTHETIC
+VER-00763,BEN-2957,AWC-053,pending_mobile_auth,open,2026-10-12,,,SYNTHETIC
+VER-00764,BEN-2961,AWC-120,other,open,2026-07-18,,,SYNTHETIC
+VER-00765,BEN-2962,AWC-071,other,resolved,2026-08-18,2026-08-31,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00766,BEN-2966,AWC-067,pending_mobile_auth,in_progress,2026-08-16,,,SYNTHETIC
+VER-00767,BEN-2967,AWC-040,auth_failed,resolved,2026-07-12,2026-07-25,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00768,BEN-2969,AWC-063,other,in_progress,2026-10-08,,,SYNTHETIC
+VER-00769,BEN-2979,AWC-044,document_missing,open,2026-08-03,,,SYNTHETIC
+VER-00770,BEN-2980,AWC-032,document_missing,resolved,2026-10-11,2026-10-24,Resolved at centre visit (synthetic),SYNTHETIC
+VER-00771,BEN-2983,AWC-119,pending_mobile_auth,open,2026-10-06,,,SYNTHETIC
+VER-00772,BEN-2994,AWC-102,pending_mobile_auth,in_progress,2026-08-27,,,SYNTHETIC
+VER-00773,BEN-2999,AWC-017,document_missing,in_progress,2026-07-30,,,SYNTHETIC

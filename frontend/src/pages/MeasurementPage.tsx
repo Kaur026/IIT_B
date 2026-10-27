@@ -291,6 +291,7 @@ export const MeasurementPage: React.FC = () => {
                 <input
                   type="date"
                   value={measurementDate}
+                  max={DEMO_TODAY}
                   onChange={(e) => setMeasurementDate(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2457F5]/30"
                   required
@@ -589,6 +590,22 @@ export const MeasurementPage: React.FC = () => {
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Reading matches expected biological growth velocity trajectory.</span>
+              </div>
+            )}
+
+            {/* Informational notice: no prior measurement history */}
+            {evaluation && evaluation.infoNotes && evaluation.infoNotes.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                {evaluation.infoNotes.map((note, idx) => (
+                  <div key={idx} className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs space-y-1 flex items-start gap-2">
+                    <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold text-[11px] mb-0.5">{note.name}</div>
+                      <p className="text-[11px] text-blue-800 leading-relaxed">{note.summary}</p>
+                      <p className="text-[10px] text-blue-600 italic pt-1">{note.suggestedAction}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

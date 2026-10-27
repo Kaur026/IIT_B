@@ -1,0 +1,80 @@
+{
+ "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
+ "config_version": "1.0.0",
+ "reporting_date": "2026-10-24",
+ "datasets": {
+  "centres": {
+   "rows": 122,
+   "empty_cells": {}
+  },
+  "workers": {
+   "rows": 122,
+   "empty_cells": {}
+  },
+  "beneficiaries": {
+   "rows": 3025,
+   "empty_cells": {
+    "guardian_name": 600,
+    "possible_duplicate_of": 3000
+   }
+  },
+  "measurements": {
+   "rows": 9715,
+   "empty_cells": {
+    "weight_value": 30,
+    "height_value": 30,
+    "supersedes_id": 9715
+   }
+  },
+  "verification_records": {
+   "rows": 773,
+   "empty_cells": {
+    "resolved_on": 484,
+    "resolution_note": 484
+   }
+  },
+  "referrals": {
+   "rows": 85,
+   "empty_cells": {
+    "acknowledged_on": 21,
+    "attended_on": 49,
+    "outcome_on": 61,
+    "outcome_note": 61
+   }
+  },
+  "maternal_profiles": {
+   "rows": 600,
+   "empty_cells": {}
+  },
+  "service_records": {
+   "rows": 4518,
+   "empty_cells": {}
+  },
+  "home_visits": {
+   "rows": 1200,
+   "empty_cells": {}
+  },
+  "review_history": {
+   "rows": 246,
+   "empty_cells": {
+    "reviewed_on": 17,
+    "decision": 17
+   }
+  },
+  "tasks_seed": {
+   "rows": 152,
+   "empty_cells": {
+    "closed_on": 82,
+    "outcome": 82
+   }
+  },
+  "age_bands_reference": {
+   "rows": 3,
+   "empty_cells": {}
+  }
+ },
+ "structural_issue_count": 0,
+ "issue_counts_by_check": {},
+ "issues_sample": [],
+ "note": "Planted data-quality errors (missing values, unit mismatches, etc.) are expected and are not structural issues; the rules engine finds them."
+}
