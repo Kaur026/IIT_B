@@ -214,7 +214,7 @@ def suggested_next_step(referral: dict) -> dict:
 
 
 def referral_summary(referrals: list) -> dict:
-    """Count referrals by status and no-contact reason for a synthetic overview."""
+    """Count legacy referral records by status and no-contact reason."""
     if not isinstance(referrals, list):
         raise ReferralError("referrals must be a list.")
     statuses = {status: 0 for status in REFERRAL_STATUSES}
@@ -226,3 +226,95 @@ def referral_summary(referrals: list) -> dict:
         if reason:
             reasons[reason] = reasons.get(reason, 0) + 1
     return {"total": len(referrals), "by_status": statuses, "by_contact_reason": reasons}
+
+
+# Revised generic/DEIC service-follow-up loop from the Oct 24 handoff. These
+# workflow states are not a clinical eligibility or treatment determination.
+FOLLOWUP_REFERRAL_KINDS = frozenset({"general", "deic"})
+FOLLOWUP_REFERRAL_STATUSES = ("sent", "acknowledged", "attended", "outcome_recorded", "not_needed")
+FOLLOWUP_REASON_CODES = frozenset({
+    "case_follow_up", "verification_follow_up", "disability_service_follow_up",
+    "service_follow_up", "other_approved_workflow",
+})
+FOLLOWUP_OUTCOME_CODES = frozenset({
+    "service_contact_recorded", "appointment_recorded", "follow_up_requested",
+    "facility_unavailable", "not_attended", "unknown", "other_workflow_outcome",
+})
+
+
+def create_followup_referral(beneficiary_id: str, centre_id: str, referral_kind: str,
+                             destination: str, reason_code: str, actor_id: str,
+                             on: DateLike, due_on: DateLike = None, task_id: str = ""):
+    """Create a generic or DEIC referral with only coded, operational fields."""
+    for key, value in (("beneficiary_id", beneficiary_id), ("centre_id", centre_id),
+                       ("destination", destination), ("actor_id", actor_id)):
+        if not isinstance(value, str) or not value.strip():
+            raise ReferralError(f"{key} is required.")
+    kind = str(referral_kind or "").strip().lower()
+    reason = str(reason_code or "").strip().lower()
+    if kind not in FOLLOWUP_REFERRAL_KINDS:
+        raise ReferralError("referral_kind must be general or deic.")
+    if reason not in FOLLOWUP_REASON_CODES:
+        raise ReferralError("reason_code is not an approved workflow code.")
+    created = parse_date(on).isoformat()
+    due = parse_date(due_on).isoformat() if due_on is not None else ""
+    record = {
+        "referral_id": str(uuid4()), "beneficiary_id": beneficiary_id.strip(),
+        "centre_id": centre_id.strip(), "task_id": str(task_id or "").strip(),
+        "referral_kind": kind, "destination": destination.strip(),
+        "reason_code": reason, "status": "sent", "created_at": created,
+        "sent_by": actor_id.strip(), "due_on": due or None,
+        "acknowledged_at": None, "attended_at": None,
+        "outcome_code": None, "outcome_recorded_at": None,
+        "timeline": [{"event": "sent", "actor_id": actor_id.strip(), "at": created}],
+        "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
+        "eligibility_decision": False,
+    }
+    return record
+
+
+def update_followup_referral(record: dict, actor_id: str, action: str,
+                             on: DateLike, outcome_code: str = ""):
+    """Apply one monotonic referral state transition; never infer an outcome."""
+    if not isinstance(record, dict) or record.get("status") not in FOLLOWUP_REFERRAL_STATUSES:
+        raise ReferralError("Referral record has an invalid state.")
+    if not isinstance(actor_id, str) or not actor_id.strip():
+        raise ReferralError("actor_id is required.")
+    verb = str(action or "").strip().lower()
+    if verb != "record_outcome" and outcome_code:
+        raise ReferralError("outcome_code is allowed only for record_outcome.")
+    when = parse_date(on).isoformat()
+    updated = deepcopy(record)
+    if verb == "acknowledge":
+        if updated["status"] != "sent":
+            raise ReferralError("Only a sent referral can be acknowledged.")
+        updated["status"] = "acknowledged"
+        updated["acknowledged_at"] = when
+    elif verb == "attend":
+        if updated["status"] not in {"sent", "acknowledged"}:
+            raise ReferralError("Referral attendance can be recorded only before an outcome.")
+        updated["status"] = "attended"
+        updated["attended_at"] = when
+    elif verb == "record_outcome":
+        if updated["status"] != "attended":
+            raise ReferralError("An outcome can be recorded only after attendance is recorded.")
+        code = str(outcome_code or "").strip().lower()
+        if code not in FOLLOWUP_OUTCOME_CODES:
+            raise ReferralError("outcome_code is not an approved workflow code.")
+        updated["status"] = "outcome_recorded"
+        updated["outcome_code"] = code
+        updated["outcome_recorded_at"] = when
+    else:
+        raise ReferralError("action must be acknowledge, attend, or record_outcome.")
+    updated["timeline"].append({"event": verb, "actor_id": actor_id.strip(), "at": when,
+                                "outcome_code": updated.get("outcome_code") if verb == "record_outcome" else None})
+    return updated
+
+
+def followup_is_overdue(record: dict, as_of: DateLike) -> bool:
+    """Overdue is derived only when a real explicit due date was supplied."""
+    if not isinstance(record, dict):
+        raise ReferralError("record must be a dictionary.")
+    if record.get("status") in {"outcome_recorded", "not_needed"} or not record.get("due_on"):
+        return False
+    return parse_date(as_of) > parse_date(record["due_on"])

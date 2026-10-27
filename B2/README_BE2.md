@@ -1,4 +1,4 @@
-# BE2 workflow handoff (prototype; synthetic data only)
+# BE2 end-to-end backend handoff (synthetic prototype)
 
 ## BE2 files
 

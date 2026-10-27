@@ -7,6 +7,7 @@ from a trusted identity provider/server session.
 
 from collections import defaultdict
 from dataclasses import dataclass
+from dataclasses import dataclass
 
 from B2.demo_clock import parse_date
 
@@ -64,6 +65,73 @@ def require_case_scope(principal: Principal, centre_id: str, action: str, assign
         raise RolePermissionError("Worker may only access cases explicitly assigned to them.")
 
 
+@dataclass(frozen=True)
+class Principal:
+    actor_id: str
+    role: str
+    centre_ids: tuple
+    assigned_worker_id: str = ""
+
+
+# Server-side synthetic demo identities. These are NOT real authentication and
+# must never be represented as production security.
+DEMO_ACTORS = {
+    "demo-worker": Principal("W07", "worker", ("AWC-001",), "W07"),
+    "demo-supervisor": Principal("SUP-001", "supervisor", ("AWC-001", "AWC-002")),
+    "demo-cdpo": Principal("CDPO-001", "cdpo", ("AWC-001", "AWC-002")),
+    "demo-nodal": Principal("NODAL-001", "nodal", ("AWC-001", "AWC-002")),
+    "demo-state": Principal("STATE-001", "state", ("AWC-001", "AWC-002")),
+    "demo-india": Principal("INDIA-001", "india", ("AWC-001", "AWC-002")),
+}
+
+ROLE_API_PERMISSIONS = {
+    "worker": frozenset({
+        "view_case", "view_history", "view_briefing", "verify_measurement",
+        "view_tasks", "task_action", "explain_case", "history_summary", "view_audit",
+        "suggest_action", "decide_action", "view_referrals", "create_referral",
+        "update_referral", "view_exceptions", "create_exception",
+        "closure_confirm", "offline_enqueue", "view_offline_queue",
+    }),
+    "supervisor": frozenset({
+        "view_case", "view_history", "view_briefing", "verify_measurement",
+        "view_tasks", "task_action", "create_task", "explain_case", "view_audit",
+        "history_summary", "suggest_action", "decide_action", "view_referrals",
+        "create_referral", "update_referral", "view_exceptions", "create_exception",
+        "resolve_exception", "closure_confirm", "view_maternal", "create_maternal",
+        "update_maternal", "create_snapshot", "view_snapshots", "offline_enqueue",
+        "view_offline_queue", "offline_sync",
+    }),
+    "cdpo": frozenset({"view_case", "view_history", "view_briefing", "view_tasks", "explain_case", "history_summary", "view_audit", "view_referrals", "view_exceptions", "view_snapshots"}),
+    "nodal": frozenset({"view_briefing", "view_snapshots"}),
+    "state": frozenset({"view_briefing", "view_snapshots"}),
+    "india": frozenset({"view_briefing", "view_snapshots"}),
+}
+
+
+def resolve_demo_actor(actor_key: str) -> Principal:
+    """Resolve only a server-allow-listed synthetic actor key."""
+    if not isinstance(actor_key, str) or actor_key not in DEMO_ACTORS:
+        raise RolePermissionError("Unknown demo actor; access denied.")
+    return DEMO_ACTORS[actor_key]
+
+
+def require_api_permission(principal: Principal, permission: str) -> None:
+    if not isinstance(principal, Principal) or permission not in ROLE_API_PERMISSIONS.get(principal.role, frozenset()):
+        raise RolePermissionError(f"Role is not permitted to perform {permission}.")
+
+
+def require_centre_scope(principal: Principal, centre_id: str) -> None:
+    if not isinstance(principal, Principal) or not isinstance(centre_id, str) or centre_id not in principal.centre_ids:
+        raise RolePermissionError("Centre is outside this actor's assigned scope.")
+
+
+def require_case_scope(principal: Principal, centre_id: str, action: str, assigned_worker_id: str = "") -> None:
+    require_api_permission(principal, action)
+    require_centre_scope(principal, centre_id)
+    if principal.role == "worker" and (not assigned_worker_id or assigned_worker_id != principal.assigned_worker_id):
+        raise RolePermissionError("Worker may only access cases explicitly assigned to them.")
+
+
 ROLE_PERMISSIONS = {
     "worker": frozenset({"view_own_tasks", "acknowledge_task", "complete_task", "record_contact_attempt"}),
     "supervisor": frozenset({"view_all_tasks", "acknowledge_task", "complete_task", "reassign_task", "escalate_task", "view_workload", "record_contact_attempt", "log_referral_outcome"}),
@@ -71,7 +139,7 @@ ROLE_PERMISSIONS = {
     "district": frozenset({"view_all_tasks", "view_workload", "view_referral_summary"}),
     "admin": frozenset({"view_all_tasks", "view_workload", "manage_demo_roles"}),
 }
-ACTIVE_TASK_STATUSES = frozenset({"open", "acknowledged", "escalated"})
+ACTIVE_TASK_STATUSES = frozenset({"open", "assigned", "acknowledged", "in_progress", "escalated"})
 
 
 class RolePermissionError(PermissionError):

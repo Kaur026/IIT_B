@@ -3,3 +3,9 @@ __pycache__/
 .vscode/
 *.sqlite
 *.db
+
+# BE2 local synthetic prototype databases and offline queue
+*.sqlite
+*.db
+B2/.offline_queue.json
+B2/.offline/

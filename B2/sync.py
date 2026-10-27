@@ -17,7 +17,7 @@ from B2.demo_clock import DateLike, parse_date
 
 
 SCHEMA_VERSION = 1
-ALLOWED_ENTITY_TYPES = frozenset({"task", "referral", "consent", "fallback"})
+ALLOWED_ENTITY_TYPES = frozenset({"task", "referral", "consent", "fallback", "access_exception", "verification", "maternal_followup"})
 ALLOWED_ACTIONS = frozenset({"upsert"})
 
 
@@ -216,5 +216,54 @@ def apply_sync_results(path, results):
         elif result.get("status") == "conflict":
             operation["sync_status"] = "conflict"
             operation["sync_error"] = result.get("message", "Conflict requires review.")
+        elif result.get("status") == "failed":
+            operation["sync_status"] = "failed"
+            operation["sync_error"] = result.get("message", "Sync attempt failed; retry is available.")
     _write_queue(path, data)
     return deepcopy(data["operations"])
+
+
+def retry_failed_operation(path, operation_id: str):
+    """Explicitly move one failed operation back to pending for another attempt."""
+    identifier = _required_text(operation_id, "operation_id")
+    data = _read_queue(path)
+    for operation in data["operations"]:
+        if operation.get("operation_id") == identifier:
+            if operation.get("sync_status") != "failed" or operation.get("resolution") == "discard_pending_change":
+                raise SyncError("Only retryable failed operations can be retried; discarded changes require a new operation.")
+            operation["sync_status"] = "pending"
+            operation["retry_count"] = int(operation.get("retry_count", 0)) + 1
+            operation.pop("sync_error", None)
+            _write_queue(path, data)
+            return deepcopy(operation)
+    raise SyncError("Offline operation not found.")
+
+
+def resolve_conflict(path, operation_id: str, resolution: str, latest_version=None):
+    """Record an explicit conflict decision; never silently replace server data."""
+    identifier = _required_text(operation_id, "operation_id")
+    choice = _required_text(resolution, "resolution").lower()
+    data = _read_queue(path)
+    for operation in data["operations"]:
+        if operation.get("operation_id") != identifier:
+            continue
+        if operation.get("sync_status") != "conflict":
+            raise SyncError("Only a conflicted operation can be resolved.")
+        if choice == "retry_with_current_version":
+            if isinstance(latest_version, bool) or not isinstance(latest_version, int) or latest_version < 0:
+                raise SyncError("latest_version is required for retry_with_current_version.")
+            operation["base_version"] = latest_version
+            operation["sync_status"] = "pending"
+            operation["resolution"] = "retry_with_current_version"
+            operation["resolution_count"] = int(operation.get("resolution_count", 0)) + 1
+            operation.pop("sync_error", None)
+        elif choice == "discard_pending_change":
+            operation["sync_status"] = "failed"
+            operation["resolution"] = "discard_pending_change"
+            operation["resolution_count"] = int(operation.get("resolution_count", 0)) + 1
+            operation["sync_error"] = "Pending change was explicitly discarded; source/server record was not changed."
+        else:
+            raise SyncError("resolution must be retry_with_current_version or discard_pending_change.")
+        _write_queue(path, data)
+        return deepcopy(operation)
+    raise SyncError("Offline operation not found.")

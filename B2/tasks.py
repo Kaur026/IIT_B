@@ -17,7 +17,7 @@ from uuid import uuid4
 from B2.demo_clock import DEFAULT_DEMO_DATE, DateLike, parse_date
 
 
-TASK_STATUSES = ("open", "assigned", "acknowledged", "in_progress", "escalated", "closed")
+TASK_STATUSES = ("open", "assigned", "assigned", "acknowledged", "in_progress", "in_progress", "escalated", "closed")
 OUTCOME_OPTIONS = (
     "reached",
     "not_reached",
@@ -332,6 +332,92 @@ def apply_task_action(task: dict, action: str, actor_id: str, on: DateLike, **kw
         )
 
     if action_value == "close":
+        if updated["status"] != "in_progress":
+            raise TaskActionError("Task must be in progress before it can be closed.")
+        return complete_task(
+            updated,
+            actor,
+            kwargs.get("outcome", ""),
+            on,
+            kwargs.get("notes", ""),
+        )
+
+    if action_value == "escalate":
+        if updated["status"] not in {"open", "assigned", "acknowledged", "in_progress"}:
+            raise TaskActionError("Task cannot be escalated from its current state.")
+        return escalate_task(
+            updated,
+            actor,
+            kwargs.get("owner_id", ""),
+            on,
+            kwargs.get("reason", ""),
+        )
+
+    raise TaskActionError("Unknown task action.")
+
+
+def apply_task_action(task: dict, action: str, actor_id: str, on: DateLike, **kwargs):
+    """Apply one explicit Day-1 task-state transition.
+
+    The API layer must authorize the actor and centre before calling this
+    function. This state machine records each action; it never makes clinical
+    decisions. Closing requires an explicit closure_verified marker from the
+    two-key closure service; public API callers cannot supply that marker.
+    """
+    updated = _copy_task(task)
+    action_value = _required_text(action, "action").lower()
+    actor = _required_text(actor_id, "actor_id")
+
+    if action_value == "assign":
+        if updated["status"] != "open":
+            raise TaskActionError("Only open tasks can be assigned.")
+        owner = _required_text(kwargs.get("owner_id"), "owner_id")
+        updated["owner_id"] = owner
+        updated["owner_role"] = str(kwargs.get("owner_role") or "worker").strip()
+        updated["status"] = "assigned"
+        _record(updated, "assigned", actor, on, {"owner_id": owner, "owner_role": updated["owner_role"]})
+        return updated
+
+    if action_value == "acknowledge":
+        if updated["status"] not in {"assigned", "escalated"}:
+            raise TaskActionError("Only assigned or escalated tasks can be acknowledged.")
+        previous = updated["status"]
+        updated["status"] = "acknowledged"
+        _record(updated, "acknowledged", actor, on, {"owner_id": updated.get("owner_id"), "previous_status": previous})
+        return updated
+
+    if action_value == "start":
+        if updated["status"] != "acknowledged":
+            raise TaskActionError("Only acknowledged tasks can move in progress.")
+        updated["status"] = "in_progress"
+        _record(updated, "in_progress", actor, on)
+        return updated
+
+    if action_value == "reassign":
+        if updated["status"] not in {"assigned", "acknowledged", "in_progress", "escalated"}:
+            raise TaskActionError("Only active assigned tasks can be reassigned.")
+        return reassign_task(
+            updated,
+            actor,
+            kwargs.get("owner_id"),
+            on,
+            kwargs.get("reason", ""),
+        )
+
+    if action_value == "record_progress":
+        if updated["status"] != "in_progress":
+            raise TaskActionError("Progress can be recorded only while a task is in progress.")
+        note = _required_text(kwargs.get("notes"), "notes")
+        progress = updated.setdefault("progress_notes", [])
+        if not isinstance(progress, list):
+            raise TaskActionError("task progress_notes must be a list.")
+        progress.append({"actor_id": actor, "at": parse_date(on).isoformat(), "note": note})
+        _record(updated, "progress_recorded", actor, on, {"note": note})
+        return updated
+
+    if action_value == "close":
+        if kwargs.get("closure_verified") is not True:
+            raise TaskActionError("Two-key closure service confirmation is required.")
         if updated["status"] != "in_progress":
             raise TaskActionError("Task must be in progress before it can be closed.")
         return complete_task(
