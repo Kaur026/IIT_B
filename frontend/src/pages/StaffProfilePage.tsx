@@ -29,7 +29,8 @@ export const StaffProfilePage: React.FC = () => {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   const activeRoleConfig = ROLE_CONFIGS[role || 'AWW'];
-  const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode });
+  const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode, sectorCode: staffUser?.sectorCode, projectCode: staffUser?.projectCode });
+  const demoToolsEnabled = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demoTools') === '1';
 
   const handleResetData = () => {
     mockStore.resetToDemoSeed();
@@ -66,14 +67,14 @@ export const StaffProfilePage: React.FC = () => {
           </p>
         </div>
 
-        <button
+        {demoToolsEnabled && role !== 'DPO' && <button
           type="button"
           onClick={() => setIsResetModalOpen(true)}
           className="px-4 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-full transition-all shadow-sm flex items-center gap-1.5 self-start sm:self-auto"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset Demo Data</span>
-        </button>
+        </button>}
       </motion.div>
 
       {/* 2. Worker Identity & Station Card */}
@@ -195,14 +196,14 @@ export const StaffProfilePage: React.FC = () => {
             </div>
 
             <div className="pt-2">
-              <button
+              {demoToolsEnabled && role !== 'DPO' && <button
                 type="button"
                 onClick={() => setIsResetModalOpen(true)}
                 className="w-full py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset to Canonical Baseline Demo Data</span>
-              </button>
+              </button>}
             </div>
           </div>
 
@@ -213,7 +214,7 @@ export const StaffProfilePage: React.FC = () => {
               <span>Simulated Governance Context</span>
             </div>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              Student research prototype for academic evaluation of anthropometric plausibility algorithms. Not connected to Ministry of Women & Child Development production APIs.
+              Illustrative anthropometric plausibility review. Not connected to government production APIs.
             </p>
           </div>
         </aside>

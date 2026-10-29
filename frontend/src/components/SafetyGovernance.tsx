@@ -13,7 +13,7 @@ export const SafetyGovernance: React.FC = () => {
     {
       title: 'Zero personal identifiers',
       description:
-        'Operates on 100% synthetic research mock datasets in this prototype. Designed to comply with national digital personal data protection norms.',
+        'Uses synthetic research mock datasets. Designed to comply with national digital personal data protection norms.',
       icon: <ShieldCheck className="w-5 h-5 text-[#2457F5]" />,
       tag: 'DPDP Aligned',
     },
