@@ -67,7 +67,7 @@ const mapMeasurementRows = (beneficiaryId: string): MeasurementRow[] =>
         weight: measurement.weightKg,
         height: measurement.heightCm,
         muac: measurement.muacCm,
-        waz: 'Z-score not calculated in this prototype',
+        waz: 'Z-score not calculated in this view',
         flag: hasFlag ? (measurement.qualityFlags[0] || measurement.clinicalFlags[0] || 'Flagged') : null,
         recordedBy: measurement.recordedBy,
         verified: measurement.isVerified,

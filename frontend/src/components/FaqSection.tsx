@@ -13,13 +13,13 @@ const FAQS: FaqItem[] = [
     id: 'faq-1',
     question: 'Does this replace Poshan Tracker?',
     answer:
-      'No. Poshan Action Layer is a student research prototype designed to sit conceptually on top of existing frontline data entry workflows. It does not replace the official Poshan Tracker mobile app or its central servers; rather, it investigates how flagged biometric records can be organized into prioritized, verified caseworker tasks.',
+      'No. This site presents workflow concepts and does not replace or connect to official Poshan Tracker services.',
   },
   {
     id: 'faq-2',
     question: 'Is real child data used?',
     answer:
-      'Never. 100% of the beneficiary records, growth trajectories, and identifying details shown in this prototype are synthetic, mathematically generated mock datasets. No real citizen Aadhaar, child names, biometric measurements, or confidential health records are ever processed or stored.',
+      'Never. All beneficiary records, growth trajectories, and identifying details shown here are synthetic mock data. No real citizen Aadhaar, child names, biometric measurements, or confidential health records are processed or stored.',
   },
   {
     id: 'faq-3',
@@ -31,7 +31,7 @@ const FAQS: FaqItem[] = [
     id: 'faq-4',
     question: 'Is this an official government service?',
     answer:
-      'No. This is an independent academic research prototype developed for educational and casework systems inquiry. It is not an official service of the Government of India, the Ministry of Women and Child Development (MoWCD), or any State Nutrition Mission.',
+      'No. It is independent and is not operated, endorsed, or connected to the Government of India, MoWCD, or any State Nutrition Mission.',
   },
   {
     id: 'faq-5',
@@ -66,7 +66,7 @@ export const FaqSection: React.FC = () => {
         </div>
         <div className="md:col-span-4">
           <p className="text-slate-500 text-sm leading-relaxed">
-            Everything you need to know about the prototype purpose, data boundaries, and verification
+            Everything you need to know about the project purpose, data boundaries, and verification
             safeguards.
           </p>
         </div>

@@ -285,6 +285,7 @@ export const ActionQueuePage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {import.meta.env.DEV && <Link to="/synthetic-operations" className="px-3.5 py-2 text-xs font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-full">B2 task queue</Link>}
           <Link
             to="/rules"
             className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"

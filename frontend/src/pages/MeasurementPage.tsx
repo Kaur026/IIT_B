@@ -25,8 +25,10 @@ import { calculateAge, evaluateMeasurementEntry, getDaysBetween } from '../utils
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { canPerformAction } from '../utils/permissions.ts';
+import { isMockDemoEnabled } from '../utils/demoMode';
+import { PreparedMeasurementView } from '../components/portal/PreparedRecordsViews';
 
-export const MeasurementPage: React.FC = () => {
+const MockMeasurementPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -624,4 +626,22 @@ export const MeasurementPage: React.FC = () => {
       </form>
     </div>
   );
+};
+
+export const MeasurementPage: React.FC = () => {
+  const { supabaseSession, authInitializing } = useAuth();
+  if (authInitializing) {
+    return <section role="status" className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Checking signed-in account…</section>;
+  }
+  if (supabaseSession) {
+    return <PreparedMeasurementView accessToken={supabaseSession.access_token} />;
+  }
+  if (isMockDemoEnabled(import.meta.env)) {
+    return <MockMeasurementPage />;
+  }
+  return <section className="rounded-3xl border border-amber-200 bg-white p-6" aria-labelledby="measurement-access-title">
+    <h1 id="measurement-access-title" className="text-xl font-semibold text-slate-900">Prepared measurements unavailable</h1>
+    <p className="mt-2 text-sm text-slate-600">Sign in with an account that has trusted backend authorization. Browser-local measurement simulation is disabled in this build.</p>
+    <Link to="/signin" className="mt-4 inline-flex rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white">Sign in</Link>
+  </section>;
 };

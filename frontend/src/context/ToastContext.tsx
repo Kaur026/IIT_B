@@ -34,8 +34,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const showPlaceholderToast = useCallback(
     (featureName?: string) => {
       showToast(
-        'Not part of the prototype',
-        featureName ? `"${featureName}" is an illustrative link not implemented in this research prototype.` : undefined,
+        'Feature unavailable',
+        featureName ? `"${featureName}" is an illustrative link not implemented in this interface.` : undefined,
         'info'
       );
     },
