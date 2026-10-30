@@ -30,23 +30,12 @@ import { useAuth } from '../context/AuthContext';
 import { GuidedWorkflowSection } from '../components/portal/GuidedWorkflowSection';
 import { CategoryIllustration, CategoryType } from '../components/portal/CategoryIllustrations';
 import { canPerformAction } from '../utils/permissions';
-import { isMockDemoEnabled } from '../utils/demoMode';
-import { PreparedDatasetSummaryCard } from '../components/portal/PreparedDatasetSummaryCard';
-import { getDashboardUnavailableState } from '../services/dashboardPreview';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { isReadOnlyDemo, requireStaffAction, role, staffUser, supabaseSession } = useAuth();
-  const mockDemoEnabled = isMockDemoEnabled(import.meta.env);
-  const canReadMockDemo = mockDemoEnabled && !supabaseSession;
-  const isAggregateOnly = isReadOnlyDemo || role === 'User' || role === 'DPO';
+  const { isReadOnlyDemo, requireStaffAction, role, staffUser } = useAuth();
   const canVerifyCases = canPerformAction(role, 're_measure');
-  const canRecordMeasurements = canPerformAction(role, 'record_measurement');
-  const canRegisterBeneficiaries = role === 'AWW';
-  const canViewQueue = role === 'AWW' || role === 'LS' || role === 'CDPO';
-  const canViewRules = role === 'LS' || role === 'CDPO' || role === 'Rule Administrator';
-  const canViewReports = role === 'LS' || role === 'CDPO' || role === 'DPO';
 
   const [activeQueueTab, setActiveQueueTab] = useState<'all' | 'urgent' | 'verification' | 'referrals'>('all');
   const [cases, setCases] = useState<BeneficiaryCase[]>([]);
@@ -56,20 +45,15 @@ export const DashboardPage: React.FC = () => {
   const [verificationNotes, setVerificationNotes] = useState('');
 
   useEffect(() => {
-    if (!canReadMockDemo) {
-      setCases([]);
-      return undefined;
-    }
     const fetch = () => {
       setCases(mockStore.getCases({ role, centreCode: staffUser?.centreCode }));
     };
     fetch();
     const unsubscribe = mockStore.subscribe(fetch);
     return unsubscribe;
-  }, [role, staffUser, canReadMockDemo]);
+  }, [role, staffUser]);
 
   const handleOpenVerifyModal = (item: BeneficiaryCase) => {
-    if (!canVerifyCases) return;
     setSelectedCaseToVerify(item);
     setVerifiedWeightInput('');
     setVerifiedHeightInput('');
@@ -78,7 +62,7 @@ export const DashboardPage: React.FC = () => {
 
   const handleConfirmVerification = () => {
     if (!selectedCaseToVerify) return;
-    if (!canVerifyCases) {
+    if (!isReadOnlyDemo && !canVerifyCases) {
       showToast('Permission Restricted', `Role ${role || 'unknown'} cannot verify cases.`, 'error');
       return;
     }
@@ -111,72 +95,6 @@ export const DashboardPage: React.FC = () => {
     setSelectedCaseToVerify(null);
   };
 
-  if (!canReadMockDemo) {
-    const apiConfigured = Boolean(import.meta.env.VITE_B2_API_URL?.trim());
-    const preview = getDashboardUnavailableState({
-      apiConfigured,
-      providerSessionActive: Boolean(supabaseSession),
-    });
-
-    return (
-      <div className="space-y-6 pb-8">
-        <PreparedDatasetSummaryCard />
-        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm" aria-labelledby="dashboard-unavailable-title">
-          <div className="bg-gradient-to-br from-[#0E1B2B] via-[#173A55] to-[#1F8A83] px-6 py-8 text-white sm:px-9 sm:py-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold tracking-wide text-white">
-              <Eye className="h-3.5 w-3.5" /> OVERVIEW DASHBOARD · PREVIEW
-            </div>
-            <h1 id="dashboard-unavailable-title" className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Overview Dashboard</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">
-              A preview of the dashboard experience. This deployment has no verified operational metrics to display.
-            </p>
-          </div>
-
-          <div className="grid gap-0 lg:grid-cols-2">
-            <section className="border-b border-slate-200 p-6 sm:p-8 lg:border-b-0 lg:border-r" aria-labelledby="dashboard-integration-title" aria-live="polite">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-semibold text-amber-900">
-                <Clock className="h-3.5 w-3.5" /> {preview.statusLabel}
-              </div>
-              <h2 id="dashboard-integration-title" className="mt-4 text-xl font-semibold text-slate-900">Connect trusted dashboard data</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{preview.message}</p>
-              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Still required</div>
-                <p className="mt-1 text-sm font-medium text-slate-800">{preview.missingIntegration}</p>
-              </div>
-              <Link to="/signin" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0E1B2B] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#173A55] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83] focus-visible:ring-offset-2">
-                Staff Sign-in <ChevronRight className="h-4 w-4" />
-              </Link>
-            </section>
-
-            <section className="p-6 sm:p-8" aria-labelledby="dashboard-capabilities-title">
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-800">
-                <Sparkles className="h-3.5 w-3.5" /> AFTER TRUSTED INTEGRATION
-              </div>
-              <h2 id="dashboard-capabilities-title" className="mt-4 text-xl font-semibold text-slate-900">What this dashboard is designed to show</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">After approved backend data sources, identity, role, and scope checks are in place, this view can present:</p>
-              <ul className="mt-5 space-y-3">
-                {[
-                  'Beneficiary and measurement summaries from approved backend records',
-                  'Centre-scoped task and referral activity',
-                  'Data source and freshness details returned by the backend',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-slate-700">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#1F8A83]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
-
-          <div className="border-t border-slate-200 bg-slate-50 px-6 py-4 text-xs leading-relaxed text-slate-600 sm:px-8" role="note">
-            No operational counts, beneficiary records, or clinical values are shown here. The prepared synthetic dataset card above remains a separate API-backed aggregate and reports its own connection state.
-          </div>
-        </section>
-      </div>
-    );
-  }
-
   const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode });
   const totalPop = Math.max(1, metrics.total);
 
@@ -208,23 +126,8 @@ export const DashboardPage: React.FC = () => {
     })
     .slice(0, 4);
 
-  if (role === 'System Administrator' || role === 'Rule Administrator') {
-    return (
-      <div className="space-y-6">
-        <PreparedDatasetSummaryCard />
-        <section className="mx-auto max-w-2xl rounded-3xl border border-amber-200 bg-white p-8 shadow-sm" aria-labelledby="role-dashboard-title">
-          <div className="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">Demo scope: administration only</div>
-          <h1 id="role-dashboard-title" className="mt-4 text-2xl font-semibold text-slate-900">No administrative workflow is available yet</h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">Account administration is unavailable. Rule changes cannot be submitted; approval remains disabled. Case and beneficiary records are not shown for this role.</p>
-          {role === 'Rule Administrator' && <Link to="/rules" className="mt-5 inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">View rule settings</Link>}
-        </section>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8 pb-12">
-      <PreparedDatasetSummaryCard />
       {/* Screen Title & Welcome */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -235,66 +138,70 @@ export const DashboardPage: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-xs font-semibold text-[#2457F5] mb-2 shadow-xs">
             <Eye className="w-3.5 h-3.5" />
+            <span>Demo Mode — Synthetic Data</span>
+            <span className="text-slate-400 font-normal">|</span>
             <span className="text-slate-600 font-normal">Varanasi District • AWC #702 (Sector Aggregates)</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
             Supervisor Operations Dashboard
           </h1>
           <p className="text-sm text-slate-500 mt-1 font-normal leading-relaxed">
-            {isAggregateOnly
+            {isReadOnlyDemo
               ? 'Public aggregate overview of nutrition monitoring, data-quality screening anomalies, and casework triage.'
-              : 'Browser-local synthetic casework for nutrition records, measurement flags, and referrals. No backend connection is active.'}
+              : 'Real-time triaging for Poshan Tracker nutrition records, anthropometric anomalies, and clinical referrals.'}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {import.meta.env.DEV && <Link to="/synthetic-operations" className="px-3.5 py-2 text-xs font-semibold text-amber-900 bg-amber-50 border border-amber-300 rounded-full">B2 backend briefing and workflows</Link>}
-          {isAggregateOnly ? (
+          {isReadOnlyDemo ? (
             <>
-              <span className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200/80 rounded-full flex items-center gap-1.5">
+              <Link
+                to="/beneficiaries"
+                className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
+              >
                 <Users className="w-3.5 h-3.5 text-[#2457F5]" />
-                <span>Beneficiary aggregate: {metrics.total}</span>
-              </span>
-              {role === 'DPO' && <Link
+                <span>Beneficiaries ({metrics.total})</span>
+              </Link>
+              <Link
                 to="/reports"
                 className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
               >
                 <FileBarChart2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>District Reports</span>
-              </Link>}
-              {isMockDemoEnabled(import.meta.env) ? <Link
+                <span>Sector Reports</span>
+              </Link>
+              <Link
                 to="/signin"
                 className="px-3.5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] active:scale-95"
               >
                 <Lock className="w-3 h-3 text-emerald-400" />
                 <span>Staff Sign In</span>
-              </Link> : <span className="px-3.5 py-2 text-xs text-slate-500">Sign-in is not configured</span>}
+              </Link>
             </>
           ) : (
             <>
-              {canRecordMeasurements && <Link
+              <Link
                 to="/measurements"
                 className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
                 title="Record new measurement"
               >
                 <Scale className="w-3.5 h-3.5 text-[#2457F5]" />
                 <span>+ Measure</span>
-              </Link>}
-              {canRegisterBeneficiaries && <Link
+              </Link>
+              <Link
                 to="/beneficiaries/register"
                 className="px-3.5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] active:scale-95"
                 title="Register new beneficiary"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>+ Register</span>
-              </Link>}
-              {canViewQueue && <Link
+              </Link>
+              <Link
                 to="/queue"
                 className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm flex items-center gap-1.5"
               >
                 <ListTodo className="w-3.5 h-3.5 text-[#2457F5]" />
                 <span>Action Queue ({metrics.pendingCases})</span>
-              </Link>}
+              </Link>
             </>
           )}
         </div>
@@ -433,7 +340,7 @@ export const DashboardPage: React.FC = () => {
       <GuidedWorkflowSection />
 
       {/* Main Grid: Public Aggregate Casework Overview OR Authenticated Staff Priority Queue */}
-      {isAggregateOnly ? (
+      {isReadOnlyDemo ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Public Left Column: Operational Casework & Follow-up Aggregates (8 Cols) */}
           <div className="lg:col-span-8 space-y-6">
@@ -555,29 +462,32 @@ export const DashboardPage: React.FC = () => {
                 Explore Demo Sections
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                  <Users className="w-4 h-4 text-[#2457F5] mb-2" />
+                <Link
+                  to="/beneficiaries"
+                  className="p-3.5 rounded-2xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200/70 transition-all text-left group"
+                >
+                  <Users className="w-4 h-4 text-[#2457F5] mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Beneficiary Cohorts</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">Aggregate demographic breakdowns above</div>
-                </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">Demographic breakdowns &amp; age clusters</div>
+                </Link>
 
-                {role === 'DPO' && <Link
+                <Link
                   to="/reports"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <FileBarChart2 className="w-4 h-4 text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Sector Reports</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">Aggregated audit &amp; reconciliation reports</div>
-                </Link>}
+                </Link>
 
-                {isMockDemoEnabled(import.meta.env) ? <Link
+                <Link
                   to="/signin"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <Lock className="w-4 h-4 text-indigo-600 mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Staff Authentication</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">Sign in for casework management</div>
-                </Link> : <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-xs text-slate-500">Staff sign-in is not configured.</div>}
+                </Link>
               </div>
             </div>
           </div>
@@ -766,7 +676,7 @@ export const DashboardPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {canVerifyCases && <div className="shrink-0 flex items-center gap-2">
+                      {(canVerifyCases || isReadOnlyDemo) && <div className="shrink-0 flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleOpenVerifyModal(item)}
@@ -805,41 +715,41 @@ export const DashboardPage: React.FC = () => {
                 Frontline Quick Actions
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  {canRegisterBeneficiaries && <Link
+                <Link
                   to="/beneficiaries/register"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <UserPlus className="w-4 h-4 text-[#2457F5] mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Register Beneficiary</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">New intake record</div>
-                </Link>}
+                </Link>
 
-                {canViewQueue && <Link
+                <Link
                   to="/queue"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-rose-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <ListTodo className="w-4 h-4 text-rose-600 mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Open Action Queue</div>
                   <div className="text-[10px] text-slate-400 mt-0.5 tabular-nums">{metrics.pendingCases} active cases</div>
-                </Link>}
+                </Link>
 
-                {canViewRules && <Link
+                <Link
                   to="/rules"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-purple-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <Sparkles className="w-4 h-4 text-purple-600 mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Review Data Quality</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">Active anomaly checks</div>
-                </Link>}
+                </Link>
 
-                {canViewReports && <Link
+                <Link
                   to="/reports"
                   className="p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50/60 border border-slate-200/70 transition-all text-left group"
                 >
                   <FileBarChart2 className="w-4 h-4 text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-semibold text-[#0F172A]">Reports &amp; Trends</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">Monthly reconciliation</div>
-                </Link>}
+                </Link>
               </div>
             </div>
           </div>
@@ -951,7 +861,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* Verification Modal / Drawer */}
       <AnimatePresence>
-        {selectedCaseToVerify && canVerifyCases && (
+        {selectedCaseToVerify && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
@@ -991,7 +901,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              {isAggregateOnly && (
+              {isReadOnlyDemo && (
                 <div className="bg-amber-50 p-3 rounded-2xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
                   <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                   <div>
@@ -1000,7 +910,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
               )}
 
-              {(canVerifyCases || isAggregateOnly) ? <>
+              {(canVerifyCases || isReadOnlyDemo) ? <>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label className="block text-slate-600 font-medium mb-1">
@@ -1012,11 +922,11 @@ export const DashboardPage: React.FC = () => {
                       min="0.01"
                       required
                       step="0.05"
-                      disabled={isAggregateOnly}
+                      disabled={isReadOnlyDemo}
                       value={verifiedWeightInput}
                       onChange={(e) => setVerifiedWeightInput(e.target.value)}
                       className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[#0F172A] font-semibold ${
-                        isAggregateOnly ? 'cursor-not-allowed opacity-80' : ''
+                        isReadOnlyDemo ? 'cursor-not-allowed opacity-80' : ''
                       }`}
                     />
                     <Scale className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5" />
@@ -1033,11 +943,11 @@ export const DashboardPage: React.FC = () => {
                       min="0.01"
                       required
                       step="0.1"
-                      disabled={isAggregateOnly}
+                      disabled={isReadOnlyDemo}
                       value={verifiedHeightInput}
                       onChange={(e) => setVerifiedHeightInput(e.target.value)}
                       className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[#0F172A] font-semibold ${
-                        isAggregateOnly ? 'cursor-not-allowed opacity-80' : ''
+                        isReadOnlyDemo ? 'cursor-not-allowed opacity-80' : ''
                       }`}
                     />
                     <Ruler className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5" />
@@ -1052,11 +962,11 @@ export const DashboardPage: React.FC = () => {
                 <textarea
                   rows={2}
                   placeholder="Record observations after verification (optional)"
-                  disabled={isAggregateOnly}
+                  disabled={isReadOnlyDemo}
                   value={verificationNotes}
                   onChange={(e) => setVerificationNotes(e.target.value)}
                   className={`w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-[#0F172A] ${
-                    isAggregateOnly ? 'cursor-not-allowed opacity-80' : ''
+                    isReadOnlyDemo ? 'cursor-not-allowed opacity-80' : ''
                   }`}
                 />
               </div>
@@ -1076,9 +986,9 @@ export const DashboardPage: React.FC = () => {
                   onClick={() => setSelectedCaseToVerify(null)}
                   className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 rounded-full"
                 >
-                  {isAggregateOnly ? 'Close Inspection' : 'Cancel'}
+                  {isReadOnlyDemo ? 'Close Inspection' : 'Cancel'}
                 </button>
-                {isAggregateOnly ? (
+                {isReadOnlyDemo ? (
                   <Link
                     to="/signin"
                     onClick={() => setSelectedCaseToVerify(null)}

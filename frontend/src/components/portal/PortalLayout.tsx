@@ -6,8 +6,7 @@ import { SkeletonShimmer } from '../common/SkeletonShimmer';
 import { mockStore } from '../../store/mockStore.ts';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
-import { canAccessPath, getNavItemsForRole, ROLE_CONFIGS } from '../../utils/permissions';
-import { isMockDemoEnabled } from '../../utils/demoMode';
+import { getNavItemsForRole, ROLE_CONFIGS } from '../../utils/permissions';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -19,10 +18,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const {
-    isStaff, isReadOnlyDemo, staffUser, role, logoutStaff, requireStaffAction,
-    supabaseSession, signOutSupabase,
-  } = useAuth();
+  const { isStaff, isReadOnlyDemo, staffUser, role, logoutStaff, requireStaffAction } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,13 +31,10 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   // Role-driven navigation tabs from permissions config
   const navItems = getNavItemsForRole(role);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     if (isStaff) {
       logoutStaff();
       showToast('Signed Out', 'Exited role simulation. Returned to public overview.', 'info');
-    } else if (supabaseSession) {
-      await signOutSupabase();
-      showToast('Signed Out', 'Supabase account session ended.', 'info');
     }
     navigate('/');
   };
@@ -75,8 +68,6 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   };
 
   const currentRoleConfig = role ? ROLE_CONFIGS[role] : null;
-  const mockDemoEnabled = isMockDemoEnabled(import.meta.env);
-  const demoToolsEnabled = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demoTools') === '1';
 
   return (
     <div className="min-h-screen bg-[#F5F9FC] text-[#0E1B2B] flex flex-col antialiased selection:bg-[#CFEFD8] selection:text-[#0E1B2B] relative">
@@ -88,6 +79,12 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
 
       {/* Fixed Header Stack */}
       <header className="sticky top-0 z-40 w-full transition-all duration-200">
+        {/* Top Sandbox Notice */}
+        <div className="bg-[#0E1B2B] text-white/90 text-[11px] py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#CFEFD8]" />
+          <span>Student research prototype • 100% synthetic data • Not an official Government of India service</span>
+        </div>
+
         {/* Main Navigation Bar */}
         <div
           className={`w-full transition-all duration-300 border-b ${
@@ -111,6 +108,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                   <span className="font-semibold text-sm tracking-tight text-[#0E1B2B] group-hover:text-[#1F8A83] transition-colors leading-none">
                     Poshan Action Layer
                   </span>
+                  <span className="text-[10px] text-[#5B6B7C] font-mono mt-0.5">STUDENT PROTOTYPE</span>
                 </div>
               </Link>
             </div>
@@ -151,7 +149,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
               {isStaff ? (
                 <>
                   {/* Reset Demo Data Action Button */}
-                  {demoToolsEnabled && role !== 'System Administrator' && role !== 'Rule Administrator' && <motion.button
+                  <motion.button
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
                     type="button"
@@ -162,10 +160,10 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                     <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
                     <span className="hidden md:inline">Reset Demo Data</span>
                     <span className="md:hidden text-[11px]">Reset</span>
-                  </motion.button>}
+                  </motion.button>
 
                   {/* Role Persona Badge (No personal names) */}
-                  {canAccessPath(role, '/profile').allowed && <Link
+                  <Link
                     to="/profile"
                     className="hidden sm:flex items-center gap-2 pl-2 pr-3 py-1 bg-slate-100 hover:bg-slate-200/70 rounded-full border border-slate-200 transition-colors"
                     title="View Active Persona Profile"
@@ -182,17 +180,17 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                         {currentRoleConfig?.label || staffUser?.roleLabel}
                       </span>
                     </div>
-                  </Link>}
+                  </Link>
 
                   {/* Switch Persona Button */}
-                  {mockDemoEnabled && <Link
+                  <Link
                     to="/signin"
                     className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F8A83] bg-[#CFEFD8]/40 hover:bg-[#CFEFD8]/80 px-2.5 py-1.5 rounded-full border border-[#1F8A83]/20 transition-colors"
-                    title="Switch the browser-local mock demo persona"
+                    title="Switch demo simulation role"
                   >
                     <UserCheck className="w-3 h-3" />
-                    <span className="hidden lg:inline">Switch Demo Role</span>
-                  </Link>}
+                    <span className="hidden lg:inline">Switch Role</span>
+                  </Link>
 
                   <motion.button
                     whileHover={{ y: -1 }}
@@ -200,21 +198,11 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                     type="button"
                     onClick={handleSignOut}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 bg-white hover:bg-rose-50 px-2.5 sm:px-3 py-1.5 rounded-full border border-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 shadow-xs"
-                    title="End browser-local demo session"
+                    title="End role simulation session"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Exit Simulation</span>
                   </motion.button>
-                </>
-              ) : supabaseSession ? (
-                <>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-900" title="Provider session; frontend casework remains synthetic demo data">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>Authenticated account</span>
-                  </div>
-                  <button type="button" onClick={handleSignOut} className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 bg-white px-2.5 sm:px-3 py-1.5 rounded-full border border-slate-200" title="Sign out of Supabase">
-                    <LogOut className="w-3.5 h-3.5" /><span>Sign Out</span>
-                  </button>
                 </>
               ) : (
                 <>
@@ -228,21 +216,21 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                   </div>
 
                   {/* Role Simulation Sign In Action */}
-                  {mockDemoEnabled && <Link
+                  <Link
                     to="/signin"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#0E1B2B] hover:bg-black px-3.5 py-1.5 rounded-full shadow-xs transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
-                    title="Open the browser-local mock-data role demonstration"
+                    title="Simulate AWW, Supervisor, CDPO, or DPO persona"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-[#CFEFD8]" />
-                    <span>Mock Data Demo</span>
-                  </Link>}
+                    <span>Role Simulation</span>
+                  </Link>
 
                   {/* Return to overview */}
                   <Link
                     to="/"
                     className="hidden sm:inline-flex items-center text-xs font-medium text-[#5B6B7C] hover:text-[#0E1B2B] px-2 py-1 rounded-full hover:bg-slate-100 transition-colors"
                   >
-                    Back to Home
+                    Overview
                   </Link>
                 </>
               )}
@@ -293,7 +281,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       <footer className="w-full bg-white border-t border-slate-200/70 py-6 px-4 sm:px-6 mt-12 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-center sm:text-left leading-relaxed">
-            Poshan Action Layer · Synthetic data only · 2026.
+            Poshan Action Layer • Academic Student Prototype for Frontline Nutrition Monitoring • 100% synthetic data • 2026.
           </p>
           <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
             <span>Active Scope: {currentRoleConfig ? `${currentRoleConfig.scopeLevel} (${staffUser?.centreCode || staffUser?.sectorCode || staffUser?.projectCode || 'District'})` : 'Public Aggregate'}</span>

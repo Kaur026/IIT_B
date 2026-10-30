@@ -102,6 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateDemo, onNavigateLogin 
             <span className="font-semibold text-sm tracking-tight text-[#0E1B2B] group-hover:text-[#1F8A83] transition-colors leading-none">
               Poshan Action Layer
             </span>
+            <span className="text-[10px] text-[#5B6B7C] font-mono">Demo Prototype</span>
           </div>
         </a>
 
@@ -129,14 +130,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateDemo, onNavigateLogin 
             onClick={onNavigateLogin}
             className="text-xs font-medium text-[#5B6B7C] hover:text-[#0E1B2B] px-3 py-2 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
           >
-            Staff sign-in
+            Log in (demo)
           </button>
           <button
             type="button"
             onClick={onNavigateDemo}
             className="group inline-flex items-center gap-1.5 bg-[#0E1B2B] text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-sm hover:bg-black/85 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
           >
-            <span>View interactive demo</span>
+            <span>Explore Demo</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
@@ -178,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateDemo, onNavigateLogin 
             }}
             className="w-full text-left px-4 py-2 text-sm font-medium text-[#5B6B7C] hover:bg-black/5 rounded-xl"
           >
-            Staff sign-in
+            Log in (demo)
           </button>
           <button
             type="button"
@@ -188,7 +189,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateDemo, onNavigateLogin 
             }}
             className="w-full mt-1 flex items-center justify-center gap-2 bg-[#0E1B2B] text-white text-sm font-medium py-2.5 rounded-full shadow-sm"
           >
-            <span>View interactive demo</span>
+            <span>Explore Demo</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

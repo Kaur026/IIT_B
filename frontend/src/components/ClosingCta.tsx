@@ -32,7 +32,7 @@ export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
               onClick={onNavigateDemo}
               className="group inline-flex items-center gap-2.5 bg-[#0F172A] text-white text-sm sm:text-base font-medium px-8 py-4 rounded-full shadow-md hover:bg-slate-800 transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
             >
-              <span>View interactive demo</span>
+              <span>Explore dashboard demo</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>
@@ -69,7 +69,7 @@ export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
 
         {/* Small Caption */}
         <div className="mt-8 pt-4 border-t border-slate-900/10 text-center lg:text-left text-[11px] text-slate-500 font-medium">
-          Illustrative imagery • Synthetic demographic examples
+          Illustrative imagery • Academic student research prototype • Synthetic demographic models
         </div>
       </div>
     </section>

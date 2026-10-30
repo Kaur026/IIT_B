@@ -14,47 +14,6 @@ import {
 } from '../utils/casework.ts';
 import { type UserRole, canPerformAction } from '../utils/permissions.ts';
 
-type DemoScope = {
-  role?: UserRole | null;
-  centreCode?: string;
-  sectorCode?: string;
-  projectCode?: string;
-  actorId?: string;
-};
-
-const DEMO_SECTOR_CENTRES: Record<string, string[]> = { 'Sector-4': ['AWC-702', 'AWC-703', 'AWC-704'] };
-const DEMO_PROJECT_CENTRES: Record<string, string[]> = { 'Project-Central': ['AWC-702', 'AWC-703', 'AWC-704'] };
-
-function centresForDemoScope(scope?: DemoScope): string[] | null {
-  if (!scope) return null;
-  if (!scope.role) return [];
-  switch (scope.role) {
-    case 'AWW': {
-      const centre = scope.centreCode || 'AWC-702';
-      return centre === 'AWC-702' ? [centre] : [];
-    }
-    case 'LS': {
-      const sector = scope.sectorCode || 'Sector-4';
-      return DEMO_SECTOR_CENTRES[sector] || [];
-    }
-    case 'CDPO': {
-      const project = scope.projectCode || 'Project-Central';
-      return DEMO_PROJECT_CENTRES[project] || [];
-    }
-    default:
-      return [];
-  }
-}
-
-function scopeAllowsCentre(scope: DemoScope | null | undefined, centreCode?: string): boolean {
-  if (!scope?.role || !centreCode) return false;
-  return centresForDemoScope(scope)?.includes(centreCode) === true;
-}
-
-function recordCentre(store: MockStore, beneficiaryId: string, explicitCentre?: string): string | undefined {
-  return explicitCentre || store.getBeneficiaryById(beneficiaryId)?.centreCode;
-}
-
 export const DEMO_TODAY = DEMO_CURRENT_DATE; // '2026-10-24'
 
 export interface BeneficiaryRecord {
@@ -1115,9 +1074,11 @@ class MockStore {
   // =========================================================================
   // BENEFICIARY OPERATIONS WITH ROLE SCOPING
   // =========================================================================
-  public getBeneficiaries(scope?: DemoScope): BeneficiaryRecord[] {
-    const centres = centresForDemoScope(scope);
-    if (centres) return this.beneficiaries.filter((beneficiary) => centres.includes(beneficiary.centreCode));
+  public getBeneficiaries(scope?: { role?: UserRole | null; centreCode?: string }): BeneficiaryRecord[] {
+    if (scope?.role === 'AWW') {
+      const targetCentre = scope.centreCode || 'AWC-702';
+      return this.beneficiaries.filter((b) => b.centreCode === targetCentre);
+    }
     return [...this.beneficiaries];
   }
 
@@ -1136,22 +1097,14 @@ class MockStore {
       birthWeight?: number;
       customId?: string;
     },
-    actorContext?: DemoScope
+    actorContext?: { actorId?: string; role?: UserRole | null }
   ): { id: string; error?: string } {
     // Validation
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(ben.dob) || Number.isNaN(Date.parse(`${ben.dob}T00:00:00Z`)) || new Date(`${ben.dob}T00:00:00Z`).toISOString().slice(0, 10) !== ben.dob || ben.dob > DEMO_CURRENT_DATE) {
-      return { id: '', error: 'Enter a valid date of birth on or before the demo date.' };
-    }
-    if (!['Male', 'Female', 'Other'].includes(ben.gender) || !['child_under_6', 'pregnant', 'lactating', 'adolescent'].includes(ben.category)) {
-      return { id: '', error: 'Select a supported category and gender value.' };
-    }
-    if (ben.birthWeight !== undefined && (!Number.isFinite(ben.birthWeight) || ben.birthWeight < 0.5 || ben.birthWeight > 10)) {
-      return { id: '', error: 'Birth weight must be between 0.5 and 10 kg.' };
-    }
+    if (!ben.dob) return { id: '', error: 'Date of birth is required.' };
 
     // Enforce role permission check
-    if (actorContext?.role !== 'AWW') {
-      return { id: '', error: `Role ${actorContext?.role || 'unknown'} cannot register beneficiaries directly.` };
+    if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
+      return { id: '', error: `Role ${actorContext.role} cannot register beneficiaries directly.` };
     }
 
     const nextBenNum = 2000 + this.beneficiaries.length;
@@ -1165,12 +1118,9 @@ class MockStore {
       candidateId = `BEN-${nextBenNum + 7}`;
     }
 
-    const birthWeight = ben.birthWeight ?? 2.9;
-    const actorId = actorContext?.actorId || 'AWW-409';
-    const centreCode = actorContext.centreCode || 'AWC-702';
-    if (!centresForDemoScope(actorContext)?.includes(centreCode) || (ben.centreCode && ben.centreCode !== centreCode)) {
-      return { id: '', error: 'AWW registration is limited to the assigned demo centre.' };
-    }
+    const birthWeight = ben.birthWeight || 2.9;
+    const actorId = actorContext?.actorId || ben.assignedAww || 'AWW-409';
+    const centreCode = ben.centreCode || 'AWC-702';
 
     const newRecord: BeneficiaryRecord = {
       id: candidateId,
@@ -1230,15 +1180,7 @@ class MockStore {
   // =========================================================================
   // MEASUREMENT & SCREENING INTAKE
   // =========================================================================
-  public getMeasurements(beneficiaryId?: string, scope?: DemoScope): MeasurementRecord[] {
-    if (scope) {
-      const centres = centresForDemoScope(scope) || [];
-      return this.measurements.filter((measurement) => {
-        if (beneficiaryId && measurement.beneficiaryId !== beneficiaryId) return false;
-        const beneficiary = this.getBeneficiaryById(measurement.beneficiaryId);
-        return Boolean(beneficiary && centres.includes(beneficiary.centreCode));
-      });
-    }
+  public getMeasurements(beneficiaryId?: string): MeasurementRecord[] {
     if (!beneficiaryId) return [...this.measurements];
     return this.measurements.filter((m) => m.beneficiaryId === beneficiaryId);
   }
@@ -1255,23 +1197,19 @@ class MockStore {
       notes?: string;
       actor?: string;
     },
-    actorContext?: DemoScope
+    actorContext?: { actorId?: string; role?: UserRole | null }
   ): { success: boolean; measurementId?: string; flags: string[]; caseCreated?: string; error?: string } {
     // Check permission: CDPO and DPO cannot record measurements
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
       return {
         success: false,
         flags: [],
-        error: `Role ${actorContext?.role || 'unknown'} cannot record field measurements. Restricted to AWW and Lady Supervisor.`,
+        error: `Role ${actorContext.role} cannot record field measurements. Restricted to AWW and Lady Supervisor.`,
       };
     }
 
     const ben = this.getBeneficiaryById(params.beneficiaryId);
     if (!ben) return { success: false, flags: [], error: 'Beneficiary not found.' };
-    const permittedCentres = centresForDemoScope(actorContext);
-    if (permittedCentres && !permittedCentres.includes(ben.centreCode)) {
-      return { success: false, flags: [], error: 'Measurement is outside the assigned demo organization scope.' };
-    }
 
     const measurementDate = params.measurementDate === undefined ? DEMO_CURRENT_DATE : params.measurementDate;
     const inputError = validateMeasurementInput(params.weightKg, params.heightCm, measurementDate);
@@ -1429,13 +1367,12 @@ class MockStore {
   // =========================================================================
   // ACTION CASES & MULTI-TIER ESCALATION WITH ROLE SCOPING
   // =========================================================================
-  public getCases(scope?: DemoScope): BeneficiaryCase[] {
+  public getCases(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): BeneficiaryCase[] {
     if (scope?.role === 'AWW') {
       const targetCentre = scope.centreCode || 'AWC-702';
-      return this.cases.filter((c) => c.centreCode === targetCentre);
+      const actor = scope.actorId || 'AWW-409';
+      return this.cases.filter((c) => c.centreCode === targetCentre || c.assignedAww === actor || c.assignedActor === actor);
     }
-    const centres = centresForDemoScope(scope);
-    if (centres) return this.cases.filter((item) => centres.includes(item.centreCode || this.getBeneficiaryById(item.id)?.centreCode || ''));
     return [...this.cases];
   }
 
@@ -1443,13 +1380,11 @@ class MockStore {
     return this.cases.find((c) => c.id === id || c.actionId === id);
   }
 
-  public acknowledgeCase(actionId: string, actorContext?: string | DemoScope): boolean {
+  public acknowledgeCase(actionId: string, actorContext?: string | { actorId?: string; role?: UserRole | null }): boolean {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'acknowledge_case')) return false;
     const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
     if (idx === -1) return false;
-    const targetCase = this.cases[idx];
-    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, targetCase.centreCode || this.getBeneficiaryById(targetCase.id)?.centreCode)) return false;
 
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
 
@@ -1477,19 +1412,16 @@ class MockStore {
     actionId: string,
     assignedActor: string,
     dueDate: string,
-    actorContext?: DemoScope
+    actorContext?: { actorId?: string; role?: UserRole | null }
   ): { success: boolean; error?: string } {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'assign_owner')) {
-      return { success: false, error: `Role ${actorContext?.role || 'unknown'} cannot assign owners. Restricted to Supervisor and CDPO.` };
+      return { success: false, error: `Role ${actorContext.role} cannot assign owners. Restricted to Supervisor and CDPO.` };
     }
 
     const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
     if (idx === -1) return { success: false, error: 'Case not found.' };
 
     const target = this.cases[idx];
-    if (!scopeAllowsCentre(actorContext, target.centreCode || this.getBeneficiaryById(target.id)?.centreCode)) {
-      return { success: false, error: 'Case is outside the assigned demo organization scope.' };
-    }
     target.assignedActor = assignedActor;
     target.dueDate = dueDate;
 
@@ -1515,7 +1447,7 @@ class MockStore {
     actionId: string,
     targetTier: 1 | 2 | 3 | 4,
     reason: string,
-    actorContext?: string | DemoScope
+    actorContext?: string | { actorId?: string; role?: UserRole | null }
   ): boolean {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'escalate')) return false;
@@ -1523,7 +1455,6 @@ class MockStore {
     if (idx === -1) return false;
 
     const targetCase = this.cases[idx];
-    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, targetCase.centreCode || this.getBeneficiaryById(targetCase.id)?.centreCode)) return false;
     const tierInfo = ESCALATION_TIERS[targetTier];
     if (!tierInfo) return false;
 
@@ -1570,7 +1501,7 @@ class MockStore {
     verifiedWeight: number,
     verifiedHeight: number,
     notes: string,
-    actorContext?: string | DemoScope
+    actorContext?: string | { actorId?: string; role?: UserRole | null }
   ): boolean {
     if (!Number.isFinite(verifiedWeight) || verifiedWeight <= 0 || !Number.isFinite(verifiedHeight) || verifiedHeight <= 0) {
       return false;
@@ -1586,7 +1517,6 @@ class MockStore {
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
 
     const target = this.cases[caseIndex];
-    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, target.centreCode || this.getBeneficiaryById(target.id)?.centreCode)) return false;
     const hashPart1 = ((actionId.length * 3721 + Math.round(verifiedWeight * 100)) % 65536).toString(16).padStart(4, '0');
     const hashPart2 = ((Math.round(verifiedHeight * 10) + 1234) % 65536).toString(16).padStart(4, '0');
     const verificationHash = `0x${hashPart1}...${hashPart2}`;
@@ -1633,9 +1563,16 @@ class MockStore {
   // =========================================================================
   // REFERRALS & FOLLOW-UP WORKFLOW WITH ROLE SCOPING
   // =========================================================================
-  public getReferrals(scope?: DemoScope): ReferralRecord[] {
-    const centres = centresForDemoScope(scope);
-    if (centres) return this.referrals.filter((referral) => centres.includes(this.getBeneficiaryById(referral.beneficiaryId)?.centreCode || ''));
+  public getReferrals(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): ReferralRecord[] {
+    if (scope?.role === 'AWW') {
+      const targetCentre = scope.centreCode || 'AWC-702';
+      const actor = scope.actorId || 'AWW-409';
+      return this.referrals.filter((r) => {
+        if (r.owner === actor) return true;
+        const ben = this.getBeneficiaryById(r.beneficiaryId);
+        return ben?.centreCode === targetCentre;
+      });
+    }
     return [...this.referrals];
   }
 
@@ -1652,17 +1589,14 @@ class MockStore {
       priority?: 'Urgent' | 'High' | 'Routine';
       owner?: string;
     },
-    actorContext?: DemoScope
+    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
   ): { success: boolean; referralId?: string; error?: string } {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'create_referral')) {
-      return { success: false, error: `Role ${actorContext?.role || 'unknown'} cannot initiate clinical referrals.` };
+      return { success: false, error: `Role ${actorContext.role} cannot initiate clinical referrals.` };
     }
 
     const ben = this.getBeneficiaryById(data.beneficiaryId);
     if (!ben) return { success: false, error: 'Beneficiary not found.' };
-    if (!scopeAllowsCentre(actorContext, ben.centreCode)) {
-      return { success: false, error: 'Referral target is outside the assigned demo organization scope.' };
-    }
     if (!data.reason.trim() || !data.dueDate.trim()) {
       return { success: false, error: 'A referral reason and due date are required.' };
     }
@@ -1719,7 +1653,7 @@ class MockStore {
       findings: string;
       actor?: string;
     },
-    actorContext?: DemoScope
+    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
   ): boolean {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'log_follow_up')) return false;
     if (!attempt.findings.trim() || !['Home Visit', 'Phone Call', 'AWC Consultation'].includes(attempt.method)) return false;
@@ -1727,8 +1661,12 @@ class MockStore {
     if (rIdx === -1) return false;
 
     const target = this.referrals[rIdx];
-    const beneficiary = this.getBeneficiaryById(target.beneficiaryId);
-    if (!scopeAllowsCentre(actorContext, beneficiary?.centreCode)) return false;
+    if (actorContext.role === 'AWW') {
+      const beneficiary = this.getBeneficiaryById(target.beneficiaryId);
+      const actorId = actorContext.actorId || 'AWW-409';
+      const centreCode = actorContext.centreCode || 'AWC-702';
+      if (target.owner !== actorId && beneficiary?.centreCode !== centreCode) return false;
+    }
     const actor = actorContext.actorId || attempt.actor || 'AWW-409';
     const newAttempt: ReferralFollowUp = {
       id: `FU-${target.followUpAttempts.length + 1}`,
@@ -1763,7 +1701,7 @@ class MockStore {
     refId: string,
     outcome: string,
     nextSteps: string,
-    actorContext?: string | (DemoScope & { outcomeConfirmed?: boolean })
+    actorContext?: string | { actorId?: string; role?: UserRole | null; outcomeConfirmed?: boolean }
   ): { success: boolean; error?: string } {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'resolve_referral')) {
@@ -1772,7 +1710,7 @@ class MockStore {
     if (!outcome.trim()) {
       return { success: false, error: 'Select a clinical outcome before closing the referral.' };
     }
-    if (!actorContext || typeof actorContext !== 'object' || actorContext.outcomeConfirmed !== true) {
+    if (typeof actorContext !== 'object' || actorContext.outcomeConfirmed !== true) {
       return { success: false, error: 'Confirm that the selected clinical outcome is supported by a verified record.' };
     }
     if (nextSteps.trim().length < 10) {
@@ -1782,17 +1720,13 @@ class MockStore {
     const rIdx = this.referrals.findIndex((r) => r.id === refId);
     if (rIdx === -1) return { success: false, error: 'Referral not found.' };
 
-    const target = this.referrals[rIdx];
-    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, this.getBeneficiaryById(target.beneficiaryId)?.centreCode)) {
-      return { success: false, error: 'Referral is outside the assigned demo organization scope.' };
-    }
-
     if (this.referrals[rIdx].status === 'Completed') {
       return { success: false, error: 'Referral is already completed.' };
     }
 
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'Sector Supervisor (LS-01)';
 
+    const target = this.referrals[rIdx];
     target.status = 'Completed';
     target.finalOutcome = outcome.trim();
     target.outcomeConfirmed = true;
@@ -1884,25 +1818,20 @@ class MockStore {
     return id;
   }
 
-  public getAuditLog(scope?: DemoScope): AuditLedgerEntry[] {
-    if (scope?.role === 'AWW' || scope?.role === 'DPO' || scope?.role === 'User' || scope?.role === 'System Administrator' || scope?.role === 'Rule Administrator') return [];
-    const centres = centresForDemoScope(scope);
-    if (centres) return this.auditLog.filter((entry) => {
-      const caseItem = this.cases.find((item) => item.actionId === entry.actionId || item.id === entry.palId);
-      const beneficiary = this.getBeneficiaryById(entry.palId);
-      return centres.includes(caseItem?.centreCode || beneficiary?.centreCode || '');
-    });
+  public getAuditLog(scope?: { role?: UserRole | null }): AuditLedgerEntry[] {
+    if (scope?.role === 'AWW') {
+      return []; // AWW has no audit ledger access per matrix
+    }
     return [...this.auditLog];
   }
 
   // =========================================================================
   // DYNAMIC POPULATION & REPORTING METRICS WITH SCOPE
   // =========================================================================
-  public getMetrics(scope?: DemoScope) {
-    const districtAggregate = !scope?.role || scope.role === 'User' || scope.role === 'DPO';
-    const bens = districtAggregate ? [...this.beneficiaries] : this.getBeneficiaries(scope);
-    const cases = districtAggregate ? [...this.cases] : this.getCases(scope);
-    const referrals = districtAggregate ? [...this.referrals] : this.getReferrals(scope);
+  public getMetrics(scope?: { role?: UserRole | null; centreCode?: string }) {
+    const bens = this.getBeneficiaries(scope);
+    const cases = this.getCases(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
+    const referrals = this.getReferrals(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
 
     const total = bens.length;
 

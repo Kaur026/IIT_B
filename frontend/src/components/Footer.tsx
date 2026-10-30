@@ -147,16 +147,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateDemo, onNavigateLogin 
                   onClick={onNavigateLogin}
                   className="text-slate-500 hover:text-slate-900 transition-colors font-semibold text-[#2457F5]"
                 >
-                  Staff sign-in
+                  Frontline Staff Login (Demo)
                 </button>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* Bottom Bar Repeating Prototype Disclaimer */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p className="text-center sm:text-left">
-            © 2026 Poshan Action Layer.
+            Student research prototype: independent academic study of casework workflows around Poshan Tracker • Synthetic demo data only • Not affiliated with the Ministry of WCD • 2026.
           </p>
           <div className="flex items-center gap-4 text-slate-400">
             <button

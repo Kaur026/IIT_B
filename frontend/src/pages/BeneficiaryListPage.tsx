@@ -27,10 +27,8 @@ import { AnimatedNumber } from '../components/common/AnimatedNumber';
 import { DataBadge } from '../components/common/DataBadge';
 import { useAuth } from '../context/AuthContext';
 import { ROLE_CONFIGS } from '../utils/permissions';
-import { isMockDemoEnabled } from '../utils/demoMode';
-import { PreparedBeneficiaryView } from '../components/portal/PreparedRecordsViews';
 
-const MockBeneficiaryListPage: React.FC = () => {
+export const BeneficiaryListPage: React.FC = () => {
   const navigate = useNavigate();
   const { isReadOnlyDemo, role, staffUser } = useAuth();
 
@@ -97,13 +95,10 @@ const MockBeneficiaryListPage: React.FC = () => {
     currentPage * itemsPerPage
   );
 
-  const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode, sectorCode: staffUser?.sectorCode, projectCode: staffUser?.projectCode });
+  const metrics = mockStore.getMetrics();
 
   return (
     <div className="space-y-6 pb-12">
-      <Link to="/b1-explorer" className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-xs font-semibold text-teal-900 hover:bg-teal-100">
-        Open separate B1 Synthetic Screening Dataset explorer
-      </Link>
       {/* 1. Header & Quick Actions */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -753,22 +748,4 @@ const MockBeneficiaryListPage: React.FC = () => {
       )}
     </div>
   );
-};
-
-export const BeneficiaryListPage: React.FC = () => {
-  const { supabaseSession, authInitializing } = useAuth();
-  if (authInitializing) {
-    return <section role="status" className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Checking signed-in account…</section>;
-  }
-  if (supabaseSession) {
-    return <PreparedBeneficiaryView accessToken={supabaseSession.access_token} />;
-  }
-  if (isMockDemoEnabled(import.meta.env)) {
-    return <MockBeneficiaryListPage />;
-  }
-  return <section className="rounded-3xl border border-amber-200 bg-white p-6" aria-labelledby="beneficiary-access-title">
-    <h1 id="beneficiary-access-title" className="text-xl font-semibold text-slate-900">Prepared beneficiaries unavailable</h1>
-    <p className="mt-2 text-sm text-slate-600">Sign in with an account that has trusted backend authorization. Browser-local demonstration records are disabled in this build.</p>
-    <Link to="/signin" className="mt-4 inline-flex rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white">Sign in</Link>
-  </section>;
 };

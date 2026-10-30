@@ -234,7 +234,6 @@ export const ReferralsPage: React.FC = () => {
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
             Monitor Malnutrition Rehabilitation Centres (NRC) admissions, Primary Health Centre consultations, and ensure caregiver follow-up milestones are fulfilled.
           </p>
-          {import.meta.env.DEV && <Link to="/synthetic-operations" className="mt-3 inline-flex rounded-full border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">Open B2 API-backed referrals</Link>}
         </div>
 
         {canCreateReferral && <button
