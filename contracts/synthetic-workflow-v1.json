@@ -1,0 +1,38 @@
+{
+  "contract_version": 1,
+  "label": "SYNTHETIC INTEGRATION TEST DATA ONLY",
+  "principal": {
+    "actor_id": "PAL-IT-WORKER-001",
+    "role": "worker",
+    "centre_ids": ["PAL-IT-CENTRE-001"],
+    "assigned_worker_id": "PAL-IT-WORKER-001"
+  },
+  "beneficiary": {
+    "beneficiary_id": "PAL-IT-BEN-001",
+    "child_id": "PAL-IT-BEN-001",
+    "centre_id": "PAL-IT-CENTRE-001",
+    "assigned_worker_id": "PAL-IT-WORKER-001",
+    "date_of_birth": "2026-06-15",
+    "sex": "F",
+    "category": "child_under_6",
+    "caregiver_kinship": "Mother",
+    "registered_at": "2026-10-15",
+    "source_row": {
+      "child_id": "PAL-IT-BEN-001",
+      "assigned_worker_id": "PAL-IT-WORKER-001",
+      "sex": "F",
+      "date_of_birth": "2026-06-15"
+    },
+    "label": "SYNTHETIC DATA / INTEGRATION TEST ONLY"
+  },
+  "first_measurement": {
+    "beneficiary_id": "PAL-IT-BEN-001",
+    "measurement": {
+      "measurement_date": "2026-10-15",
+      "weight_kg": 7.0,
+      "height_cm": 64.0,
+      "danger_sign": "yes"
+    },
+    "recorded_at": "2026-10-15"
+  }
+}

@@ -1,6 +1,6 @@
 # Poshan Tracker Action Layer
 
-Prototype workspace for exploring a nutrition action workflow: synthetic beneficiary and measurement data, configurable screening rules, data-quality checks, and follow-up task concepts. The repository contains separate frontend, Python rule-engine, Python workflow, and simulation work. **These parts are not connected into one running application.** The frontend is a standalone demo; Python modules are callable libraries and scripts, not an HTTP service. All bundled beneficiary data is synthetic.
+Prototype workspace for exploring a nutrition action workflow: synthetic beneficiary and measurement data, configurable screening rules, data-quality checks, and follow-up task concepts. The original React screens remain local demos; separate development-only synthetic workflow pages call the B2 FastAPI prototype. Neither the original screens nor B2 are connected to operational data or trusted production identity. All bundled beneficiary data is synthetic.
 
 ## Objectives and status
 
@@ -8,17 +8,17 @@ The project explores how screening signals might be reviewed and turned into ver
 
 | Implemented in this repository | Planned, proposed, or incomplete |
 | --- | --- |
-| React/Vite screens with simulated roles, seeded synthetic records, local browser persistence, and casework interactions | Frontend-to-Python integration or a backend API |
+| React/Vite mock screens with simulated roles and local browser persistence, including a deterministic 600-beneficiary cohort; separate development-only B2 workflow pages; a private-source B1 parser contract used only in tests | Trusted B1 CSV serving, frontend-to-B2 operational integration for real users, and production backend identity/storage |
 | B1 rule evaluation, measurement trust checks, configurable thresholds, approval/override operations, and mother-child family links | Clinical/field validation of rule thresholds and operational schedules |
-| B2 task, referral, fallback, role, audit/consent, and offline queue/synchronization primitives | Remote authenticated synchronization, durable production storage, encryption, server-side authorization |
+| B2 synthetic FastAPI workflow API, task/referral/fallback/role/audit primitives, and local offline queue/synchronization prototype | Production identity/database adapters, remote authenticated synchronization, durable production storage, encryption, operational hierarchy assignments |
 | Member 3 synthetic data generation, analysis, and handoff utilities | Production data import, governance, retention, monitoring, recovery, and privacy/safety review |
 
 ## Technology
 
 - Frontend: React, TypeScript, React Router, Vite, Tailwind CSS, and localStorage.
-- B1 and B2: Python. B1 uses pandas; `who_growth.py` uses the repository's bundled `who_lms.json` table. B2 uses the Python standard library.
+- B1 and B2: Python. B1 uses pandas; `who_growth.py` uses the repository's bundled `who_lms.json` table. B2's API dependencies are listed in `B2/requirements.txt`; its workflow helper modules use the standard library.
 - Simulation: Python with pandas, NumPy, and Matplotlib (see `member3_data_simulation/requirements.txt`).
-- Tests: Node's built-in test runner for the frontend utility test; Python `unittest` modules for B2; a standalone B1 assertion script.
+- Tests: Node's built-in frontend unit/service tests; Python `unittest` modules for B2; a standalone B1 assertion script.
 
 ## Architecture
 
@@ -33,18 +33,19 @@ flowchart LR
   B2[B2 Python workflow primitives] --> T[Tasks, referrals, role checks, audit models, local sync queue]
   SIM[Member 3 simulation and handoff data] --> OUT[CSV reports / handoff files]
   FE -. no API connection .- B1
-  FE -. no API connection .- B2
+  FE -->|development-only synthetic workspace| B2
+  FE -. original dashboard, queue, and referrals remain mockStore-backed .- B2
   B1 -. no automatic connection .- B2
 ```
 
-See [architecture](docs/architecture.md) and [data flow](docs/data-flow.md) for responsibilities and workflow details. No API endpoints currently exist.
+See [architecture](docs/architecture.md), [data flow](docs/data-flow.md), and the [backend/frontend API contract](docs/backend-frontend-contract.md). B2 has a local prototype API and isolated development-only frontend workflows; protected requests remain unavailable while authentication is disabled.
 
 ## Repository layout
 
 ```text
 B1/                       Screening rules, validation, synthetic CSV/JSON, standalone checks
-B2/                       Python task/referral/role/audit/offline-sync prototypes and unittest tests
-frontend/                 Independent React/Vite user-interface demo and utility test
+B2/                       Python workflow modules, synthetic FastAPI prototype, local SQLite store, and unittest tests
+frontend/                 React/Vite mock demo, separate B2 client workflows, and B1 source-contract tests
 member3_data_simulation/  Synthetic data generation, alert analysis, validation, and handoff utilities
 docs/                     Architecture and data-flow documentation
 ```
@@ -80,15 +81,19 @@ python .\test_be1.py
 
 `test_be1.py` copies B1 files to a temporary directory and runs its assertions against that copy. The rule engine can be imported by Python callers; it does not start a server. `build_data.py` regenerates synthetic data and can overwrite the checked-in CSV files, so do not run it unless regeneration is intended.
 
-### B2 workflow library
+### B2 workflow API and library
 
 From the repository root:
 
 ```powershell
-python -m unittest B2.test_tasks B2.test_day2 -v
+python -m unittest B2.test_beneficiaries B2.test_authorization B2.test_tasks B2.test_day2 -v
 ```
 
-B2 has no third-party runtime requirements and no server entry point.
+B2 API: with its dependencies already provisioned, run `python -m uvicorn B2.api:app --reload` from the repository root. Keep `B2_AUTH_MODE=disabled`; protected endpoints intentionally deny access until trusted identity and authorization adapters exist. The development-only B2 workspace is separate from the original `mockStore` demo pages and will show an unavailable state while protected B2 access is disabled. Do not enable demo auth or put real beneficiary data into this prototype. See [B2 setup](B2/README.md) and the [contract](docs/backend-frontend-contract.md).
+
+### Static mock-data demonstration
+
+The frontend can be built without a B2 URL. For a production static demo that should include the local role picker, set `VITE_ENABLE_DEMO_MODE=true` in the build environment; leave `VITE_B2_API_URL` and Supabase variables unset for a mock-only demonstration. All `VITE_` variables are public browser values. The role picker is a presentation-only simulation and does not grant B2 access. The dedicated B2 pages remain unavailable in production builds and never fall back to mock data. Configure the selected static host's SPA fallback to `index.html` before relying on direct route URLs. See [auth and demo setup](docs/auth-integration-setup.md).
 
 ### Simulation utilities
 
@@ -112,9 +117,9 @@ From `frontend/`, run `npm test`, `npm run lint`, and `npm run build`. From the 
 
 ## Known limitations
 
-- No HTTP API, database, shared schemas package, or live integration between frontend, B1, B2, and simulation utilities.
+- The development-only synthetic workflow and operations pages call the B2 API, but the original Dashboard, Action Queue, and Referrals screens remain `mockStore` demos. There is no shared record mapping or production persistence.
 - Frontend route guards and role labels are client-side demonstrations, not security controls. The dashboard and screens should be treated as demo workflows.
-- B2's audit/consent/task/referral models are in memory; its JSON queue is local and does not provide remote synchronization or encryption.
+- B2's synthetic API uses local prototype SQLite; its offline JSON queue does not provide remote synchronization or encryption.
 - Rule values and workflow timing assumptions need qualified review before any operational use. See each module README for details.
 
 ## Development guidelines

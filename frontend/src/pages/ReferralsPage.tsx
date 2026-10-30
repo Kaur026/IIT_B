@@ -27,6 +27,13 @@ import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { DataBadge } from '../components/common/DataBadge';
 import { canPerformAction } from '../utils/permissions.ts';
+import { getTodayISODate } from '../utils/casework.ts';
+
+const getDefaultDueDate = () => {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 7);
+  return `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`;
+};
 
 export const ReferralsPage: React.FC = () => {
   const { showToast } = useToast();
@@ -50,13 +57,12 @@ export const ReferralsPage: React.FC = () => {
   const [newBenId, setNewBenId] = useState('');
   const [newReason, setNewReason] = useState('Severe Acute Malnutrition (SAM) • WAZ < -3 SD');
   const [newDestination, setNewDestination] = useState<ReferralRecord['destination']>('Nutrition Rehabilitation Centre (NRC)');
-  const [newDueDate, setNewDueDate] = useState('2026-10-31');
+  const [newDueDate, setNewDueDate] = useState(getDefaultDueDate);
   const [newPriority, setNewPriority] = useState<'Urgent' | 'High' | 'Routine'>('Urgent');
 
   // Follow-up Form State
   const [fuMethod, setFuMethod] = useState<'Home Visit' | 'Phone Call' | 'AWC Consultation'>('Home Visit');
   const [fuFindings, setFuFindings] = useState('');
-  const [fuActor, setFuActor] = useState(staffUser?.id || 'AWW-409');
 
   // Resolve Outcome Form State
   const [resolveOutcome, setResolveOutcome] = useState('');
@@ -141,7 +147,7 @@ export const ReferralsPage: React.FC = () => {
       return;
     }
 
-    const actorId = fuActor || staffUser?.id || 'AWW-409';
+    const actorId = staffUser?.id || 'AWW-409';
     const saved = mockStore.addFollowUpAttempt(
       followUpTarget.id,
       {
@@ -207,9 +213,10 @@ export const ReferralsPage: React.FC = () => {
     setResolveTarget(item);
   };
 
-  const openCasesCount = referrals.filter((r) => r.status !== 'Completed').length;
-  const completedCount = referrals.filter((r) => r.status === 'Completed').length;
-  const inProgressCount = referrals.filter((r) => r.status === 'Follow-up In Progress').length;
+  const totalActiveCount = referrals.filter((r) => r.status !== 'Completed').length;
+  const inFollowUpCount = referrals.filter((r) => r.status === 'Follow-up In Progress').length;
+  const pendingOutcomeCount = referrals.filter((r) => r.status === 'Completed' && !r.outcomeConfirmed).length;
+  const completedVerifiedCount = referrals.filter((r) => r.status === 'Completed' && r.outcomeConfirmed).length;
 
   return (
     <div className="space-y-6 pb-12">
@@ -228,7 +235,7 @@ export const ReferralsPage: React.FC = () => {
             <span>&gt;</span>
             <span className="text-slate-800 font-semibold">Referrals & Follow-up</span>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
             Clinical Referrals & Follow-up Tracker
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
@@ -238,7 +245,10 @@ export const ReferralsPage: React.FC = () => {
 
         {canCreateReferral && <button
           type="button"
-          onClick={() => setIsNewModalOpen(true)}
+          onClick={() => {
+            setNewDueDate(getDefaultDueDate());
+            setIsNewModalOpen(true);
+          }}
           className="px-4 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full transition-all shadow-sm flex items-center gap-1.5 self-start sm:self-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] active:scale-95"
         >
           <Plus className="w-3.5 h-3.5" />
@@ -251,36 +261,36 @@ export const ReferralsPage: React.FC = () => {
         {[
           {
             label: 'Total Active Referrals',
-            value: referrals.length,
-            subtext: `${openCasesCount} pending/active • ${completedCount} closed`,
+            value: totalActiveCount,
+            subtext: `${totalActiveCount} active NRC/PHC cases`,
             icon: Heart,
-            color: 'bg-rose-50 text-rose-700 border-rose-200/60',
+            color: 'bg-rose-50 text-rose-700 border-rose-200/80',
           },
           {
             label: 'In Field Follow-up',
-            value: inProgressCount,
-            subtext: 'Home visit or phone outreach underway',
+            value: inFollowUpCount,
+            subtext: 'Home visit or phone outreach active',
             icon: Clock,
-            color: 'bg-blue-50 text-[#2457F5] border-blue-200/60',
+            color: 'bg-blue-50 text-blue-700 border-blue-200/80',
           },
           {
-            label: 'Completed Workflow',
-            value: completedCount,
-            subtext: 'Stored referral workflow status',
+            label: 'Pending Outcome Confirmation',
+            value: pendingOutcomeCount,
+            subtext: 'Awaiting supervisory signoff',
+            icon: AlertTriangle,
+            color: 'bg-amber-50 text-amber-700 border-amber-200/80',
+          },
+          {
+            label: 'Completed & Verified',
+            value: completedVerifiedCount,
+            subtext: 'Confirmed clinical resolutions',
             icon: CheckCircle2,
-            color: 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
-          },
-          {
-            label: 'NRC Facility Escalations',
-            value: referrals.filter((r) => r.destination === 'Nutrition Rehabilitation Centre (NRC)').length,
-            subtext: 'Severe Acute Malnutrition (SAM) care',
-            icon: Building2,
-            color: 'bg-purple-50 text-purple-700 border-purple-200/60',
+            color: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
           },
         ].map((kpi, idx) => (
           <div
             key={idx}
-            className="bg-white/90 backdrop-blur-md rounded-[24px] border border-slate-200/80 p-5 shadow-sm space-y-2"
+            className="bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-5 shadow-xs space-y-2 flex flex-col justify-between min-h-[130px]"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</span>
@@ -288,10 +298,12 @@ export const ReferralsPage: React.FC = () => {
                 <kpi.icon className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-light tracking-tight text-[#0F172A] tabular-nums">
-              {kpi.value}
+            <div>
+              <div className="text-3xl font-semibold text-slate-900 tracking-tight tabular-nums">
+                {kpi.value}
+              </div>
+              <p className="text-xs text-slate-500 mt-1 font-normal truncate">{kpi.subtext}</p>
             </div>
-            <p className="text-[11px] text-slate-400 font-normal">{kpi.subtext}</p>
           </div>
         ))}
       </div>
@@ -349,22 +361,22 @@ export const ReferralsPage: React.FC = () => {
           filteredReferrals.map((item) => (
             <article
               key={item.id}
-              className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 shadow-sm space-y-4 hover:border-slate-300 transition-all"
+              className="bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-4 sm:p-5 shadow-xs space-y-3.5 hover:border-slate-300 transition-all"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm shrink-0 border border-rose-100">
-                    <Heart className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm shrink-0 border border-rose-200/80">
+                    <Heart className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <Link
                         to={`/beneficiaries/${item.beneficiaryId}`}
-                        className="font-semibold text-sm text-slate-900 hover:text-[#2457F5] transition-colors font-mono"
+                        className="font-semibold text-sm text-slate-900 hover:text-blue-600 transition-colors font-mono"
                       >
                         <DataBadge variant="beneficiary" className="font-mono">{item.beneficiaryId}</DataBadge>
                       </Link>
-                      <span className="text-xs text-slate-500">• {item.ageDisplay}</span>
+                      <span className="text-xs text-slate-500">· {item.ageDisplay}</span>
                     </div>
                     <div className="text-xs text-rose-700 font-medium mt-0.5">
                       {item.reason}
@@ -374,17 +386,23 @@ export const ReferralsPage: React.FC = () => {
 
                 <div className="flex items-center gap-2 self-start md:self-auto">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                    className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
                       item.status === 'Completed' && item.outcomeConfirmed
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : item.status === 'Completed'
                         ? 'bg-amber-50 text-amber-800 border-amber-200'
                         : item.status === 'Follow-up In Progress'
                         ? 'bg-blue-50 text-blue-800 border-blue-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                        : new Date(item.dueDate) < new Date('2026-10-24')
+                        ? 'bg-rose-50 text-rose-800 border-rose-200'
+                        : 'bg-slate-100 text-slate-800 border-slate-200'
                     }`}
                   >
-                    {item.status === 'Completed' ? `Completed · ${item.outcomeConfirmed ? 'outcome confirmed' : 'workflow status'}` : item.status}
+                    {item.status === 'Completed'
+                      ? (item.outcomeConfirmed ? 'Completed & Verified' : 'Pending Outcome Confirmation')
+                      : new Date(item.dueDate) < new Date('2026-10-24')
+                      ? 'Overdue Follow-up'
+                      : item.status}
                   </span>
                   <DataBadge variant="action" className="font-mono">{item.id}</DataBadge>
                 </div>
@@ -446,7 +464,7 @@ export const ReferralsPage: React.FC = () => {
                 <div className={`${item.outcomeConfirmed ? 'bg-emerald-50/80 border-emerald-200/80' : 'bg-amber-50/80 border-amber-200/80'} border rounded-2xl p-4 text-xs space-y-1`}>
                   <div className={`flex items-center gap-1.5 font-semibold ${item.outcomeConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>
                     <CheckCircle2 className={`w-4 h-4 ${item.outcomeConfirmed ? 'text-emerald-600' : 'text-amber-600'}`} />
-                    <span>{item.outcomeConfirmed ? 'Confirmed Referral Outcome' : 'Demo Outcome · confirmation required'}{item.outcomeDate ? ` (${item.outcomeDate})` : ''}</span>
+                    <span>{item.outcomeConfirmed ? 'Confirmed Referral Outcome' : 'Pending Outcome Confirmation'}{item.outcomeDate ? ` (${item.outcomeDate})` : ''}</span>
                   </div>
                   <p className={`${item.outcomeConfirmed ? 'text-emerald-800' : 'text-amber-800'} leading-relaxed font-medium`}>{item.finalOutcome}</p>
                   {item.nextSteps && (
@@ -463,7 +481,7 @@ export const ReferralsPage: React.FC = () => {
                   {item.status === 'Completed'
                     ? item.outcomeConfirmed
                       ? 'Workflow status Completed; outcome confirmation is recorded.'
-                      : 'Stored workflow status Completed; demo outcome requires confirmation.'
+                      : 'Workflow status Completed; supervisory outcome confirmation pending.'
                     : 'Mandatory outcome note required prior to case closure.'}
                 </div>
 
@@ -568,6 +586,7 @@ export const ReferralsPage: React.FC = () => {
                     <input
                       type="date"
                       value={newDueDate}
+                      min={getTodayISODate()}
                       onChange={(e) => setNewDueDate(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
                       required
@@ -628,7 +647,7 @@ export const ReferralsPage: React.FC = () => {
               </div>
 
               <form onSubmit={handleSaveFollowUp} className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-1">
                     <label className="font-semibold text-slate-700">Contact Method</label>
                     <select
@@ -638,18 +657,8 @@ export const ReferralsPage: React.FC = () => {
                     >
                       <option value="Home Visit">In-Person Home Visit</option>
                       <option value="AWC Consultation">AWC Consultation Desk</option>
-                      <option value="Phone Call">Phone Outreach (IVR)</option>
+                      <option value="Phone Call">Phone Outreach</option>
                     </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">Staff Actor</label>
-                    <input
-                      type="text"
-                      value={fuActor}
-                      onChange={(e) => setFuActor(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
-                    />
                   </div>
                 </div>
 

@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Shield, ArrowRight, Lock, Info, Eye } from 'lucide-react';
+import { ArrowRight, Lock, Eye, Building2, UserCheck, AlertCircle } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
-import { useAuth } from '../context/AuthContext';
-import { UserRole, ROLE_CONFIGS } from '../utils/permissions';
+import { createDemoPersona, useAuth } from '../context/AuthContext';
+import { isUserRole, UserRole, ROLE_CONFIGS } from '../utils/permissions';
+import { isMockDemoEnabled } from '../utils/demoMode';
+
+const VALID_AWW_CENTRES: Record<string, { workerId: string; centreName: string }> = {
+  'AWC-702': { workerId: 'AWW-409', centreName: 'Anganwadi Centre 702' },
+  'AWC-703': { workerId: 'AWW-405', centreName: 'Anganwadi Centre 703' },
+  'AWC-704': { workerId: 'AWW-410', centreName: 'Anganwadi Centre 704' },
+  'AWC-705': { workerId: 'AWW-417', centreName: 'Anganwadi Centre 705' },
+  'AWC-706': { workerId: 'AWW-421', centreName: 'Anganwadi Centre 706' },
+};
 
 export const SignInPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,36 +22,44 @@ export const SignInPage: React.FC = () => {
   const { loginAsStaff } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('AWW');
-  const [workerId, setWorkerId] = useState<string>(ROLE_CONFIGS['AWW'].defaultId);
-  const [password, setPassword] = useState('••••••••');
+  const [centreCodeInput, setCentreCodeInput] = useState('AWC-702');
+  const demoEnabled = isMockDemoEnabled(import.meta.env);
 
   const redirectMessage = (location.state as any)?.message;
   const redirectTarget = (location.state as any)?.from || '/dashboard';
 
-  const handleRoleChange = (role: UserRole) => {
-    setSelectedRole(role);
-    setWorkerId(ROLE_CONFIGS[role].defaultId);
+  const handleRoleChange = (value: string) => {
+    if (isUserRole(value)) {
+      setSelectedRole(value);
+      if (value === 'AWW' && !centreCodeInput.trim()) {
+        setCentreCodeInput('AWC-702');
+      }
+    }
   };
 
   const currentConfig = ROLE_CONFIGS[selectedRole];
+  const normalizedCentre = centreCodeInput.trim().toUpperCase();
+  const awwCentreConfig = VALID_AWW_CENTRES[normalizedCentre];
+  const isAww = selectedRole === 'AWW';
+  const isAwwValid = !isAww || Boolean(awwCentreConfig);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    const effectiveId = workerId.trim() || currentConfig.defaultId;
+    if (!demoEnabled || !isAwwValid) return;
 
-    loginAsStaff({
-      id: effectiveId,
-      role: selectedRole,
-      roleLabel: currentConfig.label,
-      centreCode: selectedRole === 'AWW' ? 'AWC-702' : undefined,
-      sectorCode: selectedRole === 'LS' ? 'Sector-4' : undefined,
-      projectCode: selectedRole === 'CDPO' ? 'Project-Central' : undefined,
-      signedInAt: new Date().toISOString(),
-    });
+    let persona;
+    if (isAww) {
+      if (!awwCentreConfig) return;
+      persona = createDemoPersona('AWW', undefined, normalizedCentre, awwCentreConfig.workerId);
+    } else {
+      persona = createDemoPersona(selectedRole);
+    }
+
+    if (!await loginAsStaff(persona)) return;
 
     showToast(
-      'Session Simulation Started',
-      `Active persona: ${effectiveId} (${currentConfig.label}) • Scoped to ${currentConfig.scopeLevel}.`,
+      'Session Started',
+      `Active persona: ${isAww ? `AWW (${awwCentreConfig?.workerId} at ${normalizedCentre})` : currentConfig.label}.`,
       'success'
     );
     navigate(redirectTarget);
@@ -55,12 +72,6 @@ export const SignInPage: React.FC = () => {
         className="fixed inset-0 pointer-events-none bg-gradient-to-br from-[#CFEFD8]/20 via-[#F5F9FC] to-[#D6E6F7]/30 -z-10"
         aria-hidden="true"
       />
-
-      {/* Top Banner */}
-      <header className="w-full bg-[#0E1B2B] text-white/90 text-[11px] py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#CFEFD8]" />
-        <span>Student research prototype • 100% synthetic data • Not an official Government of India service</span>
-      </header>
 
       {/* Nav back to landing */}
       <div className="max-w-6xl w-full mx-auto px-6 py-6 flex items-center justify-between">
@@ -88,17 +99,16 @@ export const SignInPage: React.FC = () => {
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-8 sm:p-10 shadow-layered relative"
         >
-          {/* Header pill */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-semibold text-slate-700 mb-4">
-            <Shield className="w-3.5 h-3.5 text-[#1F8A83]" />
-            Role Simulation
+            <UserCheck className="w-3.5 h-3.5 text-[#1F8A83]" />
+            Frontline Access Portal
           </div>
 
-          <h1 className="text-3xl font-light tracking-tight text-[#0E1B2B]">
-            Staff Persona Simulation
+          <h1 className="text-3xl font-bold tracking-tight text-[#0E1B2B]">
+            Staff Sign In
           </h1>
           <p className="text-xs text-[#5B6B7C] mt-2 font-normal leading-relaxed">
-            Select an operational role to test frontline and supervisory casework scoping. No actual credentials or personal identifiers are stored.
+            Select your operational role persona to access your assigned Anganwadi Centre, sector, or project worklist.
           </p>
 
           {/* Guard Redirect Alert if user attempted staff-only workflow */}
@@ -106,119 +116,126 @@ export const SignInPage: React.FC = () => {
             <div className="mt-4 mb-2 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
               <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Staff Simulation Required</p>
+                <p className="font-semibold">Staff Access Required</p>
                 <p className="text-[11px] text-amber-800 mt-0.5">{redirectMessage}</p>
               </div>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSignIn} className="mt-6 space-y-5">
-            {/* Operational Role Level */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-slate-700">
-                  Select Role Persona
+          {demoEnabled ? (
+            <form onSubmit={handleSignIn} className="mt-6 space-y-5">
+              {/* Role Persona Dropdown */}
+              <div>
+                <label htmlFor="demo-role" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Role Persona
                 </label>
-                <span className="text-[10px] text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                  Demo simulation, not authentication
-                </span>
+                <select
+                  id="demo-role"
+                  value={selectedRole}
+                  onChange={(e) => handleRoleChange(e.target.value)}
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#0E1B2B] font-medium focus:outline-none focus:ring-2 focus:ring-[#1F8A83]/30 focus:border-[#1F8A83] transition-all cursor-pointer"
+                >
+                  <option value="AWW">Anganwadi Worker (AWW) — Frontline Centre Level</option>
+                  <option value="LS">Lady Supervisor (LS) — Sector Level (Sector-4)</option>
+                  <option value="CDPO">Child Development Project Officer (CDPO) — Project Level</option>
+                  <option value="DPO">District Programme Officer (DPO) — District Level</option>
+                  <option value="System Administrator">System Administrator — Administrative Functions</option>
+                  <option value="Rule Administrator">Rule Administrator — Rule Management</option>
+                </select>
+                <p className="text-[11px] text-[#5B6B7C] mt-1.5 leading-relaxed">
+                  {currentConfig.description}
+                </p>
               </div>
-              <select
-                value={selectedRole}
-                onChange={(e) => handleRoleChange(e.target.value as UserRole)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#0E1B2B] font-medium focus:outline-none focus:ring-2 focus:ring-[#1F8A83]/30 focus:border-[#1F8A83] transition-all cursor-pointer"
+
+              {/* Centre Code Input when AWW is selected */}
+              {isAww && (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="aww-centre-code" className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-[#1F8A83]" />
+                      <span>Enter Centre Code</span>
+                    </label>
+                    <span className="text-[10px] text-slate-400">
+                      e.g. AWC-702 to AWC-706
+                    </span>
+                  </div>
+                  <input
+                    id="aww-centre-code"
+                    type="text"
+                    value={centreCodeInput}
+                    onChange={(e) => setCentreCodeInput(e.target.value)}
+                    placeholder="Enter centre code (e.g. AWC-702)"
+                    className={`w-full text-xs bg-slate-50 border rounded-xl px-4 py-3 font-mono font-medium focus:outline-none focus:ring-2 transition-all ${
+                      isAwwValid
+                        ? 'border-slate-200 text-[#0E1B2B] focus:ring-[#1F8A83]/30 focus:border-[#1F8A83]'
+                        : 'border-rose-300 text-rose-900 bg-rose-50/40 focus:ring-rose-200'
+                    }`}
+                  />
+                  {!isAwwValid && (
+                    <p className="mt-1.5 text-[11px] text-rose-600 flex items-center gap-1" role="alert">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      <span>Invalid centre code. Please enter one of: AWC-702, AWC-703, AWC-704, AWC-705, AWC-706.</span>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Selected Worker and Centre Display */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700 space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">Assigned Identity:</span>
+                  <span className="font-mono font-semibold text-slate-900">
+                    {isAww && awwCentreConfig
+                      ? awwCentreConfig.workerId
+                      : currentConfig.defaultId}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">Assigned Scope:</span>
+                  <span className="font-medium text-slate-900">
+                    {isAww && awwCentreConfig
+                      ? `${normalizedCentre} (${awwCentreConfig.centreName})`
+                      : currentConfig.defaultScope}
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <motion.button
+                whileHover={{ y: isAwwValid ? -1 : 0 }}
+                whileTap={{ scale: isAwwValid ? 0.98 : 1 }}
+                type="submit"
+                disabled={!isAwwValid}
+                className="w-full mt-2 py-3 px-6 rounded-full bg-[#0E1B2B] hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
               >
-                <option value="AWW">Anganwadi Worker (AWW) — Centre Scope (AWC-702)</option>
-                <option value="LS">Lady Supervisor (LS) — Sector Scope (Sector-4)</option>
-                <option value="CDPO">Child Development Project Officer (CDPO) — Project Scope</option>
-                <option value="DPO">District Programme Officer (DPO) — District View Scope</option>
-              </select>
-              <p className="text-[11px] text-[#5B6B7C] mt-1.5 leading-relaxed">
-                {currentConfig.description}
-              </p>
-            </div>
+                <span>Start Demo Persona ({currentConfig.label})</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.button>
 
-            {/* Worker ID (pre-filled per role) */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Synthetic Identifier
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={workerId}
-                  onChange={(e) => setWorkerId(e.target.value)}
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#0E1B2B] font-mono focus:outline-none focus:ring-2 focus:ring-[#1F8A83]/30 focus:border-[#1F8A83] transition-all"
-                  placeholder="e.g. AWW-409"
-                  required
-                />
-                <span className="absolute right-3.5 top-3 text-[10px] uppercase font-mono font-bold text-[#1F8A83] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  {currentConfig.scopeLevel}
-                </span>
+              {/* Public Overview Link */}
+              <div className="text-center pt-2">
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#1F8A83] transition-colors py-1"
+                >
+                  <Eye className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Explore Public Read-Only Overview →</span>
+                </Link>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1 font-mono">
-                Simulated actor: {workerId} • Scope: {currentConfig.defaultScope}
-              </p>
+            </form>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950" role="status">
+              <h2 className="font-bold">Staff sign-in is unavailable</h2>
+              <p className="mt-1 text-xs leading-relaxed">Local persona simulation is disabled in this build.</p>
             </div>
-
-            {/* Passcode placeholder */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Simulation Passcode
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[#0E1B2B] font-medium focus:outline-none focus:ring-2 focus:ring-[#1F8A83]/30 focus:border-[#1F8A83] transition-all"
-                  placeholder="Any password works for simulation"
-                  required
-                />
-                <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-3.5" />
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Any passcode accepted for research simulation.
-              </p>
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="w-full mt-2 py-3 px-6 rounded-full bg-[#0E1B2B] hover:bg-black text-white font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
-            >
-              <span>Launch Persona Simulation ({currentConfig.label})</span>
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
-
-            {/* Public Demo Alternative Link */}
-            <div className="text-center pt-2">
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#1F8A83] transition-colors py-1"
-              >
-                <Eye className="w-3.5 h-3.5 text-slate-400" />
-                <span>Or explore Public Read-Only Overview without role simulation →</span>
-              </Link>
-            </div>
-          </form>
-
-          {/* Disclaimer Box */}
-          <div className="mt-6 pt-5 border-t border-slate-100 flex items-start gap-2 text-[11px] text-slate-400 leading-relaxed">
-            <Info className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-            <span>
-              Academic research prototype for testing frontline triage usability. 100% synthetic data. No real personal records, Aadhaar numbers, or governmental credentials are held.
-            </span>
-          </div>
+          )}
         </motion.div>
       </main>
 
       {/* Footer */}
       <footer className="w-full py-6 text-center text-xs text-slate-400">
-        © 2026 Poshan Action Layer • Academic Research Prototype
+        © 2026 Poshan Action Layer
       </footer>
     </div>
   );

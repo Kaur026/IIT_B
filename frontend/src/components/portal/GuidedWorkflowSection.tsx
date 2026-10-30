@@ -143,7 +143,7 @@ export const GuidedWorkflowSection: React.FC = () => {
       title: 'Close Task & Audit Trail',
       short: 'Close & Audit',
       icon: CheckCircle2,
-      color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+      color: 'text-blue-700 bg-[#F8FBFF] border-[#BBD5F0]',
       activeRing: 'ring-emerald-500',
       actionTitle: 'Immutable Closure & Learning',
       desc: 'The task is formally resolved and archived with a tamper-evident audit ledger entry, cryptographic proof hash, and resolution timestamp.',
@@ -175,7 +175,7 @@ export const GuidedWorkflowSection: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5" />
             <span>Interactive Casework Tour • 6-Step Closed-Loop Lifecycle</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-[#0F172A] tracking-tight">
+          <h2 className="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight">
             How Poshan Action Layer Works
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
@@ -200,12 +200,12 @@ export const GuidedWorkflowSection: React.FC = () => {
       </div>
 
       {/* 2. Interactive Scenario Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/70">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#E8F2FC] p-3.5 rounded-2xl border border-[#BBD5F0]">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-700">Choose a synthetic example:</span>
-          <span className="text-[11px] text-slate-400 hidden md:inline">• Safe sandbox walkthrough</span>
+          <span className="text-xs font-semibold text-[#17365D]">Choose a synthetic example:</span>
+          <span className="text-[11px] text-[#52708F] hidden md:inline">• Safe sandbox walkthrough</span>
         </div>
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-full border border-slate-200/80 shadow-xs">
+        <div className="flex items-center gap-1.5 bg-[#F8FBFF] p-1 rounded-full border border-[#BBD5F0] shadow-xs">
           <button
             type="button"
             onClick={() => {
@@ -263,7 +263,7 @@ export const GuidedWorkflowSection: React.FC = () => {
                     isCurrent
                       ? 'bg-[#0F172A] text-white'
                       : isDone
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
                   }`}
                 >

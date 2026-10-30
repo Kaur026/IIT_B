@@ -70,7 +70,7 @@ export const CoreCapabilities: React.FC = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-[#1F8A83]" />
             <span>Core capabilities</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#0E1B2B] tracking-[-0.02em] leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0E1B2B] tracking-[-0.02em] leading-tight">
             Designed for clarity in the field.
           </h2>
         </div>
@@ -111,7 +111,7 @@ export const CoreCapabilities: React.FC = () => {
                     <Icon className="w-6 h-6 stroke-[1.75]" />
                   </div>
 
-                  <h3 className="text-xl font-medium tracking-tight text-[#0E1B2B] mb-3">
+                  <h3 className="text-xl font-semibold tracking-tight text-[#0E1B2B] mb-3">
                     {card.title}
                   </h3>
 
@@ -130,7 +130,7 @@ export const CoreCapabilities: React.FC = () => {
                 </div>
 
                 {/* Sized placeholder frame */}
-                <div className="w-full h-28 rounded-2xl bg-gradient-to-br from-[#CFEFD8]/30 to-[#D6E6F7]/40 border border-white/70 flex flex-col items-center justify-center p-3 text-center">
+                <div className="w-full h-28 rounded-2xl bg-gradient-to-br from-[#E8F2FC] to-[#F8FBFF] border border-[#BBD5F0] flex flex-col items-center justify-center p-3 text-center">
                   <div className="text-[11px] font-mono font-medium text-[#0E1B2B] uppercase tracking-wider">
                     {card.assetName}
                   </div>

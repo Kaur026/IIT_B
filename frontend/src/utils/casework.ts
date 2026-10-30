@@ -5,6 +5,11 @@
 
 export const DEMO_CURRENT_DATE = '2026-10-24'; // Saturday, 24 Oct 2026
 
+export function getTodayISODate(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
 export interface CaseRecord {
   id: string;
   beneficiaryId: string;
@@ -228,7 +233,8 @@ function parseDateParts(dateStr: string): { year: number; month: number; day: nu
 export function validateMeasurementInput(
   weight: number,
   height: number,
-  measurementDate: unknown
+  measurementDate: unknown,
+  referenceDate = DEMO_CURRENT_DATE,
 ): string | null {
   if (!Number.isFinite(weight)) return 'Weight must be a finite number.';
   if (!Number.isFinite(height)) return 'Height must be a finite number.';
@@ -240,8 +246,8 @@ export function validateMeasurementInput(
   if (Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== measurementDate) {
     return 'Measurement date must be a valid calendar date.';
   }
-  if (measurementDate > DEMO_CURRENT_DATE) {
-    return `Measurement date cannot be after ${DEMO_CURRENT_DATE}.`;
+  if (measurementDate > referenceDate) {
+    return `Measurement date cannot be after ${referenceDate}.`;
   }
 
   return null;
@@ -253,7 +259,8 @@ export function validateMeasurementInput(
 export function calculateAge(
   dobStr: string,
   refDateStr: string = DEMO_CURRENT_DATE,
-  categoryHint?: string
+  categoryHint?: string,
+  genderHint?: 'Male' | 'Female' | 'Other',
 ): AgeCalculationResult {
   const dobParts = parseDateParts(dobStr);
   const refParts = parseDateParts(refDateStr);
@@ -320,13 +327,17 @@ export function calculateAge(
   } else if (categoryHint === 'lactating') {
     cohort = 'lactatingMothers';
     cohortLabel = 'Lactating Mothers';
-  } else if (categoryHint === 'adolescent' || (completedYears >= 10 && completedYears <= 19)) {
+  } else if (
+    completedYears >= 10
+    && completedYears <= 19
+    && (genderHint === undefined || genderHint === 'Female')
+  ) {
     cohort = 'adolescentGirls';
     cohortLabel = 'Adolescent Girls';
-  } else if (totalCompletedMonths <= 6) {
+  } else if (totalCompletedMonths < 6) {
     cohort = 'children0to6m';
     cohortLabel = 'Children (0–6m)';
-  } else if (totalCompletedMonths <= 36) {
+  } else if (totalCompletedMonths < 36) {
     cohort = 'children6mTo3y';
     cohortLabel = 'Children (6m–3y)';
   } else {
@@ -393,6 +404,27 @@ export function getDaysBetween(date1: string, date2: string): number {
   return Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
 }
 
+export function getDaysUntilDate(value: string, referenceDate = getTodayISODate()): number | undefined {
+  const withinHours = value.trim().match(/^Within (\d+) hours?$/i);
+  if (withinHours) return Math.max(0, Math.ceil(Number(withinHours[1]) / 24));
+  const relative = value.trim().match(/^(Today|Tomorrow|Yesterday|In (\d+) days?)(?:\b|,)/i)
+    || value.trim().match(/^(Today|Tomorrow|Yesterday|In (\d+) days?)$/i);
+  if (relative) {
+    const phrase = relative[1].toLowerCase();
+    if (phrase === 'today') return 0;
+    if (phrase === 'tomorrow') return 1;
+    if (phrase === 'yesterday') return -1;
+    return Number(relative[2]);
+  }
+  if (/overdue/i.test(value)) return -1;
+  const date = parseDateParts(value);
+  const reference = parseDateParts(referenceDate);
+  if (!date || !reference) return undefined;
+  const dueTime = Date.UTC(date.year, date.month, date.day);
+  const referenceTime = Date.UTC(reference.year, reference.month, reference.day);
+  return Math.round((dueTime - referenceTime) / 86400000);
+}
+
 /**
  * Evaluates anthropometric entry against biological limits and active casework heuristics
  */
@@ -400,6 +432,7 @@ export function evaluateMeasurementEntry(params: {
   currentWeight: number;
   currentHeight: number;
   measurementDate?: string;
+  referenceDate?: string;
   dob: string;
   previousRecord?: {
     weight: number;
@@ -414,6 +447,7 @@ export function evaluateMeasurementEntry(params: {
     currentWeight,
     currentHeight,
     measurementDate = DEMO_CURRENT_DATE,
+    referenceDate = DEMO_CURRENT_DATE,
     dob,
     previousRecord,
     muacCm,
@@ -421,7 +455,7 @@ export function evaluateMeasurementEntry(params: {
     customRules = [],
   } = params;
 
-  const inputError = validateMeasurementInput(currentWeight, currentHeight, measurementDate);
+  const inputError = validateMeasurementInput(currentWeight, currentHeight, measurementDate, referenceDate);
   if (inputError) {
     const inputFlag: PlausibilityFlag = {
       code: 'ERR-INPUT',

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Lenis from 'lenis';
-import { AnnouncementBar } from '../components/AnnouncementBar';
 import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
 import { CoreCapabilities } from '../components/CoreCapabilities';
@@ -73,10 +72,7 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F6FAFF] text-[#0F172A] relative flex flex-col selection:bg-[#CFEFD8] selection:text-[#0F172A]">
-      {/* 1. Slim Announcement Bar */}
-      <AnnouncementBar />
-
-      {/* 2. Floating Glass Navbar */}
+      {/* Floating Glass Navbar */}
       <Navbar
         onNavigateDemo={navigateToDemo}
         onNavigateLogin={navigateToSignIn}

@@ -1,4 +1,4 @@
-# v0 sandbox internal files
+﻿# v0 sandbox internal files
 __v0_runtime_loader.js
 __v0_devtools.tsx
 __v0_jsx-dev-runtime.ts
@@ -15,3 +15,11 @@ node_modules
 .next/
 .DS_Store
 /dist/
+
+# Ignore real environment files while tracking templates
+.env
+.env.*
+!.env.example
+
+*.log
+**/tsconfig.tsbuildinfo

@@ -1,4 +1,4 @@
-"""FastAPI surface for the proposed BE2 Day 1 synthetic prototype.
+﻿"""FastAPI surface for the proposed BE2 Day 1 synthetic prototype.
 
 Run from the repository root with:
     python -m uvicorn B2.api:app --reload
@@ -9,416 +9,63 @@ Poshan Tracker integration.
 
 import atexit
 import csv
+import ipaddress
 import json
 import os
 import sys
 from datetime import date
 from pathlib import Path
-from uuid import uuid4
+from typing import Literal
+from urllib.parse import urlsplit
+from uuid import UUID, uuid4
 
-from fastapi import FastAPI, Header, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from B2 import ai_service, tasks
-from B2.demo_clock import DEFAULT_DEMO_DATE, parse_date
-from B2.roles import (
-    DEMO_ACTORS,
-    RolePermissionError,
-    Principal,
-    require_api_permission,
-    require_case_scope,
-    require_centre_scope,
-    resolve_demo_actor,
+from B2 import ai_service, beneficiaries as beneficiary_service, closure, exceptions as access_exceptions, maternal, referrals, summary, sync, tasks
+from B2.auth import (
+    AssignmentResolver,
+    IdentityProviderUnavailable,
+    IdentityVerifier,
+    InvalidCredentials,
+    VerifiedIdentity,
 )
-from B2.store import PrototypeStore, StoreError
-from B2.verification import (
-    VerificationError,
-    build_flag_snapshot,
-    remeasure,
-)
-
-ROOT = Path(__file__).resolve().parents[1]
-B1_DIR = ROOT / "B1"
-if str(B1_DIR) not in sys.path:
-    sys.path.insert(0, str(B1_DIR))
-
-
-class VerificationRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    beneficiary_id: str = Field(min_length=1)
-    measurement: dict
-    recorded_at: str = Field(min_length=1)
-    today: str | None = None
-
-
-class CreateTaskRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    flag_id: str = Field(min_length=1)
-    created_on: str | None = None
-
-
-class TaskActionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    action: str = Field(min_length=1)
-    owner_id: str | None = None
-    reason: str | None = None
-    outcome: str | None = None
-    notes: str | None = None
-    on: str | None = None
-
-
-class NextActionDecisionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    decision: str = Field(min_length=1)
-    edited_action: str | None = None
-    reason: str | None = None
-    on: str | None = None
-
-
-def _audit(store, principal, centre_id, entity_type, entity_id, action, on, details=None):
-    return store.append_audit({
-        "event_id": str(uuid4()),
-        "actor_id": principal.actor_id,
-        "role": principal.role,
-        "centre_id": centre_id,
-        "entity_type": entity_type,
-        "entity_id": entity_id,
-        "action": action,
-        "occurred_at": parse_date(on).isoformat(),
-        "details": details or {},
-    })
-
-
-def _seed_synthetic_fixture(store):
-    """Import exactly the BE1 C0001 fixture and add an explicitly synthetic centre.
-
-    AWC-001 is a demo-only mapping, not a claim about the source data. The
-    imported source row is preserved intact under source_row.
-    """
-    if store.get_beneficiary("C0001") is not None:
-        return
-    csv_path = B1_DIR / "children.csv"
-    if not csv_path.exists():
-        return
-    with csv_path.open(newline="", encoding="utf-8") as handle:
-        row = next((r for r in csv.DictReader(handle) if r.get("child_id") == "C0001"), None)
-    if row is None:
-        return
-
-    try:
-        import data_checks
-        import rules_engine
-    except ImportError:
-        return
-
-    beneficiary = {
-        "beneficiary_id": row["child_id"],
-        "child_id": row["child_id"],
-        "centre_id": "AWC-001",
-        "assigned_worker_id": row.get("assigned_worker_id", ""),
-        "source_row": row,
-        "label": "SYNTHETIC DATA / PROPOSED INTEGRATION — centre mapping is demo-only",
-    }
-    store.add_beneficiary(beneficiary)
-    original = {
-        "measurement_id": "MEAS-C0001-BASELINE",
-        "beneficiary_id": "C0001",
-        "centre_id": "AWC-001",
-        "source": "original",
-        "parent_measurement_id": "",
-        "recorded_at": row.get("measurement_date") or DEFAULT_DEMO_DATE.isoformat(),
-        "recorded_by": "BE1 synthetic fixture",
-        "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
-        **{key: row.get(key) for key in (
-            "measurement_date", "weight_kg", "height_cm", "muac_mm", "oedema", "danger_sign",
-            "age_months", "sex", "measurement_valid", "weight_prev1_kg", "weight_prev2_kg",
-            "enrolled", "enrolment_date", "last_visit_date", "referral_status", "referral_date",
-        )},
-    }
-    check = data_checks.check_child(row, today=DEFAULT_DEMO_DATE)
-    evaluation = rules_engine.evaluate_child(row, today=DEFAULT_DEMO_DATE)
-    original["measurement_valid"] = check.get("measurement_valid", True)
-    original["data_quality_issues"] = check.get("issues", [])
-    original["evaluation"] = evaluation
-    store.append_measurement(original)
-    if evaluation.get("colour") != "GREEN":
-        try:
-            version = json.loads((B1_DIR / "thresholds.json").read_text(encoding="utf-8")).get("version", "unknown")
-        except (OSError, json.JSONDecodeError):
-            version = "unknown"
-        flag = build_flag_snapshot(
-            beneficiary, original, evaluation, check, version,
-            row.get("measurement_date") or DEFAULT_DEMO_DATE.isoformat(),
-            flag_id="FLAG-C0001-BASELINE",
-        )
-        store.add_flag(flag)
-
-
-def create_app(store=None, seed_demo=True):
-    database_path = os.environ.get("B2_DB_PATH", str(ROOT / "B2" / ".prototype.sqlite"))
-    repository = store or PrototypeStore(database_path)
-    if store is None:
-        atexit.register(repository.close)
-    if seed_demo:
-        _seed_synthetic_fixture(repository)
-
-    application = FastAPI(
-        title="BE2 Day 1 API — synthetic prototype",
-        version="0.1.0-proposed",
-        description="Proposed, mock-first API. Not approved for real beneficiary data or production use.",
-    )
-    application.state.store = repository
-    origins = [o.strip() for o in os.environ.get("B2_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",") if o.strip()]
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=False,
-        allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Content-Type", "X-Demo-Actor"],
-    )
-
-    @application.exception_handler(HTTPException)
-    async def http_error_handler(request: Request, exc: HTTPException):
-        detail = exc.detail
-        if isinstance(detail, dict) and "code" in detail:
-            payload = detail
-        else:
-            payload = {"code": "request_error", "message": str(detail), "retryable": False}
-        return JSONResponse(status_code=exc.status_code, content={"error": payload})
-
-    @application.exception_handler(RequestValidationError)
-    async def validation_error_handler(request: Request, exc: RequestValidationError):
-        return JSONResponse(status_code=422, content={"error": {
-            "code": "invalid_request", "message": "Request fields are missing or invalid.",
-            "retryable": False, "fields": exc.errors(),
-        }})
-
-    @application.exception_handler(RolePermissionError)
-    async def permission_error_handler(request: Request, exc: RolePermissionError):
-        return JSONResponse(status_code=403, content={"error": {"code": "forbidden", "message": str(exc), "retryable": False}})
-
-    async def domain_error_handler(request: Request, exc: Exception):
-        return JSONResponse(status_code=400, content={"error": {"code": "invalid_operation", "message": str(exc), "retryable": False}})
-
-    for error_type in (StoreError, VerificationError, ai_service.AIServiceError, tasks.TaskActionError):
-        application.add_exception_handler(error_type, domain_error_handler)
-
-    def principal(actor_key: str) -> Principal:
-        try:
-            return resolve_demo_actor(actor_key)
-        except RolePermissionError as exc:
-            raise HTTPException(status_code=401, detail={"code": "unauthorized", "message": str(exc), "retryable": False}) from exc
-
-    def beneficiary_case(actor, beneficiary_id, permission):
-        beneficiary = repository.get_beneficiary(beneficiary_id)
-        if beneficiary is None:
-            raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Beneficiary not found.", "retryable": False})
-        require_case_scope(actor, beneficiary["centre_id"], permission, beneficiary.get("assigned_worker_id", ""))
-        return beneficiary
-
-    def flag_case(actor, flag_id, permission):
-        flag = repository.get_flag(flag_id)
-        if flag is None:
-            raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Flag not found.", "retryable": False})
-        beneficiary = beneficiary_case(actor, flag["beneficiary_id"], permission)
-        return beneficiary, flag
-
-    def validate_demo_owner(owner_id, centre_id, expected_role=None):
-        """Fail closed unless a synthetic target identity is explicitly allow-listed."""
-        matches = [p for p in DEMO_ACTORS.values() if p.actor_id == owner_id and centre_id in p.centre_ids]
-        if not matches:
-            raise RolePermissionError("Task owner is not an allow-listed demo actor for this centre.")
-        if expected_role and matches[0].role != expected_role:
-            raise RolePermissionError(f"Task owner must have the synthetic role {expected_role!r}.")
-        return matches[0]
-
-    @application.get("/api/health")
-    def health():
-        return {"status": "ok", "mode": "synthetic_prototype", "seeded": repository.get_beneficiary("C0001") is not None,
-                "label": "SYNTHETIC DATA / PROPOSED INTEGRATION", "production_auth": False}
-
-    @application.get("/api/cases/{beneficiary_id}/explain")
-    def explain_case_endpoint(beneficiary_id: str, flag_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        beneficiary = beneficiary_case(actor, beneficiary_id, "explain_case")
-        result = ai_service.explain_case(repository, beneficiary_id, flag_id)
-        result["centre_id"] = beneficiary["centre_id"]
-        return result
-
-    @application.get("/api/beneficiaries/{beneficiary_id}/history")
-    def history_endpoint(beneficiary_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        beneficiary = beneficiary_case(actor, beneficiary_id, "history_summary")
-        result = ai_service.history_summary(repository, beneficiary_id)
-        result["centre_id"] = beneficiary["centre_id"]
-        return result
-
-    @application.post("/api/verification")
-    def verification_endpoint(body: VerificationRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        beneficiary = beneficiary_case(actor, body.beneficiary_id, "verify_measurement")
-        try:
-            result = remeasure(repository, body.beneficiary_id, body.measurement, actor.actor_id, body.recorded_at, body.today or body.recorded_at)
-        except (VerificationError, StoreError) as exc:
-            raise HTTPException(status_code=400, detail={"code": "verification_failed", "message": str(exc), "retryable": False}) from exc
-        record = result["measurement"]
-        _audit(repository, actor, beneficiary["centre_id"], "measurement", record["measurement_id"], "remeasurement_saved", body.recorded_at,
-               {"beneficiary_id": body.beneficiary_id, "parent_measurement_id": record["parent_measurement_id"], "flag_id": result["flag"]["flag_id"]})
-        return {**result, "history_link": f"/api/beneficiaries/{body.beneficiary_id}/history", "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
-
-    @application.post("/api/tasks")
-    def create_task_endpoint(body: CreateTaskRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        try:
-            require_api_permission(actor, "create_task")
-        except RolePermissionError:
-            raise
-        beneficiary, flag = flag_case(actor, body.flag_id, "create_task")
-        active_existing = [t for t in repository.list_tasks(beneficiary_id=beneficiary["beneficiary_id"])
-                           if t.get("flag_id") == body.flag_id and t.get("status") != "closed"]
-        if active_existing:
-            raise HTTPException(status_code=409, detail={"code": "active_task_exists", "message": "An active task already exists for this saved flag.", "retryable": False})
-        measurement = repository.get_measurement(flag["measurement_id"])
-        if measurement is None:
-            raise HTTPException(status_code=409, detail={"code": "source_missing", "message": "The saved measurement linked to this flag is unavailable.", "retryable": False})
-        source_row = dict(beneficiary.get("source_row", {}))
-        source_row.update({"child_id": beneficiary["beneficiary_id"], "assigned_worker_id": beneficiary.get("assigned_worker_id", "")})
-        try:
-            task = tasks.create_task(source_row, measurement.get("evaluation", {}), created_on=body.created_on or DEFAULT_DEMO_DATE)
-        except tasks.TaskActionError:
-            raise
-        if task is None:
-            raise HTTPException(status_code=409, detail={"code": "no_action_task", "message": "The saved rule result is GREEN; no task was created.", "retryable": False})
-        task.update({"beneficiary_id": beneficiary["beneficiary_id"], "centre_id": beneficiary["centre_id"], "flag_id": body.flag_id})
-        repository.save_task(task)
-        _audit(repository, actor, beneficiary["centre_id"], "task", task["task_id"], "task_created", body.created_on or DEFAULT_DEMO_DATE,
-               {"beneficiary_id": beneficiary["beneficiary_id"], "flag_id": body.flag_id, "initial_status": task["status"]})
-        return {"task": task, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
-
-    @application.get("/api/tasks")
-    def list_tasks_endpoint(centre_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        require_api_permission(actor, "view_tasks")
-        require_centre_scope(actor, centre_id)
-        records = repository.list_tasks(centre_id=centre_id)
-        if actor.role == "worker":
-            records = [t for t in records if t.get("owner_id") == actor.assigned_worker_id]
-        return {"centre_id": centre_id, "tasks": records, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
-
-    @application.post("/api/tasks/{task_id}/actions")
-    def task_action_endpoint(task_id: str, body: TaskActionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        task = repository.get_task(task_id)
-        if task is None:
-            raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Task not found.", "retryable": False})
-        beneficiary = beneficiary_case(actor, task["beneficiary_id"], "task_action")
-        action = body.action.strip().lower()
-        if action == "close":
-            raise HTTPException(status_code=409, detail={"code": "two_key_closure_not_implemented", "message": "Day 1 does not expose closure. Two-key closure checks require the approved Day 2 workflow.", "retryable": False})
-        if action in {"assign", "reassign", "escalate"} and actor.role == "worker":
-            raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Workers cannot assign, reassign, or escalate tasks.", "retryable": False})
-        if actor.role == "worker" and task.get("owner_id") != actor.assigned_worker_id:
-            raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Worker may only act on a task assigned to them.", "retryable": False})
-        if action == "assign":
-            validate_demo_owner(body.owner_id or "", beneficiary["centre_id"], "worker")
-        elif action == "reassign":
-            validate_demo_owner(body.owner_id or "", beneficiary["centre_id"], task.get("owner_role", "worker"))
-        elif action == "escalate":
-            next_level = int(task.get("escalation_level", 0)) + 1
-            if next_level >= len(tasks.ESCALATION_LADDER):
-                raise HTTPException(status_code=409, detail={"code": "no_escalation_target", "message": "No later escalation target is configured.", "retryable": False})
-            expected_role = tasks.ESCALATION_LADDER[next_level]["role"]
-            validate_demo_owner(body.owner_id or "", beneficiary["centre_id"], expected_role)
-        try:
-            updated = tasks.apply_task_action(
-                task, action, actor.actor_id, body.on or DEFAULT_DEMO_DATE,
-                owner_id=body.owner_id, reason=body.reason, outcome=body.outcome, notes=body.notes,
-                owner_role="worker",
-            )
-            repository.save_task(updated)
-        except (tasks.TaskActionError, StoreError) as exc:
-            raise HTTPException(status_code=400, detail={"code": "invalid_task_transition", "message": str(exc), "retryable": False}) from exc
-        _audit(repository, actor, beneficiary["centre_id"], "task", task_id, action, body.on or DEFAULT_DEMO_DATE,
-               {"previous_status": task["status"], "status": updated["status"], "owner_id": updated.get("owner_id")})
-        return {"task": updated, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
-
-    @application.get("/api/next-actions/{flag_id}")
-    def next_action_endpoint(flag_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        beneficiary, flag = flag_case(actor, flag_id, "suggest_action")
-        result = ai_service.suggest_next_action(repository, beneficiary["beneficiary_id"], flag_id)
-        result["centre_id"] = beneficiary["centre_id"]
-        return result
-
-    @application.post("/api/next-actions/{flag_id}/decision")
-    def next_action_decision_endpoint(flag_id: str, body: NextActionDecisionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        beneficiary, flag = flag_case(actor, flag_id, "decide_action")
-        suggestion = ai_service.suggest_next_action(repository, beneficiary["beneficiary_id"], flag_id)
-        suggestion["centre_id"] = beneficiary["centre_id"]
-        try:
-            decision = ai_service.record_next_action_decision(
-                repository, suggestion, actor.actor_id, body.decision, body.on or DEFAULT_DEMO_DATE,
-                edited_action=body.edited_action or "", reason=body.reason or "",
-            )
-        except ai_service.AIServiceError as exc:
-            raise HTTPException(status_code=400, detail={"code": "invalid_decision", "message": str(exc), "retryable": False}) from exc
-        _audit(repository, actor, beneficiary["centre_id"], "next_action_decision", decision["decision_id"], "decision_recorded", decision["created_at"],
-               {"flag_id": flag_id, "decision": decision["decision"], "action_code": decision["action_code"]})
-        return {"decision": decision, "suggestion": suggestion, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
-
-    @application.get("/api/briefing")
-    def briefing_endpoint(centre_id: str, as_of: str = Query(DEFAULT_DEMO_DATE.isoformat()), x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
-        require_api_permission(actor, "view_briefing")
-        require_centre_scope(actor, centre_id)
-        try:
-            return ai_service.daily_briefing(repository, centre_id, as_of)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail={"code": "invalid_date", "message": str(exc), "retryable": False}) from exc
-
-    return application
-
-
-app = create_app()
-"""FastAPI surface for the proposed BE2 Day 1 synthetic prototype.
-
-Run from the repository root with:
-    python -m uvicorn B2.api:app --reload
-This API uses synthetic demo actor keys, SQLite prototype storage and a
-synthetic centre mapping. It is not production authentication or a live
-Poshan Tracker integration.
-"""
-
-import atexit
-import csv
-import json
-import os
-import sys
-from pathlib import Path
-from uuid import uuid4
-
-from fastapi import FastAPI, Header, HTTPException, Query, Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field
-
-from B2 import ai_service, closure, exceptions as access_exceptions, maternal, referrals, summary, sync, tasks
 from B2.demo_clock import DEFAULT_DEMO_DATE, DemoClockError, parse_date
+from B2 import prepared_dataset
+from B2.prepared_data import (
+    PreparedBeneficiaryPage,
+    PreparedDataUnavailable,
+    PreparedDatasetMappingResolver,
+    PreparedMeasurementPage,
+    PreparedPreviewCatalog,
+    PreparedPreviewPage,
+    PREVIEW_DATASETS,
+    authorized_prepared_centres as resolve_prepared_centres,
+    page_prepared_preview,
+    page_prepared_beneficiaries,
+    page_prepared_measurements,
+    prepared_preview_catalog,
+    read_prepared_summary,
+)
 from B2.roles import (
+    AuthorizationServiceUnavailable,
     DEMO_ACTORS,
     RolePermissionError,
     Principal,
+    WorkerMappingResolver,
+    canonical_role,
     require_api_permission,
     require_case_scope,
     require_centre_scope,
+    require_referral_action,
+    require_task_action,
+    resolve_authorized_principal,
     resolve_demo_actor,
 )
-from B2.security import UnsafePayloadError, safe_note, validate_safe_json
+from B2.security import UnsafePayloadError, safe_note, safe_validation_errors, validate_safe_json
 from B2.store import PrototypeStore, StoreError
 from B2.verification import VerificationError, build_flag_snapshot, remeasure
 
@@ -434,6 +81,14 @@ class VerificationRequest(BaseModel):
     measurement: dict
     recorded_at: str = Field(min_length=1)
     today: str | None = None
+
+
+class CreateBeneficiaryRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    beneficiary_id: str | None = Field(default=None, min_length=5, max_length=80)
+    date_of_birth: date
+    sex: str = Field(min_length=1)
+    caregiver_kinship: str = Field(default="", max_length=80)
 
 
 class CreateTaskRequest(BaseModel):
@@ -546,6 +201,31 @@ class OfflineConflictResolutionRequest(BaseModel):
     latest_version: int | None = Field(default=None, ge=0)
 
 
+def phase_one_principal_dependency(
+    request: Request,
+    x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor"),
+) -> Principal:
+    """Resolve the configured principal for protected API routes.
+
+    Tests may override this dependency on a newly created in-memory app. The
+    production app always uses its normal auth resolver; no test identity or
+    public test route is added.
+    """
+    resolver = getattr(request.app.state, "principal_resolver", None)
+    if not callable(resolver):
+        raise HTTPException(status_code=401, detail={
+            "code": "unauthorized",
+            "message": "Authentication is not configured; protected access is disabled.",
+            "retryable": False,
+        })
+    return resolver(request, x_demo_actor)
+
+
+def prepared_rows_identity_dependency(request: Request) -> Principal:
+    """Use the configured principal resolver without any synthetic actor header."""
+    return phase_one_principal_dependency(request, None)
+
+
 def _audit(store, principal, centre_id, entity_type, entity_id, action, on, details=None):
     return store.append_audit({
         "event_id": str(uuid4()),
@@ -625,9 +305,81 @@ def _seed_synthetic_fixture(store):
         store.add_flag(flag)
 
 
+def prepared_preview_configuration(environ, auth_mode: str) -> tuple[bool, bool]:
+    """Return (enabled, unsafe_requested) for the separate local preview.
+
+    The preview cannot be enabled in deployed/CI contexts, while trusted auth
+    or either existing prepared-data gate is active. This never changes those
+    existing settings.
+    """
+    requested = str(environ.get("B2_PREPARED_PREVIEW_ENABLED", "")).strip().lower() == "true"
+    if not requested:
+        return False, False
+    environment = str(environ.get("B2_ENV", "")).strip().lower()
+    if environment not in {"development", "local"} or auth_mode != "disabled":
+        return False, True
+    for marker in (
+        "VERCEL", "RENDER", "RAILWAY_ENVIRONMENT", "DYNO", "K_SERVICE",
+        "AWS_LAMBDA_FUNCTION_NAME", "CI",
+    ):
+        value = str(environ.get(marker, "")).strip().lower()
+        if value and value not in {"false", "0", "no"}:
+            return False, True
+    if str(environ.get("B2_PREPARED_ROWS_ENABLED", "")).strip().lower() == "true":
+        return False, True
+    if str(environ.get("B2_PREPARED_SUMMARY_PUBLIC", "")).strip().lower() == "true":
+        return False, True
+    return True, False
+
+
+def is_loopback_preview_request(request: Request) -> bool:
+    """Reject non-loopback clients, hosts, server interfaces, and proxies."""
+    if any(name in request.headers for name in ("forwarded", "x-forwarded-for", "x-real-ip")):
+        return False
+    if request.client is None:
+        return False
+    try:
+        client_address = ipaddress.ip_address(request.client.host)
+        host_header = request.headers.get("host", "")
+        host_name = urlsplit(f"//{host_header}").hostname
+        server = request.scope.get("server")
+        server_address = ipaddress.ip_address(server[0]) if isinstance(server, (tuple, list)) and server else None
+    except (ValueError, TypeError):
+        return False
+    host_is_loopback = host_name == "localhost"
+    if host_name:
+        try:
+            host_is_loopback = host_is_loopback or ipaddress.ip_address(host_name).is_loopback
+        except ValueError:
+            pass
+    return client_address.is_loopback and host_is_loopback and server_address is not None and server_address.is_loopback
+
+
 def create_app(store=None, seed_demo=True, closure_policies=None,
                maternal_enabled=None, maternal_allowed_roles=("supervisor",),
-               offline_queue_dir=None):
+               offline_queue_dir=None, auth_mode=None,
+               identity_verifier: IdentityVerifier | None = None,
+               assignment_resolver: AssignmentResolver | None = None,
+               organization_hierarchy=None,
+               worker_mapping_resolver: WorkerMappingResolver | None = None,
+               prepared_dataset_mapping_resolver: PreparedDatasetMappingResolver | None = None):
+    auth_mode = (auth_mode or os.environ.get("B2_AUTH_MODE", "disabled")).strip().lower()
+    if auth_mode == "production":
+        auth_mode = "supabase"
+    if auth_mode not in {"disabled", "demo", "supabase"}:
+        raise RuntimeError("B2_AUTH_MODE must be disabled, demo, or supabase.")
+    if auth_mode == "demo" and os.environ.get("B2_ENV", "").strip().lower() in {"prod", "production"}:
+        raise RuntimeError("Synthetic demo authentication is prohibited when B2_ENV=production.")
+    if auth_mode == "supabase" and not (identity_verifier and assignment_resolver and organization_hierarchy):
+        raise RuntimeError(
+            "Supabase mode requires a verified-token adapter, server-side assignment resolver, "
+            "and organization hierarchy. None is configured in this repository."
+        )
+    if auth_mode == "supabase" and (store is None or isinstance(store, PrototypeStore) or seed_demo):
+        raise RuntimeError(
+            "Supabase identity mode cannot use the SQLite PrototypeStore or seeded demo records. "
+            "An explicitly configured operational repository is required."
+        )
     database_path = os.environ.get("B2_DB_PATH", str(ROOT / "B2" / ".prototype.sqlite"))
     repository = store or PrototypeStore(database_path)
     if store is None:
@@ -656,6 +408,22 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         description="Proposed, mock-first API. Not approved for real beneficiary data or production use.",
     )
     application.state.store = repository
+    application.state.auth_mode = auth_mode
+    application.state.prepared_summary_public = (
+        os.environ.get("B2_PREPARED_SUMMARY_PUBLIC", "").strip().lower() == "true"
+    )
+    application.state.prepared_rows_enabled = (
+        os.environ.get("B2_PREPARED_ROWS_ENABLED", "").strip().lower() == "true"
+    )
+    preview_requested = os.environ.get("B2_PREPARED_PREVIEW_ENABLED", "").strip().lower() == "true"
+    preview_enabled, preview_unsafe = prepared_preview_configuration(os.environ, auth_mode)
+    application.state.prepared_preview_requested = preview_requested
+    application.state.prepared_preview_enabled = preview_enabled
+    application.state.prepared_preview_unsafe = preview_unsafe
+    application.state.identity_verifier = identity_verifier
+    application.state.assignment_resolver = assignment_resolver
+    application.state.organization_hierarchy = organization_hierarchy
+    application.state.prepared_dataset_mapping_resolver = prepared_dataset_mapping_resolver
     application.state.closure_policies = closure_policies
     application.state.maternal_enabled = maternal_enabled
     application.state.maternal_allowed_roles = tuple(maternal_allowed_roles)
@@ -667,7 +435,7 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         allow_origins=origins,
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Content-Type", "X-Demo-Actor"],
+        allow_headers=["Content-Type", "Authorization", "X-Demo-Actor"],
     )
 
     @application.exception_handler(HTTPException)
@@ -683,7 +451,15 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
     async def validation_error_handler(request: Request, exc: RequestValidationError):
         return JSONResponse(status_code=422, content={"error": {
             "code": "invalid_request", "message": "Request fields are missing or invalid.",
-            "retryable": False, "fields": exc.errors(),
+            "retryable": False, "fields": safe_validation_errors(exc.errors()),
+        }})
+
+    @application.exception_handler(AuthorizationServiceUnavailable)
+    async def authorization_unavailable_handler(request: Request, exc: AuthorizationServiceUnavailable):
+        return JSONResponse(status_code=503, content={"error": {
+            "code": "authorization_service_unavailable",
+            "message": "Authorization could not be completed safely. Try again later.",
+            "retryable": True,
         }})
 
     @application.exception_handler(RolePermissionError)
@@ -691,28 +467,124 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return JSONResponse(status_code=403, content={"error": {"code": "forbidden", "message": str(exc), "retryable": False}})
 
     async def domain_error_handler(request: Request, exc: Exception):
-        return JSONResponse(status_code=400, content={"error": {"code": "invalid_operation", "message": str(exc), "retryable": False}})
+        return JSONResponse(status_code=400, content={"error": {
+            "code": "invalid_operation", "message": "The requested workflow operation could not be completed.",
+            "retryable": False,
+        }})
 
     for error_type in (
-        StoreError, DemoClockError, VerificationError, ai_service.AIServiceError, tasks.TaskActionError,
+        StoreError, DemoClockError, VerificationError, beneficiary_service.BeneficiaryError,
+        ai_service.AIServiceError, tasks.TaskActionError,
         referrals.ReferralError, access_exceptions.AccessExceptionError,
         maternal.MaternalFollowupError, closure.ClosureError, sync.SyncError,
         UnsafePayloadError,
     ):
         application.add_exception_handler(error_type, domain_error_handler)
 
-    def principal(actor_key: str) -> Principal:
+    def principal(request: Request, actor_key: str | None = None) -> Principal:
+        if auth_mode == "disabled":
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "Authentication is not configured; protected access is disabled.",
+                "retryable": False,
+            })
+        if auth_mode == "demo":
+            try:
+                return resolve_demo_actor(actor_key or "")
+            except RolePermissionError as exc:
+                raise HTTPException(status_code=401, detail={
+                    "code": "unauthorized", "message": str(exc), "retryable": False,
+                }) from exc
+        if actor_key is not None:
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "Demo actor headers are not accepted outside explicit demo mode.",
+                "retryable": False,
+            })
+        if not request.headers.get("authorization", "").lower().startswith("bearer "):
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized", "message": "A verified bearer token is required.",
+                "retryable": False,
+            })
         try:
-            return resolve_demo_actor(actor_key)
-        except RolePermissionError as exc:
-            raise HTTPException(status_code=401, detail={"code": "unauthorized", "message": str(exc), "retryable": False}) from exc
+            identity = identity_verifier.verify_request(request)
+            if not isinstance(identity, VerifiedIdentity):
+                raise ValueError("Identity verifier returned an unverified identity.")
+            subject_id = UUID(identity.subject)
+            return resolve_authorized_principal(
+                subject_id, assignment_resolver, organization_hierarchy,
+                worker_mapping_resolver=worker_mapping_resolver,
+            )
+        except InvalidCredentials:
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "Bearer credentials could not be verified.",
+                "retryable": False,
+            }) from None
+        except IdentityProviderUnavailable:
+            raise HTTPException(status_code=503, detail={
+                "code": "identity_provider_unavailable",
+                "message": "Identity verification is temporarily unavailable.",
+                "retryable": True,
+            }) from None
+        except AuthorizationServiceUnavailable:
+            raise HTTPException(status_code=503, detail={
+                "code": "authorization_service_unavailable",
+                "message": "Authorization could not be completed safely. Try again later.",
+                "retryable": True,
+            }) from None
+        except RolePermissionError:
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "A valid server-side authorization assignment is required.",
+                "retryable": False,
+            }) from None
+        except Exception as exc:
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "Identity verification or server-side assignment lookup failed.",
+                "retryable": False,
+            }) from exc
+
+    application.state.principal_resolver = principal
 
     def beneficiary_case(actor, beneficiary_id, permission):
         beneficiary = repository.get_beneficiary(beneficiary_id)
         if beneficiary is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Beneficiary not found.", "retryable": False})
-        require_case_scope(actor, beneficiary["centre_id"], permission, beneficiary.get("assigned_worker_id", ""))
+        require_case_scope(actor, beneficiary["centre_id"], permission, beneficiary.get("assigned_worker_id", ""), organization_hierarchy)
         return beneficiary
+
+    def prepared_rows_gate(request: Request) -> None:
+        """Row-level prepared data requires an explicit gate and trusted auth mode."""
+        if not request.app.state.prepared_rows_enabled:
+            raise HTTPException(status_code=404, detail={
+                "code": "not_found", "message": "Not found.", "retryable": False,
+            })
+        if request.app.state.auth_mode != "supabase":
+            raise HTTPException(status_code=401, detail={
+                "code": "unauthorized",
+                "message": "Trusted authentication is required for prepared records.",
+                "retryable": False,
+            })
+
+    def prepared_rows_actor(
+        request: Request,
+        _gate: None = Depends(prepared_rows_gate),
+        actor: Principal = Depends(prepared_rows_identity_dependency),
+    ) -> Principal:
+        return actor
+
+    def authorized_prepared_centres(request: Request, actor: Principal, dataset) -> set[str]:
+        if actor.centre_ids:
+            raise RolePermissionError("Synthetic demo centre assignments cannot authorize prepared records.")
+        require_api_permission(actor, "view_case")
+        return resolve_prepared_centres(
+            dataset,
+            actor,
+            request.app.state.organization_hierarchy,
+            request.app.state.prepared_dataset_mapping_resolver,
+        )
 
     def flag_case(actor, flag_id, permission):
         flag = repository.get_flag(flag_id)
@@ -720,6 +592,26 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Flag not found.", "retryable": False})
         beneficiary = beneficiary_case(actor, flag["beneficiary_id"], permission)
         return beneficiary, flag
+
+    def registration_centre(actor):
+        require_api_permission(actor, "register_beneficiary")
+        if canonical_role(actor.role) != "AWW":
+            raise RolePermissionError("Only AWW staff may register a beneficiary.")
+        assigned = [scope.organization_id for scope in actor.organization_scopes if scope.kind == "centre"]
+        if not assigned:
+            assigned = list(actor.centre_ids)
+        assigned = list(dict.fromkeys(assigned))
+        if len(assigned) != 1 or not actor.assigned_worker_id:
+            raise RolePermissionError("AWW registration requires one trusted centre and worker assignment.")
+        require_centre_scope(actor, assigned[0], organization_hierarchy)
+        return assigned[0]
+
+    def evaluation_today(requested_demo_date=None):
+        # Client-selected dates are test/demo affordances only. Production-like
+        # modes use the server clock for data-quality and age evaluation.
+        if auth_mode == "demo":
+            return requested_demo_date or application.state.demo_date.isoformat()
+        return date.today().isoformat()
 
     def validate_demo_owner(owner_id, centre_id, expected_role=None):
         """Fail closed unless a synthetic target identity is explicitly allow-listed."""
@@ -762,15 +654,218 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"status": "ok", "mode": "synthetic_prototype", "seeded": repository.get_beneficiary("C0001") is not None,
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION", "production_auth": False}
 
+    @application.get("/api/prepared-data/summary")
+    def prepared_data_summary_endpoint(request: Request, response: Response):
+        """Optionally public, read-only aggregate of explicitly synthetic data.
+
+        This endpoint returns no row-level records, identifiers, centre/worker
+        scope, or write operations. It is separate from authenticated B2 data.
+        """
+        if not application.state.prepared_summary_public:
+            raise HTTPException(status_code=404, detail={
+                "code": "not_found",
+                "message": "Not found.",
+                "retryable": False,
+            })
+        if request.query_params:
+            raise HTTPException(status_code=422, detail={
+                "code": "unsupported_query",
+                "message": "This aggregate endpoint does not accept filters or scope parameters.",
+                "retryable": False,
+            })
+        response.headers["Cache-Control"] = "no-store"
+        try:
+            return read_prepared_summary()
+        except PreparedDataUnavailable as exc:
+            raise HTTPException(status_code=503, detail={
+                "code": "prepared_dataset_unavailable",
+                "message": "The prepared synthetic summary is temporarily unavailable.",
+                "retryable": True,
+            }) from exc
+
+    @application.get(
+        "/api/prepared-data/beneficiaries",
+        response_model=PreparedBeneficiaryPage,
+    )
+    def prepared_beneficiaries_endpoint(
+        request: Request,
+        response: Response,
+        limit: int = Query(default=25, ge=1, le=100),
+        offset: int = Query(default=0, ge=0),
+        category: Literal["child", "pregnant_woman", "lactating_mother"] | None = Query(default=None),
+        centre_id: str | None = Query(default=None, min_length=1, max_length=128),
+        actor: Principal = Depends(prepared_rows_actor),
+    ):
+        """Return a scoped, allowlisted page of prepared beneficiary records."""
+        try:
+            dataset = prepared_dataset.read_prepared_dataset()
+        except PreparedDataUnavailable as exc:
+            raise HTTPException(status_code=503, detail={
+                "code": "prepared_dataset_unavailable",
+                "message": "Prepared synthetic records are temporarily unavailable.",
+                "retryable": True,
+            }) from exc
+        centres = authorized_prepared_centres(request, actor, dataset)
+        if centre_id is not None and centre_id not in centres:
+            raise RolePermissionError("Requested centre is outside the assigned organization scope.")
+        if centre_id is not None:
+            centres = {centre_id}
+        response.headers["Cache-Control"] = "no-store"
+        return page_prepared_beneficiaries(
+            dataset, centres, limit=limit, offset=offset, category=category,
+        )
+
+    @application.get(
+        "/api/prepared-data/measurements",
+        response_model=PreparedMeasurementPage,
+    )
+    def prepared_measurements_endpoint(
+        request: Request,
+        response: Response,
+        limit: int = Query(default=25, ge=1, le=100),
+        offset: int = Query(default=0, ge=0),
+        beneficiary_id: str | None = Query(default=None, min_length=1, max_length=128),
+        centre_id: str | None = Query(default=None, min_length=1, max_length=128),
+        actor: Principal = Depends(prepared_rows_actor),
+    ):
+        """Return scoped prepared measurement values without derived outcomes."""
+        try:
+            dataset = prepared_dataset.read_prepared_dataset()
+        except PreparedDataUnavailable as exc:
+            raise HTTPException(status_code=503, detail={
+                "code": "prepared_dataset_unavailable",
+                "message": "Prepared synthetic measurements are temporarily unavailable.",
+                "retryable": True,
+            }) from exc
+        centres = authorized_prepared_centres(request, actor, dataset)
+        if centre_id is not None and centre_id not in centres:
+            raise RolePermissionError("Requested centre is outside the assigned organization scope.")
+        if centre_id is not None:
+            centres = {centre_id}
+        if beneficiary_id is not None and not any(
+            row["beneficiary_id"] == beneficiary_id and row["centre_id"] in centres
+            for row in dataset.beneficiaries
+        ):
+            # Hide whether an identifier exists outside the caller's scope.
+            raise HTTPException(status_code=404, detail={
+                "code": "not_found", "message": "Not found.", "retryable": False,
+            })
+        response.headers["Cache-Control"] = "no-store"
+        return page_prepared_measurements(
+            dataset, centres, limit=limit, offset=offset, beneficiary_id=beneficiary_id,
+        )
+
+    def prepared_local_preview_gate(request: Request) -> None:
+        if not request.app.state.prepared_preview_requested:
+            raise HTTPException(status_code=404, detail={
+                "code": "preview_disabled", "message": "Local prepared-data preview is disabled.", "retryable": False,
+            })
+        if not request.app.state.prepared_preview_enabled or request.app.state.prepared_preview_unsafe:
+            raise HTTPException(status_code=403, detail={
+                "code": "preview_unsafe_context",
+                "message": "Local prepared-data preview is unavailable in this environment.",
+                "retryable": False,
+            })
+        if not is_loopback_preview_request(request):
+            raise HTTPException(status_code=403, detail={
+                "code": "preview_loopback_only",
+                "message": "Local prepared-data preview accepts loopback requests only.",
+                "retryable": False,
+            })
+
+    def load_preview_dataset():
+        try:
+            return prepared_dataset.read_prepared_dataset()
+        except PreparedDataUnavailable as exc:
+            raise HTTPException(status_code=503, detail={
+                "code": "prepared_dataset_unavailable",
+                "message": "Prepared synthetic preview data is temporarily unavailable.",
+                "retryable": True,
+            }) from exc
+
+    @application.get(
+        "/api/preview/prepared-data/datasets",
+        response_model=PreparedPreviewCatalog,
+    )
+    def prepared_local_preview_catalog(request: Request, response: Response):
+        prepared_local_preview_gate(request)
+        if request.query_params:
+            raise HTTPException(status_code=422, detail={
+                "code": "unsupported_query", "message": "The preview catalog does not accept query parameters.", "retryable": False,
+            })
+        response.headers["Cache-Control"] = "no-store"
+        return prepared_preview_catalog(load_preview_dataset())
+
+    @application.get(
+        "/api/preview/prepared-data/{dataset_key}",
+        response_model=PreparedPreviewPage,
+    )
+    def prepared_local_preview_page(
+        dataset_key: str,
+        request: Request,
+        response: Response,
+        limit: int = Query(default=25, ge=1, le=100),
+        offset: int = Query(default=0, ge=0, le=1_000_000),
+        filter_by: str | None = Query(default=None, min_length=1, max_length=64),
+        filter_value: str | None = Query(default=None, min_length=1, max_length=128),
+        sort_by: str | None = Query(default=None, min_length=1, max_length=64),
+        sort_order: Literal["asc", "desc"] = Query(default="asc"),
+    ):
+        prepared_local_preview_gate(request)
+        allowed_query = {"limit", "offset", "filter_by", "filter_value", "sort_by", "sort_order"}
+        if set(request.query_params.keys()) - allowed_query:
+            raise HTTPException(status_code=422, detail={
+                "code": "unsupported_query", "message": "The preview request contains unsupported query parameters.", "retryable": False,
+            })
+        if dataset_key not in PREVIEW_DATASETS:
+            raise HTTPException(status_code=404, detail={
+                "code": "dataset_not_found", "message": "Prepared preview dataset was not found.", "retryable": False,
+            })
+        try:
+            result = page_prepared_preview(
+                load_preview_dataset(), dataset_key, limit=limit, offset=offset,
+                filter_by=filter_by, filter_value=filter_value, sort_by=sort_by,
+                sort_order=sort_order,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail={
+                "code": "invalid_preview_query", "message": str(exc), "retryable": False,
+            }) from exc
+        response.headers["Cache-Control"] = "no-store"
+        return result
+
+    @application.get("/api/me")
+    def my_profile_endpoint(actor: Principal = Depends(phase_one_principal_dependency)):
+        """Return only the role and scope resolved by the configured server boundary."""
+        scopes = [
+            {"type": scope.kind, "id": scope.organization_id}
+            for scope in actor.organization_scopes
+        ]
+        if auth_mode == "demo" and not scopes:
+            # Explicitly synthetic legacy demo personas store centre scope in
+            # centre_ids. Never use this branch for Supabase authorization.
+            scopes = [{"type": "centre", "id": centre_id} for centre_id in actor.centre_ids]
+        profile = {
+            "subject_id": actor.subject_id if auth_mode == "supabase" else None,
+            "role": canonical_role(actor.role),
+            "scopes": scopes,
+            "is_active": actor.is_active,
+            "identity_mode": auth_mode,
+            "demo": auth_mode == "demo",
+        }
+        if auth_mode == "demo":
+            profile["label"] = "SYNTHETIC DEMO IDENTITY — NOT AUTHENTICATED"
+        return profile
+
     @application.get("/api/audit")
-    def audit_endpoint(centre_id: str, entity_type: str | None = None, entity_id: str | None = None,
+    def audit_endpoint(request: Request, centre_id: str, entity_type: str | None = None, entity_id: str | None = None,
                        limit: int = Query(100, ge=1, le=500),
-                       x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+                       x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "view_audit")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         events = repository.list_audit(centre_id=centre_id)
-        if actor.role == "worker":
+        if canonical_role(actor.role) == "AWW":
             owned = [b for b in repository.list_beneficiaries(centre_id)
                      if b.get("assigned_worker_id") == actor.assigned_worker_id]
             allowed_ids = set()
@@ -792,38 +887,104 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/cases/{beneficiary_id}/explain")
-    def explain_case_endpoint(beneficiary_id: str, flag_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def explain_case_endpoint(request: Request, beneficiary_id: str, flag_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         beneficiary = beneficiary_case(actor, beneficiary_id, "explain_case")
         result = ai_service.explain_case(repository, beneficiary_id, flag_id)
         result["centre_id"] = beneficiary["centre_id"]
         return result
 
+    @application.get("/api/beneficiaries")
+    def list_beneficiaries_endpoint(request: Request, centre_id: str,
+                                    actor: Principal = Depends(phase_one_principal_dependency)):
+        require_api_permission(actor, "view_case")
+        require_centre_scope(actor, centre_id, organization_hierarchy)
+        records = repository.list_beneficiaries(centre_id)
+        if canonical_role(actor.role) == "AWW":
+            records = [item for item in records if item.get("assigned_worker_id") == actor.assigned_worker_id]
+        return {"centre_id": centre_id, "beneficiaries": records,
+                "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
+
+    @application.post("/api/beneficiaries")
+    def register_beneficiary_endpoint(body: CreateBeneficiaryRequest,
+                                      actor: Principal = Depends(phase_one_principal_dependency)):
+        centre_id = registration_centre(actor)
+        validate_safe_json(body.model_dump())
+        try:
+            record = beneficiary_service.register_beneficiary(
+                repository, beneficiary_id=body.beneficiary_id,
+                date_of_birth=body.date_of_birth.isoformat(), sex=body.sex,
+                centre_id=centre_id, assigned_worker_id=actor.assigned_worker_id,
+                caregiver_kinship=safe_note(body.caregiver_kinship, "caregiver_kinship", 80),
+                registered_at=evaluation_today(),
+            )
+        except beneficiary_service.BeneficiaryError as exc:
+            raise HTTPException(status_code=422, detail={"code": "beneficiary_invalid", "message": str(exc), "retryable": False}) from exc
+        _audit(repository, actor, centre_id, "beneficiary", record["beneficiary_id"], "beneficiary_registered",
+               application.state.demo_date, {"assigned_worker_id": actor.assigned_worker_id})
+        return {"beneficiary": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
+
+    @application.get("/api/beneficiaries/{beneficiary_id}")
+    def get_beneficiary_endpoint(beneficiary_id: str,
+                                 actor: Principal = Depends(phase_one_principal_dependency)):
+        record = beneficiary_case(actor, beneficiary_id, "view_case")
+        return {"beneficiary": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
+
+    @application.get("/api/beneficiaries/{beneficiary_id}/measurements")
+    def list_beneficiary_measurements_endpoint(request: Request, beneficiary_id: str,
+                                               actor: Principal = Depends(phase_one_principal_dependency)):
+        beneficiary = beneficiary_case(actor, beneficiary_id, "view_history")
+        return {"beneficiary_id": beneficiary_id, "centre_id": beneficiary["centre_id"],
+                "measurements": repository.list_measurements(beneficiary_id),
+                "flags": repository.list_flags(beneficiary_id=beneficiary_id),
+                "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
+
+    @application.post("/api/measurements")
+    def record_measurement_endpoint(request: Request, body: VerificationRequest,
+                                    actor: Principal = Depends(phase_one_principal_dependency)):
+        beneficiary = beneficiary_case(actor, body.beneficiary_id, "record_measurement")
+        if canonical_role(actor.role) != "AWW":
+            raise RolePermissionError("Only assigned AWW staff may record an initial measurement.")
+        validate_safe_json(body.measurement)
+        try:
+            result = beneficiary_service.record_initial_measurement(
+                repository, beneficiary, body.measurement, actor.actor_id,
+                body.recorded_at, evaluation_today(body.today),
+            )
+        except beneficiary_service.BeneficiaryError as exc:
+            raise HTTPException(status_code=422, detail={"code": "measurement_invalid", "message": str(exc), "retryable": False}) from exc
+        measurement = result["measurement"]
+        _audit(repository, actor, beneficiary["centre_id"], "measurement", measurement["measurement_id"],
+               "measurement_recorded", body.recorded_at,
+               {"beneficiary_id": body.beneficiary_id, "flag_id": result["flag"]["flag_id"]})
+        return {**result, "history_link": f"/api/beneficiaries/{body.beneficiary_id}/measurements",
+                "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
+
     @application.get("/api/beneficiaries/{beneficiary_id}/history")
-    def history_endpoint(beneficiary_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def history_endpoint(beneficiary_id: str,
+                         actor: Principal = Depends(phase_one_principal_dependency)):
         beneficiary = beneficiary_case(actor, beneficiary_id, "history_summary")
         result = ai_service.history_summary(repository, beneficiary_id)
         result["centre_id"] = beneficiary["centre_id"]
         return result
 
     @application.post("/api/verification")
-    def verification_endpoint(body: VerificationRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def verification_endpoint(body: VerificationRequest,
+                              actor: Principal = Depends(phase_one_principal_dependency)):
         beneficiary = beneficiary_case(actor, body.beneficiary_id, "verify_measurement")
         validate_safe_json(body.measurement)
         try:
-            result = remeasure(repository, body.beneficiary_id, body.measurement, actor.actor_id, body.recorded_at, body.today or application.state.demo_date.isoformat())
+            result = remeasure(repository, body.beneficiary_id, body.measurement, actor.actor_id, body.recorded_at, evaluation_today(body.today))
         except (VerificationError, StoreError) as exc:
-            raise HTTPException(status_code=400, detail={"code": "verification_failed", "message": str(exc), "retryable": False}) from exc
+            raise HTTPException(status_code=400, detail={"code": "verification_failed", "message": "Measurement verification could not be completed.", "retryable": False}) from exc
         record = result["measurement"]
         _audit(repository, actor, beneficiary["centre_id"], "measurement", record["measurement_id"], "remeasurement_saved", body.recorded_at,
                {"beneficiary_id": body.beneficiary_id, "parent_measurement_id": record["parent_measurement_id"], "flag_id": result["flag"]["flag_id"]})
         return {**result, "history_link": f"/api/beneficiaries/{body.beneficiary_id}/history", "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/tasks")
-    def create_task_endpoint(body: CreateTaskRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def create_task_endpoint(body: CreateTaskRequest,
+                             actor: Principal = Depends(phase_one_principal_dependency)):
         try:
             require_api_permission(actor, "create_task")
         except RolePermissionError:
@@ -852,19 +1013,19 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"task": task, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/tasks")
-    def list_tasks_endpoint(centre_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_tasks_endpoint(request: Request, centre_id: str,
+                            actor: Principal = Depends(phase_one_principal_dependency)):
         require_api_permission(actor, "view_tasks")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         records = repository.list_tasks(centre_id=centre_id)
-        if actor.role == "worker":
+        if canonical_role(actor.role) == "AWW":
             records = [t for t in records if t.get("owner_id") == actor.assigned_worker_id
                        and (repository.get_beneficiary(t.get("beneficiary_id")) or {}).get("assigned_worker_id") == actor.assigned_worker_id]
         return {"centre_id": centre_id, "tasks": records, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/tasks/{task_id}/actions")
-    def task_action_endpoint(task_id: str, body: TaskActionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def task_action_endpoint(task_id: str, body: TaskActionRequest,
+                             actor: Principal = Depends(phase_one_principal_dependency)):
         task = repository.get_task(task_id)
         if task is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Task not found.", "retryable": False})
@@ -872,9 +1033,14 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         action = body.action.strip().lower()
         if action == "close":
             raise HTTPException(status_code=409, detail={"code": "two_key_confirmation_required", "message": "Single-key closure is disabled. Use the closure-confirmations route with an approved case-type policy.", "retryable": False})
-        if action in {"assign", "reassign", "escalate"} and actor.role == "worker":
-            raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Workers cannot assign, reassign, or escalate tasks.", "retryable": False})
-        if actor.role == "worker" and task.get("owner_id") != actor.assigned_worker_id:
+        require_task_action(actor, action)
+        if action in {"assign", "reassign", "escalate"} and auth_mode != "demo":
+            raise HTTPException(status_code=409, detail={
+                "code": "assignment_directory_unavailable",
+                "message": "Task assignment is unavailable until a trusted server-side task-owner directory is configured.",
+                "retryable": False,
+            })
+        if canonical_role(actor.role) == "AWW" and task.get("owner_id") != actor.assigned_worker_id:
             raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Worker may only act on a task assigned to them.", "retryable": False})
         if action == "assign":
             validate_demo_owner(body.owner_id or "", beneficiary["centre_id"], "worker")
@@ -901,16 +1067,16 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"task": updated, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/next-actions/{flag_id}")
-    def next_action_endpoint(flag_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def next_action_endpoint(request: Request, flag_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         beneficiary, flag = flag_case(actor, flag_id, "suggest_action")
         result = ai_service.suggest_next_action(repository, beneficiary["beneficiary_id"], flag_id)
         result["centre_id"] = beneficiary["centre_id"]
         return result
 
     @application.post("/api/next-actions/{flag_id}/decision")
-    def next_action_decision_endpoint(flag_id: str, body: NextActionDecisionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def next_action_decision_endpoint(request: Request, flag_id: str, body: NextActionDecisionRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         beneficiary, flag = flag_case(actor, flag_id, "decide_action")
         suggestion = ai_service.suggest_next_action(repository, beneficiary["beneficiary_id"], flag_id)
         suggestion["centre_id"] = beneficiary["centre_id"]
@@ -931,12 +1097,12 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         if decision_value in {"accept", "edit"}:
             validate_safe_json(body.action_data)
             if action_code == "create_task":
-                dispatched_result = create_task_endpoint(CreateTaskRequest(flag_id=flag_id, created_on=body.on), x_demo_actor)
+                dispatched_result = create_task_endpoint(request, CreateTaskRequest(flag_id=flag_id, created_on=body.on), x_demo_actor)
             elif action_code == "verify_measurement":
                 measurement = body.action_data.get("measurement")
                 if not isinstance(measurement, dict):
                     raise HTTPException(status_code=422, detail={"code": "action_data_required", "message": "Accepting verification requires action_data.measurement.", "retryable": False})
-                dispatched_result = verification_endpoint(VerificationRequest(
+                dispatched_result = verification_endpoint(request, VerificationRequest(
                     beneficiary_id=beneficiary["beneficiary_id"], measurement=measurement,
                     recorded_at=body.action_data.get("recorded_at", body.on or application.state.demo_date.isoformat()),
                     today=body.action_data.get("today", body.on or application.state.demo_date.isoformat()),
@@ -949,7 +1115,7 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 action_payload.pop("action_code", None)
                 action_payload["action"] = action_code
                 action_payload.setdefault("on", body.on or application.state.demo_date.isoformat())
-                dispatched_result = task_action_endpoint(task_ids[0], TaskActionRequest(**action_payload), x_demo_actor)
+                dispatched_result = task_action_endpoint(request, task_ids[0], TaskActionRequest(**action_payload), x_demo_actor)
             else:
                 raise HTTPException(status_code=422, detail={"code": "unsupported_suggested_action", "message": "This suggestion cannot be dispatched through an approved workflow action.", "retryable": False})
         try:
@@ -966,19 +1132,60 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/briefing")
-    def briefing_endpoint(centre_id: str, as_of: str | None = None, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def briefing_endpoint(request: Request, centre_id: str | None = None, as_of: str | None = None,
+                          actor: Principal = Depends(phase_one_principal_dependency)):
         require_api_permission(actor, "view_briefing")
-        require_centre_scope(actor, centre_id)
         as_of = as_of or application.state.demo_date.isoformat()
         try:
+            if canonical_role(actor.role) == "DPO":
+                if actor.organization_scopes:
+                    assigned_districts = [scope for scope in actor.organization_scopes if scope.kind == "district"]
+                    if not assigned_districts:
+                        raise RolePermissionError("DPO has no active district assignment.")
+                    centre_ids = sorted({
+                        centre
+                        for scope in assigned_districts
+                        for centre in organization_hierarchy.centres_in_scope(scope.kind, scope.organization_id)
+                    })
+                    if not centre_ids:
+                        raise RolePermissionError("Assigned district contains no authorized centres.")
+                    scope_label = "district"
+                else:
+                    # Legacy fixed demo actors have explicit synthetic centre
+                    # assignments only; they do not prove district hierarchy.
+                    if not centre_id:
+                        raise RolePermissionError("Synthetic DPO demo briefing requires an explicitly assigned demo centre.")
+                    require_centre_scope(actor, centre_id, organization_hierarchy)
+                    centre_ids = [centre_id]
+                    scope_label = "synthetic_centre_demo"
+                briefings = [ai_service.daily_briefing(repository, centre, as_of) for centre in centre_ids]
+                counts = {"flags": 0, "by_colour": {}, "tasks": 0, "by_task_status": {}, "active_tasks": 0}
+                for item in briefings:
+                    item_counts = item["counts"]
+                    counts["flags"] += item_counts["flags"]
+                    counts["tasks"] += item_counts["tasks"]
+                    counts["active_tasks"] += item_counts["active_tasks"]
+                    for key, value in item_counts["by_colour"].items():
+                        counts["by_colour"][key] = counts["by_colour"].get(key, 0) + value
+                    for key, value in item_counts["by_task_status"].items():
+                        counts["by_task_status"][key] = counts["by_task_status"].get(key, 0) + value
+                return {
+                    "scope": scope_label,
+                    "as_of": parse_date(as_of).isoformat(),
+                    "counts": counts,
+                    "counts_source": "saved backend records; calculated by code, not generated by AI",
+                    "label": "SYNTHETIC DATA / AGGREGATE ONLY",
+                }
+            if not centre_id:
+                raise RolePermissionError("An assigned centre is required for this briefing.")
+            require_centre_scope(actor, centre_id, organization_hierarchy)
             return ai_service.daily_briefing(repository, centre_id, as_of)
         except ValueError as exc:
             raise HTTPException(status_code=400, detail={"code": "invalid_date", "message": str(exc), "retryable": False}) from exc
 
     @application.post("/api/referrals")
-    def create_referral_endpoint(body: FollowupReferralRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def create_referral_endpoint(body: FollowupReferralRequest,
+                                 actor: Principal = Depends(phase_one_principal_dependency)):
         beneficiary = beneficiary_case(actor, body.beneficiary_id, "create_referral")
         if body.task_id:
             task = repository.get_task(body.task_id)
@@ -996,14 +1203,14 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"referral": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/referrals")
-    def list_referrals_endpoint(centre_id: str, as_of: str | None = None, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_referrals_endpoint(request: Request, centre_id: str, as_of: str | None = None,
+                                actor: Principal = Depends(phase_one_principal_dependency)):
         require_api_permission(actor, "view_referrals")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         as_of = as_of or application.state.demo_date.isoformat()
         try:
             records = repository.list_referrals(centre_id=centre_id)
-            if actor.role == "worker":
+            if canonical_role(actor.role) == "AWW":
                 records = [r for r in records if (repository.get_beneficiary(r.get("beneficiary_id")) or {}).get("assigned_worker_id") == actor.assigned_worker_id]
             for record in records:
                 record["overdue"] = referrals.followup_is_overdue(record, as_of)
@@ -1013,8 +1220,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
             raise HTTPException(status_code=400, detail={"code": "invalid_date", "message": str(exc), "retryable": False}) from exc
 
     @application.get("/api/referrals/{referral_id}")
-    def get_referral_endpoint(referral_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def get_referral_endpoint(referral_id: str,
+                              actor: Principal = Depends(phase_one_principal_dependency)):
         record = repository.get_referral(referral_id)
         if record is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Referral not found.", "retryable": False})
@@ -1022,12 +1229,13 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"referral": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/referrals/{referral_id}/actions")
-    def referral_action_endpoint(referral_id: str, body: FollowupReferralActionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def referral_action_endpoint(referral_id: str, body: FollowupReferralActionRequest,
+                                 actor: Principal = Depends(phase_one_principal_dependency)):
         record = repository.get_referral(referral_id)
         if record is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Referral not found.", "retryable": False})
         beneficiary = beneficiary_case(actor, record["beneficiary_id"], "update_referral")
+        require_referral_action(actor, body.action)
         updated = referrals.update_followup_referral(record, actor.actor_id, body.action, body.on or application.state.demo_date, body.outcome_code)
         repository.save_referral(updated)
         _audit(repository, actor, beneficiary["centre_id"], "referral", referral_id, body.action, body.on or application.state.demo_date,
@@ -1035,8 +1243,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"referral": updated, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/access-exceptions")
-    def create_access_exception_endpoint(body: AccessExceptionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def create_access_exception_endpoint(body: AccessExceptionRequest,
+                                         actor: Principal = Depends(phase_one_principal_dependency)):
         beneficiary = beneficiary_case(actor, body.beneficiary_id, "create_exception")
         if body.task_id:
             task = repository.get_task(body.task_id)
@@ -1053,19 +1261,19 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"exception": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/access-exceptions")
-    def list_access_exceptions_endpoint(centre_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_access_exceptions_endpoint(request: Request, centre_id: str,
+                                       actor: Principal = Depends(phase_one_principal_dependency)):
         require_api_permission(actor, "view_exceptions")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         records = repository.list_exceptions(centre_id=centre_id)
-        if actor.role == "worker":
+        if canonical_role(actor.role) == "AWW":
             records = [r for r in records if (repository.get_beneficiary(r.get("beneficiary_id")) or {}).get("assigned_worker_id") == actor.assigned_worker_id]
         return {"centre_id": centre_id, "exceptions": records,
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/access-exceptions/{exception_id}")
-    def get_access_exception_endpoint(exception_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def get_access_exception_endpoint(exception_id: str,
+                                      actor: Principal = Depends(phase_one_principal_dependency)):
         record = repository.get_exception(exception_id)
         if record is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Access exception not found.", "retryable": False})
@@ -1073,8 +1281,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"exception": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/access-exceptions/{exception_id}/resolve")
-    def resolve_access_exception_endpoint(exception_id: str, body: AccessExceptionResolutionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def resolve_access_exception_endpoint(exception_id: str, body: AccessExceptionResolutionRequest,
+                                          actor: Principal = Depends(phase_one_principal_dependency)):
         record = repository.get_exception(exception_id)
         if record is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Access exception not found.", "retryable": False})
@@ -1086,8 +1294,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"exception": updated, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/tasks/{task_id}/closure-confirmations")
-    def closure_confirmation_endpoint(task_id: str, body: ClosureConfirmationRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def closure_confirmation_endpoint(request: Request, task_id: str, body: ClosureConfirmationRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         task = repository.get_task(task_id)
         if task is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Task not found.", "retryable": False})
@@ -1098,7 +1306,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         if task.get("status") != "in_progress":
             raise HTTPException(status_code=409, detail={"code": "task_not_in_progress", "message": "Only an in-progress task can enter two-key closure review.", "retryable": False})
         required_step = next((item for item in policy["confirmations"] if item["key"] == body.confirmation_key), None)
-        if required_step and required_step["role"] == "worker" and task.get("owner_id") != actor.assigned_worker_id:
+        if (required_step and canonical_role(required_step["role"]) == "AWW"
+                and task.get("owner_id") != actor.actor_id):
             raise HTTPException(status_code=403, detail={"code": "forbidden", "message": "Only the currently assigned worker can provide the worker completion key.", "retryable": False})
         note = safe_note(body.notes, "notes")
         current = repository.list_closure_confirmations(task_id)
@@ -1133,8 +1342,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/maternal-followups")
-    def create_maternal_followup_endpoint(body: MaternalFollowupRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def create_maternal_followup_endpoint(request: Request, body: MaternalFollowupRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         if not maternal_enabled:
             raise HTTPException(status_code=409, detail={"code": "maternal_scope_disabled", "message": "Maternal follow-up remains disabled until scope, roles, and safety boundaries are approved.", "retryable": False})
         beneficiary = beneficiary_case(actor, body.beneficiary_id, "create_maternal")
@@ -1154,20 +1363,20 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"followup": record, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION — RESTRICTED"}
 
     @application.get("/api/maternal-followups")
-    def list_maternal_followups_endpoint(centre_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_maternal_followups_endpoint(request: Request, centre_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         if not maternal_enabled:
             raise HTTPException(status_code=409, detail={"code": "maternal_scope_disabled", "message": "Maternal follow-up remains disabled until scope, roles, and safety boundaries are approved.", "retryable": False})
         require_api_permission(actor, "view_maternal")
         if actor.role not in maternal_allowed_roles:
             raise RolePermissionError("Role is outside the restricted maternal-follow-up allow-list.")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         return {"centre_id": centre_id, "followups": repository.list_maternal_followups(centre_id=centre_id),
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION — RESTRICTED"}
 
     @application.post("/api/maternal-followups/{followup_id}/actions")
-    def maternal_followup_action_endpoint(followup_id: str, body: MaternalFollowupActionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def maternal_followup_action_endpoint(request: Request, followup_id: str, body: MaternalFollowupActionRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         if not maternal_enabled:
             raise HTTPException(status_code=409, detail={"code": "maternal_scope_disabled", "message": "Maternal follow-up remains disabled until scope, roles, and safety boundaries are approved.", "retryable": False})
         if actor.role not in maternal_allowed_roles:
@@ -1183,10 +1392,10 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"followup": updated, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION — RESTRICTED"}
 
     @application.post("/api/briefing/snapshots")
-    def create_briefing_snapshot_endpoint(body: BriefingSnapshotRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def create_briefing_snapshot_endpoint(request: Request, body: BriefingSnapshotRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "create_snapshot")
-        require_centre_scope(actor, body.centre_id)
+        require_centre_scope(actor, body.centre_id, organization_hierarchy)
         try:
             snapshot = summary.build_centre_summary(repository, body.centre_id, body.as_of or application.state.demo_date)
         except ValueError as exc:
@@ -1197,26 +1406,26 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"snapshot": snapshot, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/briefing/snapshots")
-    def list_briefing_snapshots_endpoint(centre_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_briefing_snapshots_endpoint(request: Request, centre_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "view_snapshots")
-        require_centre_scope(actor, centre_id)
+        require_centre_scope(actor, centre_id, organization_hierarchy)
         return {"centre_id": centre_id, "snapshots": repository.list_briefing_snapshots(centre_id),
                 "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.get("/api/briefing/snapshots/{snapshot_id}")
-    def get_briefing_snapshot_endpoint(snapshot_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def get_briefing_snapshot_endpoint(request: Request, snapshot_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "view_snapshots")
         snapshot = repository.get_briefing_snapshot(snapshot_id)
         if snapshot is None:
             raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Snapshot not found.", "retryable": False})
-        require_centre_scope(actor, snapshot["centre_id"])
+        require_centre_scope(actor, snapshot["centre_id"], organization_hierarchy)
         return {"snapshot": snapshot, "label": "SYNTHETIC DATA / PROPOSED INTEGRATION"}
 
     @application.post("/api/offline/queue")
-    def enqueue_offline_endpoint(body: OfflineQueueRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def enqueue_offline_endpoint(request: Request, body: OfflineQueueRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "offline_enqueue")
         validate_safe_json(body.payload)
         beneficiary = _entity_beneficiary(body.entity_type, body.entity_id, actor, "offline_enqueue")
@@ -1231,8 +1440,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"operation": operation, "queue_status": operation.get("sync_status"), "label": "SYNTHETIC DATA / LOCAL QUEUE ONLY"}
 
     @application.get("/api/offline/queue")
-    def list_offline_queue_endpoint(status: str | None = None, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def list_offline_queue_endpoint(request: Request, status: str | None = None, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "view_offline_queue")
         operations = sync.load_operations(_queue_path(actor), status)
         visible = []
@@ -1243,8 +1452,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 "label": "SYNTHETIC DATA / LOCAL QUEUE ONLY"}
 
     @application.post("/api/offline/sync/attempt")
-    def offline_sync_attempt_endpoint(body: OfflineSyncAttemptRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def offline_sync_attempt_endpoint(request: Request, body: OfflineSyncAttemptRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "offline_sync")
         validate_safe_json(body.server_state)
         queue_file = _queue_path(actor)
@@ -1267,8 +1476,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
                 "label": "SYNTHETIC DATA / LOCAL QUEUE ONLY"}
 
     @application.post("/api/offline/queue/{operation_id}/retry")
-    def retry_offline_operation_endpoint(operation_id: str, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def retry_offline_operation_endpoint(request: Request, operation_id: str, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "offline_enqueue")
         queue_file = _queue_path(actor)
         operation_before = next((item for item in sync.load_operations(queue_file) if item.get("operation_id") == operation_id), None)
@@ -1281,8 +1490,8 @@ def create_app(store=None, seed_demo=True, closure_policies=None,
         return {"operation": operation, "label": "SYNTHETIC DATA / LOCAL QUEUE ONLY"}
 
     @application.post("/api/offline/queue/{operation_id}/resolve-conflict")
-    def resolve_offline_conflict_endpoint(operation_id: str, body: OfflineConflictResolutionRequest, x_demo_actor: str = Header(..., alias="X-Demo-Actor")):
-        actor = principal(x_demo_actor)
+    def resolve_offline_conflict_endpoint(request: Request, operation_id: str, body: OfflineConflictResolutionRequest, x_demo_actor: str | None = Header(default=None, alias="X-Demo-Actor")):
+        actor = principal(request, x_demo_actor)
         require_api_permission(actor, "offline_enqueue")
         queue_file = _queue_path(actor)
         operation_before = next((item for item in sync.load_operations(queue_file) if item.get("operation_id") == operation_id), None)

@@ -29,14 +29,15 @@ export const StaffProfilePage: React.FC = () => {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   const activeRoleConfig = ROLE_CONFIGS[role || 'AWW'];
-  const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode });
+  const metrics = mockStore.getMetrics({ role, centreCode: staffUser?.centreCode, sectorCode: staffUser?.sectorCode, projectCode: staffUser?.projectCode });
+  const demoToolsEnabled = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demoTools') === '1';
 
   const handleResetData = () => {
     mockStore.resetToDemoSeed();
     setIsResetModalOpen(false);
     showToast(
       'Demo Dataset Restored',
-      'Local storage state has been reset to the canonical baseline seed (35 action cases, 133+ beneficiaries).',
+      'Local storage state has been reset to the canonical baseline seed (600 beneficiaries across 5 centres).',
       'success'
     );
   };
@@ -58,7 +59,7 @@ export const StaffProfilePage: React.FC = () => {
             <span>&gt;</span>
             <span className="text-slate-800 font-semibold">Staff Profile & Controls</span>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
             Frontline Staff Profile & System Controls
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
@@ -66,27 +67,27 @@ export const StaffProfilePage: React.FC = () => {
           </p>
         </div>
 
-        <button
+        {demoToolsEnabled && role !== 'DPO' && <button
           type="button"
           onClick={() => setIsResetModalOpen(true)}
-          className="px-4 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-full transition-all shadow-sm flex items-center gap-1.5 self-start sm:self-auto"
+          className="px-4 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-full transition-all shadow-xs flex items-center gap-1.5 self-start sm:self-auto"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset Demo Data</span>
-        </button>
+        </button>}
       </motion.div>
 
       {/* 2. Worker Identity & Station Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Profile Card (7 Cols) */}
-        <article className="lg:col-span-7 bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
+        <article className="lg:col-span-7 bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-6 sm:p-8 shadow-xs space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xl shadow-md">
               {staffUser?.id ? staffUser.id.replace('AWW-', 'W').replace('LS-', 'S').replace('CDPO-', 'C').replace('DPO-', 'D') : 'OP'}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-semibold text-[#0F172A]">{activeRoleConfig.fullTitle}</h2>
+                <h2 className="text-xl font-bold text-[#0F172A]">{activeRoleConfig.fullTitle}</h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2457F5] text-[11px] font-semibold border border-blue-200 font-mono">
                   {staffUser?.id || activeRoleConfig.defaultId}
                 </span>
@@ -122,7 +123,7 @@ export const StaffProfilePage: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <span className="text-slate-400 text-[10px] uppercase font-semibold block">Simulation Session Date</span>
+              <span className="text-slate-400 text-[10px] uppercase font-semibold block">Session Date</span>
               <span className="font-semibold text-slate-800 flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-[#2457F5]" />
                 {DEMO_TODAY} (Saturday)
@@ -131,23 +132,23 @@ export const StaffProfilePage: React.FC = () => {
           </div>
 
           {/* Operational Hierarchy */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-3">
+          <div className="bg-[#F8FBFF] rounded-2xl p-4 border border-[#BBD5F0] space-y-3">
             <h3 className="font-semibold text-xs text-[#0F172A] flex items-center gap-1.5">
               <Layers className="w-4 h-4 text-[#2457F5]" />
               <span>Multi-Tier Casework Escalation Lineage</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
-              <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+              <div className="p-2.5 rounded-xl bg-[#E8F2FC] border border-[#BBD5F0]">
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Tier 2 Supervisor</span>
                 <span className="font-semibold text-slate-800">Sector Supervisor (LS-01)</span>
                 <span className="text-slate-500 text-[10px] block">Sector Verification Desk</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+              <div className="p-2.5 rounded-xl bg-[#E8F2FC] border border-[#BBD5F0]">
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Tier 3 Medical Officer</span>
                 <span className="font-semibold text-slate-800">PHC Medical Officer</span>
                 <span className="text-slate-500 text-[10px] block">Sector PHC / ANM Clinical</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+              <div className="p-2.5 rounded-xl bg-[#E8F2FC] border border-[#BBD5F0]">
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Tier 4 District Head</span>
                 <span className="font-semibold text-slate-800">District Programme Officer (DPO)</span>
                 <span className="text-slate-500 text-[10px] block">District Mission Cell</span>
@@ -158,7 +159,7 @@ export const StaffProfilePage: React.FC = () => {
 
         {/* Demo Persistence & Storage Health Card (5 Cols) */}
         <aside className="lg:col-span-5 space-y-6">
-          <div className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 sm:p-7 shadow-sm space-y-5">
+          <div className="bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-6 sm:p-7 shadow-xs space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-[#2457F5]" />
@@ -195,27 +196,17 @@ export const StaffProfilePage: React.FC = () => {
             </div>
 
             <div className="pt-2">
-              <button
+              {demoToolsEnabled && role !== 'DPO' && <button
                 type="button"
                 onClick={() => setIsResetModalOpen(true)}
                 className="w-full py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset to Canonical Baseline Demo Data</span>
-              </button>
+              </button>}
             </div>
           </div>
 
-          {/* Academic Simulation Notice */}
-          <div className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-5 shadow-sm space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-slate-800 font-semibold">
-              <Lock className="w-4 h-4 text-slate-400" />
-              <span>Simulated Governance Context</span>
-            </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              Student research prototype for academic evaluation of anthropometric plausibility algorithms. Not connected to Ministry of Women & Child Development production APIs.
-            </p>
-          </div>
         </aside>
       </div>
 
@@ -227,12 +218,12 @@ export const StaffProfilePage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-[28px] max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4"
+              className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4"
             >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-rose-600">
                   <AlertTriangle className="w-5 h-5" />
-                  <h3 className="font-semibold text-sm text-[#0F172A]">Confirm Demo Reset</h3>
+                  <h3 className="font-bold text-sm text-[#0F172A]">Confirm Demo Reset</h3>
                 </div>
                 <button
                   type="button"
@@ -266,7 +257,7 @@ export const StaffProfilePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleResetData}
-                  className="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-sm flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Confirm Reset</span>

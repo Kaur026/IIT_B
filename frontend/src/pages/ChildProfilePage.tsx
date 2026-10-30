@@ -26,10 +26,12 @@ import {
   UserCheck,
   Lock,
 } from 'lucide-react';
-import { mockStore, BeneficiaryCase } from '../store/mockStore';
+import { mockStore, BeneficiaryCase, DemoScope } from '../store/mockStore';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { DataBadge } from '../components/common/DataBadge';
+import { calculateAge, getTodayISODate } from '../utils/casework.ts';
+import { getBeneficiaryHistorySummary, explainCase } from '../services/aiScreeningService.ts';
 
 interface MeasurementRow {
   date: string;
@@ -53,9 +55,9 @@ interface TimelineEvent {
   badgeColor: string;
 }
 
-const mapMeasurementRows = (beneficiaryId: string): MeasurementRow[] =>
+const mapMeasurementRows = (beneficiaryId: string, scope?: DemoScope): MeasurementRow[] =>
   mockStore
-    .getMeasurements(beneficiaryId)
+    .getMeasurements(beneficiaryId, scope)
     .filter((measurement) => measurement.beneficiaryId === beneficiaryId)
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -67,18 +69,18 @@ const mapMeasurementRows = (beneficiaryId: string): MeasurementRow[] =>
         weight: measurement.weightKg,
         height: measurement.heightCm,
         muac: measurement.muacCm,
-        waz: 'Z-score not calculated in this prototype',
+        waz: 'Z-score not calculated in this view',
         flag: hasFlag ? (measurement.qualityFlags[0] || measurement.clinicalFlags[0] || 'Flagged') : null,
         recordedBy: measurement.recordedBy,
         verified: measurement.isVerified,
       };
     });
 
-const getTimelineEvents = (beneficiaryId: string): TimelineEvent[] => {
-  const cases = mockStore.getCases().filter((record) => record.id === beneficiaryId);
-  const measurements = mockStore.getMeasurements(beneficiaryId).filter((record) => record.beneficiaryId === beneficiaryId);
-  const referrals = mockStore.getReferrals().filter((record) => record.beneficiaryId === beneficiaryId);
-  const audits = mockStore.getAuditLog().filter((record) => record.palId === beneficiaryId);
+const getTimelineEvents = (beneficiaryId: string, scope?: DemoScope): TimelineEvent[] => {
+  const cases = mockStore.getCases(scope).filter((record) => record.id === beneficiaryId);
+  const measurements = mockStore.getMeasurements(beneficiaryId, scope).filter((record) => record.beneficiaryId === beneficiaryId);
+  const referrals = mockStore.getReferrals(scope).filter((record) => record.beneficiaryId === beneficiaryId);
+  const audits = mockStore.getAuditLog(scope).filter((record) => record.palId === beneficiaryId);
 
   const events: TimelineEvent[] = [
     ...measurements.map((measurement) => {
@@ -159,17 +161,27 @@ export const ChildProfilePage: React.FC = () => {
   const [, setSummaryRevision] = useState(0);
 
   const targetId = id || 'BEN-0142';
+  const profileScope: DemoScope = {
+    role,
+    centreCode: staffUser?.centreCode,
+    sectorCode: staffUser?.sectorCode,
+    projectCode: staffUser?.projectCode,
+    actorId: staffUser?.id,
+  };
   const profileScopeKey = JSON.stringify([targetId, role, staffUser?.id, staffUser?.centreCode]);
   const previousProfileScopeKey = useRef(profileScopeKey);
   const [loadedProfileScopeKey, setLoadedProfileScopeKey] = useState(profileScopeKey);
   const beneficiaryExists = Boolean(mockStore.getBeneficiaryById(targetId));
-  const beneficiaryIsPermitted = mockStore
-    .getBeneficiaries({ role, centreCode: staffUser?.centreCode })
-    .some((beneficiary) => beneficiary.id === targetId);
+  const beneficiary = mockStore.getBeneficiaryById(targetId, profileScope);
+  const beneficiaryIsPermitted = Boolean(beneficiary);
+  const beneficiaryAge = beneficiary
+    ? calculateAge(beneficiary.dob, getTodayISODate(), beneficiary.category, beneficiary.gender)
+    : undefined;
 
   // Beneficiary data from store
-  const [caseItem, setCaseItem] = useState<BeneficiaryCase | undefined>(() => mockStore.getCaseById(targetId));
-  const [historyRows, setHistoryRows] = useState<MeasurementRow[]>(() => mapMeasurementRows(targetId));
+  const [caseItem, setCaseItem] = useState<BeneficiaryCase | undefined>(() => mockStore.getCaseById(targetId, profileScope));
+  const [historyRows, setHistoryRows] = useState<MeasurementRow[]>(() => mapMeasurementRows(targetId, profileScope));
+  const latestMeasurement = historyRows[historyRows.length - 1];
 
   useLayoutEffect(() => {
     const profileScopeChanged = previousProfileScopeKey.current !== profileScopeKey;
@@ -186,8 +198,8 @@ export const ChildProfilePage: React.FC = () => {
 
     const sync = () => {
       setSummaryRevision((revision) => revision + 1);
-      setCaseItem(mockStore.getCaseById(targetId));
-      setHistoryRows(mapMeasurementRows(targetId));
+      setCaseItem(mockStore.getCaseById(targetId, profileScope));
+      setHistoryRows(mapMeasurementRows(targetId, profileScope));
     };
     sync();
     const unsub = mockStore.subscribe(sync);
@@ -196,11 +208,11 @@ export const ChildProfilePage: React.FC = () => {
   }, [profileScopeKey, targetId, role, staffUser?.id, staffUser?.centreCode]);
 
   // Form inputs for Record Measurement panel
-  const [recordDate, setRecordDate] = useState('2026-10-24');
-  const [recordWeight, setRecordWeight] = useState('8.95');
-  const [recordHeight, setRecordHeight] = useState('78.0');
-  const [recordMuac, setRecordMuac] = useState('14.2');
-  const [recordNotes, setRecordNotes] = useState('Follow-up weigh-in following supervisory spot check.');
+  const [recordDate, setRecordDate] = useState(getTodayISODate());
+  const [recordWeight, setRecordWeight] = useState('');
+  const [recordHeight, setRecordHeight] = useState('');
+  const [recordMuac, setRecordMuac] = useState('');
+  const [recordNotes, setRecordNotes] = useState('');
 
   // Esc key dismiss for panel
   useEffect(() => {
@@ -276,7 +288,7 @@ export const ChildProfilePage: React.FC = () => {
     const isNotFound = !beneficiaryExists;
     return (
       <div className="min-h-[50vh] flex items-center justify-center p-6">
-        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xs">
           <h1 className="text-xl font-semibold text-[#172B4D]">
             {isNotFound ? 'Beneficiary not found' : 'Access denied'}
           </h1>
@@ -294,16 +306,22 @@ export const ChildProfilePage: React.FC = () => {
   }
 
   const summaryMeasurements = mockStore
-    .getMeasurements(targetId)
+    .getMeasurements(targetId, profileScope)
     .filter((measurement) => measurement.beneficiaryId === targetId)
     .slice()
     .sort((a, b) => b.date.localeCompare(a.date));
-  const summaryCases = mockStore.getCases().filter((record) => record.id === targetId);
+  const summaryCases = mockStore.getCases(profileScope).filter((record) => record.id === targetId);
   const summaryReferrals = mockStore
-    .getReferrals()
+    .getReferrals(profileScope)
     .filter((referral) => referral.beneficiaryId === targetId);
   const resolvedCases = summaryCases.filter((record) => record.status === 'Resolved');
   const openCases = summaryCases.filter((record) => record.status !== 'Resolved');
+  const historySummary = beneficiary ? getBeneficiaryHistorySummary({
+    beneficiary,
+    measurements: summaryMeasurements,
+    cases: summaryCases,
+    referrals: summaryReferrals,
+  }) : null;
   const completedReferrals = summaryReferrals.filter((referral) => referral.status === 'Completed');
   const openReferrals = summaryReferrals.filter((referral) => referral.status !== 'Completed');
   const recordedFollowUps = summaryReferrals.flatMap((referral) =>
@@ -338,7 +356,7 @@ export const ChildProfilePage: React.FC = () => {
         verification: measurement.isVerified ? 'The measurement record is marked verified.' : 'The measurement record is not verified.',
       })),
   ];
-  const timelineEvents = getTimelineEvents(targetId);
+  const timelineEvents = getTimelineEvents(targetId, profileScope);
   const hasStoredVerifiedWeight = Boolean(
     caseItem?.isVerified && typeof caseItem.verifiedWeight === 'number' && Number.isFinite(caseItem.verifiedWeight)
   );
@@ -379,31 +397,31 @@ export const ChildProfilePage: React.FC = () => {
               <span>Action Queue</span>
             </Link>
             <span>&gt;</span>
-            <DataBadge variant="beneficiary" className="font-mono">{caseItem?.id || targetId}</DataBadge>
+            <DataBadge variant="beneficiary" className="font-mono">{beneficiary?.id || targetId}</DataBadge>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0E1B2B]">
-            Child Profile & Longitudinal Timeline
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0E1B2B]">
+            Beneficiary Profile & Longitudinal Timeline
           </h1>
           <p className="text-xs text-slate-500 font-mono mt-1">
-            {caseItem?.id || targetId} • Action {caseItem?.actionId || 'ACT-2041'} • {caseItem?.centreCode || 'AWC-702'} (demo)
+            {beneficiary?.name || 'Beneficiary'} • {beneficiary?.id || targetId} • {caseItem ? `Action ${caseItem.actionId}` : 'No open case'} • {beneficiary?.centreCode || 'Centre unavailable'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
             to="/queue"
-            className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-sm"
+            className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full transition-all shadow-xs"
           >
             Action Queue
           </Link>
-          <button
+          {beneficiary?.category === 'child_under_6' && <button
             type="button"
             onClick={() => setIsRecordPanelOpen(true)}
-            className="px-4 py-2 text-xs font-semibold text-white bg-[#0E1B2B] hover:bg-black rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83] active:scale-95"
+            className="px-4 py-2 text-xs font-semibold text-white bg-[#0E1B2B] hover:bg-black rounded-full transition-all shadow-xs flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83] active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Record Measurement</span>
-          </button>
+          </button>}
         </div>
       </motion.div>
 
@@ -412,40 +430,40 @@ export const ChildProfilePage: React.FC = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.08 }}
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 sm:p-8 shadow-sm"
+        className="bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-6 sm:p-8 shadow-xs"
       >
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#CFEFD8] to-[#D6E6F7] text-[#0E1B2B] flex items-center justify-center font-bold text-base font-mono shadow-inner border border-white">
+            <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#E8F2FC] to-[#F8FBFF] text-[#17365D] flex items-center justify-center font-bold text-base font-mono shadow-inner border border-[#BBD5F0]">
               {targetId.replace('BEN-', '')}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-medium tracking-tight text-[#0E1B2B] font-mono flex flex-wrap items-center gap-2">
-                  <DataBadge variant="beneficiary">{caseItem?.id || targetId}</DataBadge>
-                  <span className="text-sm font-sans text-slate-500">({caseItem?.ageMonths || 14}m)</span>
+                <h2 className="text-xl font-bold tracking-tight text-[#0E1B2B] font-mono flex flex-wrap items-center gap-2">
+                  <DataBadge variant="beneficiary">{beneficiary?.id || targetId}</DataBadge>
+                  <span className="text-sm font-sans text-slate-500">{beneficiary?.name || 'Beneficiary profile'}</span>
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Normal Nutrition (Green)
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${beneficiary?.hasActiveFlag ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`}>
+                  {beneficiary?.hasActiveFlag ? 'Flagged for review' : beneficiary?.status || 'Status unavailable'}
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span>{caseItem?.ageMonths || 14} Months • {caseItem?.gender || 'Male'}</span>
+              <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-medium text-slate-700">{beneficiaryAge?.ageDisplay || 'Age unavailable'}</span>
                 <span>•</span>
-                <span>Caregiver Kinship: {caseItem?.caregiverKinship || 'Mother'}</span>
+                <span>{beneficiary?.gender || 'Gender unavailable'}</span>
                 <span>•</span>
-                <span className="inline-flex items-center gap-1">Centre: <DataBadge variant="centre" className="font-mono">{caseItem?.centreCode || 'AWC-702'}</DataBadge></span>
-              </div>
-              <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2">
-                <span className="flex items-center gap-1 font-mono">
-                  <MapPin className="w-3 h-3" /> <DataBadge variant="centre">{caseItem?.centreCode || 'AWC-702'}</DataBadge>
+                <span>{beneficiaryAge?.cohortLabel || 'Category unavailable'}</span>
+                <span>•</span>
+                <span>Caregiver: {beneficiary?.caregiverKinship || 'Not recorded'}</span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1 font-mono">
+                  <MapPin className="w-3 h-3 text-slate-400" />
+                  <DataBadge variant="centre">{beneficiary?.centreCode || 'Unavailable'}</DataBadge>
                 </span>
                 <span>•</span>
-                <span className="flex items-center gap-1 text-emerald-600 font-medium">
-                  <ShieldCheck className="w-3 h-3" /> Synthetic Record
+                <span className="inline-flex items-center gap-1">
+                  Assigned Worker: <DataBadge variant="worker" className="font-mono">{beneficiary?.assignedAww || caseItem?.assignedAww || 'Not assigned'}</DataBadge>
                 </span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1">Assigned: <DataBadge variant="worker" className="font-mono">{caseItem?.assignedAww || 'AWW-409'}</DataBadge></span>
               </div>
             </div>
           </div>
@@ -456,10 +474,10 @@ export const ChildProfilePage: React.FC = () => {
               <span className="text-base font-semibold text-slate-800 block mt-0.5">
                 {caseItem?.isVerified && typeof caseItem.verifiedWeight === 'number' && Number.isFinite(caseItem.verifiedWeight)
                   ? `${caseItem.verifiedWeight.toFixed(2)} kg`
-                  : 'Not verified'}
+                  : latestMeasurement ? `${latestMeasurement.weight.toFixed(2)} kg` : 'Not recorded'}
               </span>
-              <span className={`text-[10px] font-medium ${caseItem?.isVerified ? 'text-emerald-600' : 'text-amber-700'}`}>
-                {caseItem?.isVerified ? 'Verification recorded' : 'Awaiting verification'}
+              <span className={`text-[10px] font-medium ${caseItem?.isVerified || latestMeasurement?.verified ? 'text-emerald-600' : 'text-amber-700'}`}>
+                {caseItem?.isVerified || latestMeasurement?.verified ? 'Verified reading' : latestMeasurement ? 'Unverified reading' : 'No measurement'}
               </span>
             </div>
             <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/60 text-center min-w-[100px]">
@@ -467,16 +485,20 @@ export const ChildProfilePage: React.FC = () => {
               <span className="text-base font-semibold text-slate-800 block mt-0.5">
                 {caseItem?.isVerified && typeof caseItem.verifiedHeight === 'number' && Number.isFinite(caseItem.verifiedHeight)
                   ? `${caseItem.verifiedHeight.toFixed(1)} cm`
-                  : 'Not verified'}
+                  : latestMeasurement ? `${latestMeasurement.height.toFixed(1)} cm` : 'Not recorded'}
               </span>
-              <span className={`text-[10px] font-medium ${caseItem?.isVerified ? 'text-emerald-600' : 'text-amber-700'}`}>
-                {caseItem?.isVerified ? 'Verification recorded' : 'Awaiting verification'}
+              <span className={`text-[10px] font-medium ${caseItem?.isVerified || latestMeasurement?.verified ? 'text-emerald-600' : 'text-amber-700'}`}>
+                {caseItem?.isVerified || latestMeasurement?.verified ? 'Verified reading' : latestMeasurement ? 'Unverified reading' : 'No measurement'}
               </span>
             </div>
             <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/60 text-center min-w-[100px]">
               <span className="text-[10px] uppercase font-semibold text-slate-400 block">MUAC</span>
-              <span className="text-base font-semibold text-slate-800 block mt-0.5">14.2 cm</span>
-              <span className="text-[10px] text-emerald-600 font-medium">Green / Normal</span>
+              <span className="text-base font-semibold text-slate-800 block mt-0.5">
+                {typeof latestMeasurement?.muac === 'number' ? `${latestMeasurement.muac.toFixed(1)} cm` : 'Not recorded'}
+              </span>
+              <span className="text-[10px] text-slate-500 font-medium">
+                {typeof latestMeasurement?.muac === 'number' ? (latestMeasurement.verified ? 'Verified reading' : 'Unverified reading') : 'No MUAC reading'}
+              </span>
             </div>
             <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/60 text-center min-w-[100px]">
               <span className="text-[10px] uppercase font-semibold text-slate-400 block">Flag Status</span>
@@ -494,19 +516,85 @@ export const ChildProfilePage: React.FC = () => {
       {/* Stored-record summary for the route-selected beneficiary */}
       <section
         aria-labelledby="beneficiary-history-summary-title"
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-5 sm:p-6 shadow-sm space-y-4"
+        className="bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-5 sm:p-6 shadow-xs space-y-4"
       >
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-          <div>
-            <h2 id="beneficiary-history-summary-title" className="text-base font-semibold text-[#0E1B2B]">
-              Beneficiary History Summary
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">Recorded summary for {targetId}</p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 id="beneficiary-history-summary-title" className="text-base font-bold text-[#0E1B2B]">
+                  AI Longitudinal History Summary
+                </h2>
+                {historySummary && (
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                    historySummary.growthTrajectory === 'Steady Gain' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                    historySummary.growthTrajectory === 'Rapid Depletion' ? 'bg-rose-50 text-rose-800 border-rose-200' :
+                    historySummary.growthTrajectory === 'Growth Faltering' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                    'bg-slate-100 text-slate-700 border-slate-200'
+                  }`}>
+                    {historySummary.growthTrajectory}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">Synthesized from {summaryMeasurements.length} stored measurement records and casework events.</p>
+            </div>
           </div>
-          <span className="self-start rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800">
-            Demo Preview — not live AI
+          <span className="self-start rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800 font-mono">
+            Simulated AI Analysis • Protocol Grounded
           </span>
         </div>
+
+        {/* Narrative Box */}
+        {historySummary && (
+          <div className="bg-[#F8FBFF] rounded-2xl p-4 border border-[#BBD5F0] text-xs text-[#17365D] leading-relaxed font-medium">
+            {historySummary.narrativeSummary}
+          </div>
+        )}
+
+        {/* Missing Records Alert Banner */}
+        {historySummary && historySummary.missingRecords.length > 0 && (
+          <div className="bg-amber-50/80 rounded-2xl p-3.5 border border-amber-200 text-xs text-amber-900 space-y-1">
+            <span className="font-semibold text-[11px] uppercase text-amber-800 flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <span>Identified Missing Records / Protocol Gaps:</span>
+            </span>
+            <ul className="list-disc list-inside space-y-0.5 pl-1 text-[11px]">
+              {historySummary.missingRecords.map((gap, idx) => (
+                <li key={idx}>{gap}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Active Flag Explanation if case is open */}
+        {caseItem && !caseItem.isVerified && (() => {
+          const exp = explainCase({ caseItem, beneficiary: beneficiary || undefined });
+          return (
+            <div className="bg-rose-50/70 rounded-2xl p-4 border border-rose-200 text-xs text-rose-950 space-y-2">
+              <div className="flex items-center justify-between border-b border-rose-200/60 pb-2">
+                <span className="font-semibold text-rose-900 flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                  <span>Active Casework Flag: {exp.ruleCode} — {exp.ruleName}</span>
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-rose-200 text-rose-700 font-bold">
+                  Δ {exp.comparison.difference}
+                </span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-slate-700">
+                {exp.whyNeedsAttention}
+              </p>
+              <div className="flex items-center justify-between pt-1 text-[10px] text-slate-500">
+                <span>Values: {exp.comparison.previousValue} ({exp.comparison.previousDate || 'prior'}) → {exp.comparison.flaggedValue} ({exp.comparison.flaggedDate})</span>
+                <Link to="/queue" className="text-[#2457F5] font-semibold hover:underline">
+                  View in Action Queue →
+                </Link>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
@@ -600,7 +688,7 @@ export const ChildProfilePage: React.FC = () => {
         </div>
 
         <p className="text-[11px] text-slate-500 border-t border-slate-200/70 pt-3">
-          Summarizes recorded demo data; not a diagnosis or clinical advice.
+          Summarizes recorded observations; not an automated diagnosis or clinical advice.
         </p>
       </section>
 
@@ -624,7 +712,7 @@ export const ChildProfilePage: React.FC = () => {
               {isActive && (
                 <motion.div
                   layoutId="childProfileTabPill"
-                  className="absolute inset-0 bg-[#0F172A] rounded-full -z-10 shadow-sm"
+                  className="absolute inset-0 bg-[#0F172A] rounded-full -z-10 shadow-xs"
                   transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                 />
               )}
@@ -640,7 +728,7 @@ export const ChildProfilePage: React.FC = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 shadow-sm space-y-6"
+          className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -751,25 +839,25 @@ export const ChildProfilePage: React.FC = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 overflow-hidden shadow-sm"
+          className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs"
         >
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-sm text-[#0E1B2B]">
-                Longitudinal Anthropometric Register (5 Visits)
+                Longitudinal Measurements ({historyRows.length})
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Official physical records and verification stamps for {targetId}
+                Measurement records and supervisory verification stamps for {targetId}
               </p>
             </div>
-            <button
+            {beneficiary?.category === 'child_under_6' && <button
               type="button"
               onClick={() => setIsRecordPanelOpen(true)}
               className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full inline-flex items-center gap-1"
             >
               <Plus className="w-3 h-3" />
               <span>Record Measurement</span>
-            </button>
+            </button>}
           </div>
 
           <div className="overflow-x-auto">
@@ -833,13 +921,13 @@ export const ChildProfilePage: React.FC = () => {
           className="space-y-4"
         >
           {screeningFlags.length === 0 ? (
-            <div className="bg-white/90 rounded-[28px] border border-slate-200/80 p-6 shadow-sm text-sm text-slate-500">
+            <div className="bg-white/90 rounded-2xl border border-slate-200/80 p-6 shadow-xs text-sm text-slate-500">
               No screening flags are recorded for this beneficiary.
             </div>
           ) : screeningFlags.map((f) => (
             <div
               key={f.id}
-              className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 shadow-sm space-y-2"
+              className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-2"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -867,7 +955,7 @@ export const ChildProfilePage: React.FC = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 shadow-sm space-y-4"
+          className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4"
         >
           <h3 className="font-semibold text-sm text-[#0F172A] mb-4">
             Longitudinal Lifecycle Events
@@ -878,7 +966,7 @@ export const ChildProfilePage: React.FC = () => {
               <p className="py-6 text-sm text-slate-500">No timeline events are recorded for this beneficiary.</p>
             ) : timelineEvents.map((evt) => (
               <div key={evt.id} className="relative group">
-                <span className="absolute -left-6 top-1 w-3 h-3 rounded-full bg-white border-2 border-[#2457F5] shadow-sm" />
+                <span className="absolute -left-6 top-1 w-3 h-3 rounded-full bg-white border-2 border-[#2457F5] shadow-xs" />
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/70 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-xs text-[#0F172A]">{evt.title}</span>
@@ -923,11 +1011,11 @@ export const ChildProfilePage: React.FC = () => {
                 {/* Header */}
                 <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                   <div>
-                    <h2 className="font-semibold text-lg text-[#0F172A]">
+                    <h2 className="font-bold text-lg text-[#0F172A]">
                       + Record Anthropometry
                     </h2>
                     <p className="text-xs text-slate-500 font-mono">
-                      {targetId} ({caseItem?.ageMonths || 14}m)
+                      {targetId} ({beneficiaryAge?.ageDisplay || 'Age unavailable'})
                     </p>
                   </div>
                   <button
@@ -948,6 +1036,7 @@ export const ChildProfilePage: React.FC = () => {
                     <input
                       type="date"
                       value={recordDate}
+                      max={getTodayISODate()}
                       onChange={(e) => setRecordDate(e.target.value)}
                       className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[#0F172A]"
                       required
@@ -1043,7 +1132,7 @@ export const ChildProfilePage: React.FC = () => {
                     {isReadOnlyDemo ? (
                       <Link
                         to="/signin"
-                        className="px-5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full shadow-sm flex items-center gap-1.5"
+                        className="px-5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full shadow-xs flex items-center gap-1.5"
                       >
                         <Lock className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Staff Sign In to Record</span>
@@ -1051,7 +1140,7 @@ export const ChildProfilePage: React.FC = () => {
                     ) : (
                       <button
                         type="submit"
-                        className="px-5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full shadow-sm flex items-center gap-1.5"
+                        className="px-5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full shadow-xs flex items-center gap-1.5"
                       >
                         <Check className="w-3.5 h-3.5" />
                         <span>Confirm & Create Action</span>

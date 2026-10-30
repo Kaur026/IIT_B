@@ -13,7 +13,7 @@ export const SafetyGovernance: React.FC = () => {
     {
       title: 'Zero personal identifiers',
       description:
-        'Operates on 100% synthetic research mock datasets in this prototype. Designed to comply with national digital personal data protection norms.',
+        'Uses synthetic research mock datasets. Designed to comply with national digital personal data protection norms.',
       icon: <ShieldCheck className="w-5 h-5 text-[#2457F5]" />,
       tag: 'DPDP Aligned',
     },
@@ -38,7 +38,7 @@ export const SafetyGovernance: React.FC = () => {
       {/* Two Column Header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-12">
         <div className="lg:col-span-7">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#0F172A] tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight leading-tight">
             Built with clinical safety and privacy at the core
           </h2>
         </div>
@@ -67,7 +67,7 @@ export const SafetyGovernance: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg font-medium text-slate-900 tracking-tight mb-2">
+              <h3 className="text-lg font-semibold text-slate-900 tracking-tight mb-2">
                 {card.title}
               </h3>
 

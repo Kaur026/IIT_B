@@ -2,7 +2,7 @@
  * Single Master Reactive Mock Store for Poshan Action Layer
  * 100% synthetic data consistency across all portal screens and routes.
  * Persists demo state in localStorage with confirmed reset capability.
- * Storage Key: poshan_action_layer_store_v2 (bumped to prevent resurrection of personal names)
+ * Storage Key: poshan_action_layer_store_v4 (bumped for the six-cohort synthetic seed)
  */
 
 import {
@@ -11,20 +11,78 @@ import {
   validateMeasurementInput,
   DEMO_CURRENT_DATE,
   ESCALATION_TIERS,
+  getDaysBetween,
+  getDaysUntilDate,
+  getTodayISODate,
 } from '../utils/casework.ts';
 import { type UserRole, canPerformAction } from '../utils/permissions.ts';
+
+export type DemoScope = {
+  role?: UserRole | null;
+  centreCode?: string;
+  sectorCode?: string;
+  projectCode?: string;
+  actorId?: string;
+};
+
+export const DEMO_SECTOR_CENTRES: Record<string, string[]> = {
+  'Sector-4': ['AWC-702', 'AWC-703', 'AWC-704'],
+  'Sector-5': ['AWC-705', 'AWC-706'],
+};
+export const DEMO_PROJECT_CENTRES: Record<string, string[]> = {
+  'Project-Central': ['AWC-702', 'AWC-703', 'AWC-704', 'AWC-705', 'AWC-706'],
+};
+
+export const DEMO_AWW_CENTRES: Record<string, string> = {
+  'AWW-409': 'AWC-702', 'AWW-412': 'AWC-702', 'AWW-405': 'AWC-703',
+  'AWW-410': 'AWC-704', 'AWW-417': 'AWC-705', 'AWW-421': 'AWC-706',
+};
+
+function centresForDemoScope(scope?: DemoScope): string[] | null {
+  if (!scope) return null;
+  if (!scope.role) return [];
+  switch (scope.role) {
+    case 'AWW': {
+      const assignedCentre = scope.actorId ? DEMO_AWW_CENTRES[scope.actorId] : undefined;
+      if (scope.actorId && !assignedCentre) return [];
+      const centre = assignedCentre || scope.centreCode || 'AWC-702';
+      if (assignedCentre && scope.centreCode && scope.centreCode !== assignedCentre) return [];
+      return Object.values(DEMO_AWW_CENTRES).includes(centre) ? [centre] : [];
+    }
+    case 'LS': {
+      const sector = scope.sectorCode || 'Sector-4';
+      return DEMO_SECTOR_CENTRES[sector] || [];
+    }
+    case 'CDPO': {
+      const project = scope.projectCode || 'Project-Central';
+      return DEMO_PROJECT_CENTRES[project] || [];
+    }
+    default:
+      return [];
+  }
+}
+
+function scopeAllowsCentre(scope: DemoScope | null | undefined, centreCode?: string): boolean {
+  if (!scope?.role || !centreCode) return false;
+  return centresForDemoScope(scope)?.includes(centreCode) === true;
+}
+
+function recordCentre(store: MockStore, beneficiaryId: string, explicitCentre?: string): string | undefined {
+  return explicitCentre || store.getBeneficiaryById(beneficiaryId)?.centreCode;
+}
 
 export const DEMO_TODAY = DEMO_CURRENT_DATE; // '2026-10-24'
 
 export interface BeneficiaryRecord {
   id: string; // BEN-xxxx
+  name: string;
   dob: string; // YYYY-MM-DD
   gender: 'Male' | 'Female' | 'Other';
   category: 'child_under_6' | 'pregnant' | 'lactating' | 'adolescent';
   caregiverKinship: string; // e.g. 'Mother', 'Father', 'Grandmother'
   centreCode: string; // e.g. 'AWC-702'
   assignedAww: string; // e.g. 'AWW-409'
-  birthWeight: number;
+  birthWeight?: number;
   status: 'Active' | 'Under Monitoring' | 'Referred' | 'Discharged';
   registrationDate: string;
   lastMeasurementDate?: string;
@@ -79,6 +137,86 @@ export interface ReferralRecord {
   outcomeConfirmed?: boolean;
   outcomeDate?: string;
   nextSteps?: string;
+  lifecycleStatus?: ReferralLifecycleStatus;
+}
+
+export type ReferralLifecycleStatus = 'sent' | 'acknowledged' | 'attended' | 'outcome_recorded';
+
+export type TaskLifecycleStatus = 'assigned' | 'acknowledged' | 'in_progress' | 'closed';
+
+export interface DemoTaskRecord {
+  id: string;
+  beneficiaryId: string;
+  centreCode: string;
+  ownerId: string;
+  status: TaskLifecycleStatus;
+  dueDate: string;
+  caseStatus: BeneficiaryCase['status'];
+}
+
+export interface DemoCentreRecord {
+  id: string;
+  name: string;
+  sectorCode: string;
+  projectCode: string;
+  districtCode: string;
+}
+
+export interface DemoWorkerRecord {
+  id: string;
+  role: UserRole;
+  centreCode?: string;
+  sectorCode?: string;
+  projectCode?: string;
+  districtCode?: string;
+}
+
+export interface DemoHomeVisitRecord {
+  id: string;
+  beneficiaryId: string;
+  centreCode: string;
+  workerId: string;
+  visitDate: string;
+  status: 'scheduled' | 'completed';
+  note: string;
+}
+
+export interface DemoMaternalProfileRecord {
+  id: string;
+  beneficiaryId: string;
+  centreCode: string;
+  stage: 'pregnant' | 'lactating';
+  registeredOn: string;
+}
+
+export interface DemoServiceRecord {
+  id: string;
+  beneficiaryId: string;
+  centreCode: string;
+  workerId: string;
+  serviceType: 'growth_monitoring' | 'nutrition_counselling' | 'supplementary_nutrition' | 'home_visit';
+  serviceDate: string;
+  status: 'recorded' | 'scheduled';
+}
+
+export interface DemoReviewHistoryRecord {
+  id: string;
+  actionId: string;
+  beneficiaryId: string;
+  centreCode: string;
+  reviewerId: string;
+  status: 'pending' | 'reviewed';
+  reviewedOn?: string;
+}
+
+export interface DemoVerificationRecord {
+  id: string;
+  actionId: string;
+  beneficiaryId: string;
+  centreCode: string;
+  status: 'open' | 'resolved';
+  openedOn: string;
+  resolvedOn?: string;
 }
 
 export interface EscalationStep {
@@ -154,13 +292,110 @@ export interface AuditLedgerEntry {
   status: 'Verified' | 'Escalated' | 'Logged';
 }
 
-export const STORAGE_KEY = 'poshan_action_layer_store_v2';
+export interface AIDecisionRecord {
+  id: string; // DEC-xxxx
+  beneficiaryId: string;
+  caseActionId: string;
+  suggestionId: string;
+  decision: 'accept' | 'reject' | 'modify';
+  actionCode: string;
+  actionNotes?: string;
+  rejectionReason?: string;
+  actorId: string;
+  actorRole: UserRole;
+  centreCode: string;
+  timestamp: string;
+}
+
+export const STORAGE_KEY = 'poshan_action_layer_store_v4';
+
+export const DEMO_BENEFICIARY_COUNTS = {
+  child_under_6: 322,
+  adolescent: 50,
+  pregnant: 137,
+  lactating: 91,
+} as const;
+
+const CANONICAL_CENTRES: DemoCentreRecord[] = [
+  { id: 'AWC-702', name: 'Anganwadi Centre 702', sectorCode: 'Sector-4', projectCode: 'Project-Central', districtCode: 'District-1' },
+  { id: 'AWC-703', name: 'Anganwadi Centre 703', sectorCode: 'Sector-4', projectCode: 'Project-Central', districtCode: 'District-1' },
+  { id: 'AWC-704', name: 'Anganwadi Centre 704', sectorCode: 'Sector-4', projectCode: 'Project-Central', districtCode: 'District-1' },
+  { id: 'AWC-705', name: 'Anganwadi Centre 705', sectorCode: 'Sector-5', projectCode: 'Project-Central', districtCode: 'District-1' },
+  { id: 'AWC-706', name: 'Anganwadi Centre 706', sectorCode: 'Sector-5', projectCode: 'Project-Central', districtCode: 'District-1' },
+];
+
+const CANONICAL_WORKERS: DemoWorkerRecord[] = [
+  ...Object.entries(DEMO_AWW_CENTRES).map(([id, centreCode]) => ({ id, role: 'AWW' as const, centreCode })),
+  { id: 'LS-01', role: 'LS', sectorCode: 'Sector-4' },
+  { id: 'CDPO-01', role: 'CDPO', projectCode: 'Project-Central' },
+  { id: 'DPO-01', role: 'DPO', districtCode: 'District-1' },
+];
+
+const FICTIONAL_GIVEN_NAMES: Record<'Male' | 'Female' | 'Other', string[]> = {
+  Male: ['Aarav', 'Vivaan', 'Aditya', 'Vihaan', 'Arjun', 'Reyansh', 'Ishaan', 'Kabir', 'Advait', 'Krish', 'Rohan', 'Anay', 'Dev', 'Nikhil', 'Kunal', 'Samar', 'Ayaan', 'Dhruv', 'Manav', 'Yash', 'Aman', 'Neel', 'Arnav', 'Shaurya', 'Mihir', 'Ritvik', 'Siddharth', 'Parth', 'Om', 'Harsh'],
+  Female: ['Aadhya', 'Ananya', 'Diya', 'Ira', 'Kavya', 'Meera', 'Saanvi', 'Aarohi', 'Anika', 'Ishita', 'Myra', 'Nisha', 'Riya', 'Tara', 'Veda', 'Zoya', 'Aditi', 'Avni', 'Charvi', 'Ishani', 'Kiara', 'Mahi', 'Navya', 'Pihu', 'Radhika', 'Saira', 'Tanvi', 'Uma', 'Vaishnavi', 'Yamini'],
+  Other: ['Aadi', 'Amar', 'Baani', 'Chaitanya', 'Devi', 'Geet', 'Harini', 'Jai', 'Kiran', 'Milan', 'Noor', 'Ravi', 'Sahil', 'Samar', 'Tej', 'Aman', 'Anmol', 'Darshan', 'Indu', 'Jeevan', 'Kavi', 'Madhav', 'Nirav', 'Rohan', 'Shanti', 'Tarun', 'Uday', 'Vijay', 'Yuvan', 'Zain'],
+};
+
+const FICTIONAL_SURNAMES = [
+  'Bansal', 'Chauhan', 'Desai', 'Dwivedi', 'Ghosh', 'Gupta', 'Jaiswal', 'Joshi',
+  'Khan', 'Kulkarni', 'Malik', 'Mehta', 'Mishra', 'Nair', 'Pandey', 'Patel',
+  'Pillai', 'Rao', 'Saxena', 'Shah', 'Sharma', 'Singh', 'Tiwari', 'Verma', 'Yadav',
+];
+
+function fictionalBeneficiaryName(index: number, gender: BeneficiaryRecord['gender']): string {
+  const firstNames = FICTIONAL_GIVEN_NAMES[gender];
+  return `${firstNames[index % firstNames.length]} ${FICTIONAL_SURNAMES[Math.floor(index / firstNames.length) % FICTIONAL_SURNAMES.length]}`;
+}
+
+function dateDaysBeforeDemo(days: number): string {
+  const date = new Date(`${DEMO_CURRENT_DATE}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - days);
+  return date.toISOString().slice(0, 10);
+}
+
+function childDatesForDemo(ageMonths: number, registrationOffset: number): { dob: string; registrationDate: string } {
+  const dob = new Date(`${DEMO_CURRENT_DATE}T00:00:00Z`);
+  dob.setUTCMonth(dob.getUTCMonth() - ageMonths);
+  const registration = new Date(dob);
+  registration.setUTCDate(registration.getUTCDate() + registrationOffset);
+  return {
+    dob: dob.toISOString().slice(0, 10),
+    registrationDate: registration.toISOString().slice(0, 10),
+  };
+}
+
+function adolescentDateOfBirthForDemo(ageYears: number, index: number): string {
+  const [referenceYear, referenceMonth, referenceDay] = DEMO_CURRENT_DATE.split('-').map(Number);
+  const birthMonth = (index * 5) % 12;
+  const birthDay = 1 + ((index * 11) % 28);
+  const birthdayHasPassed = birthMonth < referenceMonth - 1
+    || (birthMonth === referenceMonth - 1 && birthDay <= referenceDay);
+  const birthYear = referenceYear - ageYears - (birthdayHasPassed ? 0 : 1);
+  return `${birthYear}-${String(birthMonth + 1).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
+}
+
+function placementForIndex(index: number): { centreCode: string; assignedAww: string } {
+  const bucket = (index * 37 + Math.floor(index / 5) * 11) % 100;
+  const centreCode = bucket < 30 ? 'AWC-702'
+    : bucket < 54 ? 'AWC-703'
+      : bucket < 74 ? 'AWC-704'
+        : bucket < 90 ? 'AWC-705' : 'AWC-706';
+  const centreWorkers = Object.entries(DEMO_AWW_CENTRES)
+    .filter(([, workerCentre]) => workerCentre === centreCode)
+    .map(([workerId]) => workerId);
+  return {
+    centreCode,
+    assignedAww: centreWorkers[index % centreWorkers.length],
+  };
+}
 
 // Canonical Baseline Seed Data
 function generateCanonicalSeed() {
   const beneficiaries: BeneficiaryRecord[] = [
     {
       id: 'BEN-0142',
+      name: 'Aarav Sharma',
       dob: '2025-08-10', // ~14 months on 2026-10-24
       gender: 'Male',
       category: 'child_under_6',
@@ -177,6 +412,7 @@ function generateCanonicalSeed() {
     },
     {
       id: 'BEN-0891',
+      name: 'Ananya Verma',
       dob: '2024-12-04', // ~22 months on 2026-10-24
       gender: 'Female',
       category: 'child_under_6',
@@ -193,12 +429,13 @@ function generateCanonicalSeed() {
     },
     {
       id: 'BEN-0334',
+      name: 'Vivaan Singh',
       dob: '2026-01-14', // ~9 months on 2026-10-24
       gender: 'Male',
       category: 'child_under_6',
       caregiverKinship: 'Mother',
       centreCode: 'AWC-702',
-      assignedAww: 'AWW-405',
+      assignedAww: 'AWW-409',
       birthWeight: 2.7,
       status: 'Referred',
       registrationDate: '2026-01-20',
@@ -209,6 +446,7 @@ function generateCanonicalSeed() {
     },
     {
       id: 'BEN-0512',
+      name: 'Kavya Mishra',
       dob: '2024-02-18', // ~32 months
       gender: 'Male',
       category: 'child_under_6',
@@ -225,12 +463,13 @@ function generateCanonicalSeed() {
     },
     {
       id: 'BEN-0773',
+      name: 'Ishaan Yadav',
       dob: '2025-11-05', // ~11 months
       gender: 'Female',
       category: 'child_under_6',
       caregiverKinship: 'Mother',
       centreCode: 'AWC-702',
-      assignedAww: 'AWW-410',
+      assignedAww: 'AWW-412',
       birthWeight: 2.65,
       status: 'Under Monitoring',
       registrationDate: '2025-11-10',
@@ -241,6 +480,7 @@ function generateCanonicalSeed() {
     },
     {
       id: 'BEN-0922',
+      name: 'Meera Gupta',
       dob: '2025-07-20', // ~15 months
       gender: 'Male',
       category: 'child_under_6',
@@ -257,28 +497,30 @@ function generateCanonicalSeed() {
     },
   ];
 
-  // Synthesize remaining 127 children and mothers across centres to match cohort
+  // Keep the original synthetic child records stable and add enough records to
+  // reach the configured child cohort size.
   for (let i = 0; i < 127; i++) {
     const idNum = 1000 + i * 19;
     const isGirl = i % 2 === 0;
     const gender = isGirl ? 'Female' : 'Male';
     const ageMonths = 1 + ((i * 3) % 68);
 
-    const dobYear = 2026 - Math.floor(ageMonths / 12);
-    const dobMonth = 1 + (Math.abs(10 - (ageMonths % 12)) % 12);
-    const dobStr = `${dobYear}-${String(dobMonth).padStart(2, '0')}-15`;
+    const { dob: dobStr, registrationDate } = childDatesForDemo(ageMonths, 2 + (i % 13));
 
     const isStale = i % 7 === 0;
-    const lastDate = isStale ? '2026-08-12' : `2026-10-${String(1 + (i % 22)).padStart(2, '0')}`;
+    const lastDate = dateDaysBeforeDemo(isStale ? 42 + (i % 12) : 1 + (i % 22));
     const weight = Number((4.5 + ageMonths * 0.28 + (i % 3) * 0.2).toFixed(1));
     const height = Number((55.0 + ageMonths * 0.8 + (i % 4) * 0.5).toFixed(1));
 
-    // Distribution across centres in Sector-4 (AWC-702, AWC-703, AWC-704)
-    const centreCode = i % 5 === 0 ? 'AWC-703' : i % 8 === 0 ? 'AWC-704' : 'AWC-702';
-    const assignedAww = centreCode === 'AWC-702' ? (i % 2 === 0 ? 'AWW-409' : 'AWW-412') : centreCode === 'AWC-703' ? 'AWW-405' : 'AWW-410';
+    const centreCode = i % 17 === 0 ? 'AWC-705' : i % 19 === 0 ? 'AWC-706' : i % 5 === 0 ? 'AWC-703' : i % 8 === 0 ? 'AWC-704' : 'AWC-702';
+    const assignedAww = centreCode === 'AWC-702' ? (i % 2 === 0 ? 'AWW-409' : 'AWW-412')
+      : centreCode === 'AWC-703' ? 'AWW-405'
+        : centreCode === 'AWC-704' ? 'AWW-410'
+          : centreCode === 'AWC-705' ? 'AWW-417' : 'AWW-421';
 
     beneficiaries.push({
       id: `BEN-${idNum}`,
+      name: fictionalBeneficiaryName(i + 6, gender),
       dob: dobStr,
       gender,
       category: 'child_under_6',
@@ -287,12 +529,107 @@ function generateCanonicalSeed() {
       assignedAww,
       birthWeight: Number((2.6 + (i % 5) * 0.15).toFixed(2)),
       status: isStale ? 'Under Monitoring' : 'Active',
-      registrationDate: dobStr,
+      registrationDate,
       lastMeasurementDate: lastDate,
       lastWeight: weight,
       lastHeight: height,
       hasActiveFlag: isStale,
     });
+  }
+
+  const additionalChildren = DEMO_BENEFICIARY_COUNTS.child_under_6 - beneficiaries.length;
+  for (let i = 0; i < additionalChildren; i++) {
+    const index = beneficiaries.length;
+    const ageMonths = 1 + ((i * 17) % 71);
+    const gender = i % 2 === 0 ? 'Female' : 'Male';
+    const { dob, registrationDate } = childDatesForDemo(ageMonths, 2 + (i % 13));
+    const placement = placementForIndex(index);
+    const isStale = i % 9 === 0;
+    const lastMeasurementDate = dateDaysBeforeDemo(isStale ? 42 + (i % 12) : 1 + (i % 24));
+    const weight = Number((3.2 + ageMonths * 0.19 + (i % 7) * 0.11).toFixed(1));
+    const height = Number((49.5 + ageMonths * 0.72 + (i % 5) * 0.4).toFixed(1));
+    beneficiaries.push({
+      id: `BEN-${10000 + i}`,
+      name: fictionalBeneficiaryName(index, gender),
+      dob,
+      gender,
+      category: 'child_under_6',
+      caregiverKinship: i % 19 === 0 ? 'Grandmother' : i % 13 === 0 ? 'Father' : 'Mother',
+      ...placement,
+      birthWeight: Number((2.5 + (i % 8) * 0.12).toFixed(2)),
+      status: isStale ? 'Under Monitoring' : 'Active',
+      registrationDate,
+      lastMeasurementDate,
+      lastWeight: weight,
+      lastHeight: height,
+      hasActiveFlag: isStale,
+    });
+  }
+
+  for (let i = 0; i < DEMO_BENEFICIARY_COUNTS.adolescent; i++) {
+    const index = beneficiaries.length;
+    const placement = placementForIndex(index);
+    const ageYears = 10 + ((i * 7) % 10);
+    const isMonitored = i % 8 === 0;
+    beneficiaries.push({
+      id: `BEN-${12000 + i}`,
+      name: fictionalBeneficiaryName(index, 'Female'),
+      dob: adolescentDateOfBirthForDemo(ageYears, i),
+      gender: 'Female',
+      category: 'adolescent',
+      caregiverKinship: i % 5 === 0 ? 'Grandmother' : 'Mother',
+      ...placement,
+      status: isMonitored ? 'Under Monitoring' : 'Active',
+      registrationDate: dateDaysBeforeDemo(2 + (i % 180)),
+      hasActiveFlag: isMonitored,
+    });
+  }
+
+  let nameSequence = beneficiaries.length;
+  const addMaternalBeneficiaries = (category: 'pregnant' | 'lactating', count: number, firstId: number, extraIdStart: number) => {
+    for (let i = 0; i < count; i++) {
+      const idNumber = i < 8 ? firstId + i : extraIdStart + i - 8;
+      const placement = placementForIndex(nameSequence);
+      const ageYears = category === 'pregnant' ? 20 + (i % 13) : 19 + (i % 15);
+      const birthMonth = 1 + ((i * 7 + (category === 'lactating' ? 4 : 0)) % 12);
+      const dob = new Date(Date.UTC(2026 - ageYears, birthMonth - 1, 15)).toISOString().slice(0, 10);
+      const registrationDate = dateDaysBeforeDemo(2 + (i % 180));
+      beneficiaries.push({
+        id: `BEN-${idNumber}`,
+        name: fictionalBeneficiaryName(nameSequence++, 'Female'),
+        dob,
+        gender: 'Female',
+        category,
+        caregiverKinship: 'Self',
+        ...placement,
+        status: i % 6 === 0 ? 'Under Monitoring' : 'Active',
+        registrationDate,
+        hasActiveFlag: false,
+      });
+    }
+  };
+  addMaternalBeneficiaries('pregnant', DEMO_BENEFICIARY_COUNTS.pregnant, 4001, 11000);
+  addMaternalBeneficiaries('lactating', DEMO_BENEFICIARY_COUNTS.lactating, 4009, 11129);
+
+  beneficiaries.forEach((beneficiary, index) => {
+    if (DEMO_AWW_CENTRES[beneficiary.assignedAww] !== beneficiary.centreCode) {
+      throw new Error(`Synthetic beneficiary ${beneficiary.id} has a worker from another centre.`);
+    }
+    if (!beneficiary.name) beneficiary.name = fictionalBeneficiaryName(index, beneficiary.gender);
+  });
+
+  if (
+    beneficiaries.length !== Object.values(DEMO_BENEFICIARY_COUNTS).reduce((total, count) => total + count, 0)
+    || beneficiaries.filter((beneficiary) => beneficiary.category === 'child_under_6').length !== DEMO_BENEFICIARY_COUNTS.child_under_6
+    || beneficiaries.filter((beneficiary) => beneficiary.category === 'adolescent').length !== DEMO_BENEFICIARY_COUNTS.adolescent
+    || beneficiaries.filter((beneficiary) => beneficiary.category === 'pregnant').length !== DEMO_BENEFICIARY_COUNTS.pregnant
+    || beneficiaries.filter((beneficiary) => beneficiary.category === 'lactating').length !== DEMO_BENEFICIARY_COUNTS.lactating
+    || new Set(beneficiaries.map((beneficiary) => beneficiary.id)).size !== beneficiaries.length
+    || beneficiaries.some((beneficiary) => beneficiary.category === 'adolescent'
+      && (beneficiary.gender !== 'Female'
+        || calculateAge(beneficiary.dob, DEMO_CURRENT_DATE, beneficiary.category, beneficiary.gender).cohort !== 'adolescentGirls'))
+  ) {
+    throw new Error('Synthetic beneficiary seed does not match the configured cohort distribution.');
   }
 
   // 35 Action Cases
@@ -519,6 +856,11 @@ function generateCanonicalSeed() {
       escalationHistory: [],
     },
   ];
+  const acknowledgedExample = cases.find((caseItem) => caseItem.status === 'Pending Verification');
+  if (acknowledgedExample) {
+    acknowledgedExample.acknowledgedAt = '2026-10-24T10:00:00.000Z';
+    acknowledgedExample.acknowledgedBy = acknowledgedExample.assignedAww;
+  }
 
   // Synthesize remaining 29 cases to complete 35 active cases
   const RULES_LIST = [
@@ -533,11 +875,30 @@ function generateCanonicalSeed() {
     const ben = beneficiaries[6 + i];
     const rule = RULES_LIST[i % RULES_LIST.length];
     const isUrgent = rule.cat === 'urgent' || rule.cat === 'sam';
+    const flaggedWeight = ben.lastWeight ?? 8.4;
+    const flaggedHeight = ben.lastHeight ?? 71.2;
+    const prevWeight = rule.code === 'RUL-01'
+      ? Number((flaggedWeight - 1.9).toFixed(2))
+      : rule.code === 'RUL-03'
+        ? Number((flaggedWeight + 0.85).toFixed(2))
+        : rule.code === 'RUL-04'
+          ? Number((flaggedWeight - 0.3).toFixed(2))
+          : rule.code === 'RUL-02'
+            ? flaggedWeight
+            : Number((flaggedWeight - 0.2).toFixed(2));
+    const prevHeight = rule.code === 'RUL-02'
+      ? Number((flaggedHeight + 1.5).toFixed(1))
+      : Number((flaggedHeight - 0.4).toFixed(1));
+    const prevDate = '12 Sep 2026';
+    const flaggedDate = ben.lastMeasurementDate || '20 Oct 2026';
+    const deltaText = rule.code === 'RUL-02'
+      ? `${(flaggedHeight - prevHeight).toFixed(1)} cm (Height)`
+      : `${flaggedWeight - prevWeight > 0 ? '+' : ''}${(flaggedWeight - prevWeight).toFixed(2)} kg in ${getDaysBetween(prevDate, flaggedDate)}d`;
 
     cases.push({
       id: ben.id,
       actionId: `ACT-${2050 + i}`,
-      ageMonths: 8 + (i % 40),
+      ageMonths: calculateAge(ben.dob, flaggedDate, ben.category, ben.gender).completedMonths,
       gender: ben.gender,
       caregiverKinship: ben.caregiverKinship,
       centreCode: ben.centreCode,
@@ -548,13 +909,13 @@ function generateCanonicalSeed() {
       ruleCode: rule.code,
       ruleName: rule.name,
       triggerDetail: `Variance detected against ${rule.name} standard thresholds (Illustrative demo rule • Demo simulation)`,
-      prevWeight: ben.lastWeight ? Number((ben.lastWeight - 0.4).toFixed(1)) : 8.0,
-      prevHeight: ben.lastHeight ? Number((ben.lastHeight - 1.2).toFixed(1)) : 70.0,
-      prevDate: '12 Sep 2026',
-      flaggedWeight: ben.lastWeight || 8.4,
-      flaggedHeight: ben.lastHeight || 71.2,
-      flaggedDate: ben.lastMeasurementDate || '20 Oct 2026',
-      weightDelta: isUrgent ? '+1.9 kg in 30d' : '-1.5 cm in 30d',
+      prevWeight,
+      prevHeight,
+      prevDate,
+      flaggedWeight,
+      flaggedHeight,
+      flaggedDate,
+      weightDelta: deltaText,
       priority: isUrgent ? 'Urgent' : 'Needs Attention',
       priorityColor: isUrgent ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-amber-100 text-amber-800 border-amber-200',
       dueDate: i % 3 === 0 ? 'Today' : i % 3 === 1 ? 'Tomorrow' : 'In 3 days',
@@ -743,6 +1104,14 @@ function generateCanonicalSeed() {
       followUpAttempts: [],
     },
   ];
+  referrals.push(...generateExpandedReferrals(beneficiaries));
+  referrals.forEach((referral) => {
+    if (referral.lifecycleStatus) return;
+    if (referral.status === 'Completed') referral.lifecycleStatus = 'outcome_recorded';
+    else if (referral.followUpAttempts.some((attempt) => attempt.method === 'AWC Consultation')) referral.lifecycleStatus = 'attended';
+    else if (referral.followUpAttempts.length > 0) referral.lifecycleStatus = 'acknowledged';
+    else referral.lifecycleStatus = 'sent';
+  });
 
   // Audit Log (Synthetic IDs and role actors only)
   const auditLog: AuditLedgerEntry[] = [
@@ -803,9 +1172,73 @@ function generateCanonicalSeed() {
     },
   ];
 
-  const measurements: MeasurementRecord[] = generateCanonicalMeasurements();
+  const measurements: MeasurementRecord[] = generateExpandedMeasurements(beneficiaries, generateCanonicalMeasurements());
+  measurements.forEach((measurement) => {
+    const beneficiary = beneficiaries.find((item) => item.id === measurement.beneficiaryId);
+    if (beneficiary) measurement.recordedBy = beneficiary.assignedAww;
+  });
+  cases.forEach((caseItem) => {
+    const beneficiary = beneficiaries.find((item) => item.id === caseItem.id);
+    if (beneficiary) {
+      caseItem.centreCode = beneficiary.centreCode;
+      caseItem.assignedAww = beneficiary.assignedAww;
+      if (caseItem.assignedActor.startsWith('AWW-')) caseItem.assignedActor = beneficiary.assignedAww;
+    }
+  });
+  referrals.forEach((referral) => {
+    const beneficiary = beneficiaries.find((item) => item.id === referral.beneficiaryId);
+    if (beneficiary) {
+      referral.owner = beneficiary.assignedAww;
+      referral.followUpAttempts.forEach((attempt) => {
+        if (attempt.actor.startsWith('AWW-')) attempt.actor = beneficiary.assignedAww;
+      });
+    }
+  });
+  const support = generateSupportRecords(beneficiaries, cases, referrals);
 
-  return { beneficiaries, measurements, cases, rules, referrals, auditLog };
+  return { beneficiaries, measurements, cases, rules, referrals, auditLog, ...support };
+}
+
+function generateExpandedReferrals(beneficiaries: BeneficiaryRecord[]): ReferralRecord[] {
+  const children = beneficiaries.filter((beneficiary) => beneficiary.category === 'child_under_6');
+  const referralSpecs: Array<{ status: ReferralRecord['status']; lifecycleStatus: ReferralLifecycleStatus; method?: ReferralFollowUp['method'] }> = [
+    { status: 'Pending', lifecycleStatus: 'sent' },
+    { status: 'Follow-up In Progress', lifecycleStatus: 'acknowledged', method: 'Phone Call' },
+    { status: 'Follow-up In Progress', lifecycleStatus: 'attended', method: 'AWC Consultation' },
+    { status: 'Completed', lifecycleStatus: 'outcome_recorded', method: 'AWC Consultation' },
+  ];
+  return referralSpecs.map((spec, index) => {
+    const beneficiary = children[10 + index];
+    const age = calculateAge(beneficiary.dob, DEMO_CURRENT_DATE).completedMonths;
+    const followUpAttempts: ReferralFollowUp[] = spec.method ? [{
+      id: `FU-DEMO-${index + 1}`,
+      date: `2026-10-${String(16 + index).padStart(2, '0')}`,
+      actor: beneficiary.assignedAww,
+      method: spec.method,
+      findings: spec.lifecycleStatus === 'attended'
+        ? 'Attendance recorded; no clinical outcome is included in this synthetic record.'
+        : 'Follow-up contact recorded in the synthetic workflow.',
+    }] : [];
+    return {
+      id: `REF-60${index + 1}`,
+      beneficiaryId: beneficiary.id,
+      ageDisplay: `${age} months`,
+      reason: 'Routine programme follow-up (synthetic demonstration)',
+      destination: 'Community Health Centre (CHC)' as const,
+      referralDate: `2026-10-${String(14 + index).padStart(2, '0')}`,
+      owner: beneficiary.assignedAww,
+      dueDate: `2026-10-${String(25 + index).padStart(2, '0')}`,
+      status: spec.status,
+      lifecycleStatus: spec.lifecycleStatus,
+      priority: 'Routine' as const,
+      followUpAttempts,
+      ...(spec.lifecycleStatus === 'outcome_recorded' ? {
+        finalOutcome: 'Administrative follow-up completion recorded; no clinical outcome was supplied.',
+        outcomeConfirmed: true,
+        outcomeDate: '2026-10-20',
+      } : {}),
+    };
+  });
 }
 
 // Canonical Measurements Seed
@@ -961,6 +1394,116 @@ function generateCanonicalMeasurements(): MeasurementRecord[] {
   ];
 }
 
+function generateExpandedMeasurements(
+  beneficiaries: BeneficiaryRecord[],
+  existing: MeasurementRecord[],
+): MeasurementRecord[] {
+  const measurements = [...existing];
+  const withHistory = new Set(existing.map((measurement) => measurement.beneficiaryId));
+  let sequence = 5001;
+  beneficiaries.filter((beneficiary) => beneficiary.category === 'child_under_6' && !withHistory.has(beneficiary.id)).forEach((beneficiary) => {
+    const latestDate = beneficiary.lastMeasurementDate || DEMO_CURRENT_DATE;
+    const latest = new Date(`${latestDate}T00:00:00Z`);
+    const registration = new Date(`${beneficiary.registrationDate}T00:00:00Z`);
+    const earlier = new Date(latest.getTime() - 45 * 24 * 60 * 60 * 1000);
+    const firstDate = earlier < registration ? registration : earlier;
+    const latestWeight = beneficiary.lastWeight ?? beneficiary.birthWeight ?? 2.9;
+    const latestHeight = beneficiary.lastHeight ?? 50;
+    const addRecord = (date: Date, weightKg: number, heightCm: number) => {
+      const dateValue = date.toISOString().slice(0, 10);
+      const age = calculateAge(beneficiary.dob, dateValue);
+      measurements.push({
+        id: `MEA-${sequence++}`,
+        beneficiaryId: beneficiary.id,
+        date: dateValue,
+        ageMonths: age.completedMonths,
+        weightKg,
+        heightCm,
+        hasEdema: false,
+        posture: age.recommendedMeasurementPosture,
+        recordedBy: beneficiary.assignedAww,
+        qualityFlags: [],
+        clinicalFlags: [],
+        isVerified: false,
+        notes: 'Synthetic demonstration reading; no clinical interpretation recorded.',
+      });
+    };
+    if (firstDate < latest) {
+      addRecord(firstDate, Number(Math.max(0.5, latestWeight - 0.25).toFixed(2)), Number(Math.max(45, latestHeight - 0.4).toFixed(1)));
+    }
+    addRecord(latest, latestWeight, latestHeight);
+  });
+  return measurements;
+}
+
+function generateSupportRecords(beneficiaries: BeneficiaryRecord[], cases: BeneficiaryCase[], referrals: ReferralRecord[]) {
+  const maternalProfiles: DemoMaternalProfileRecord[] = beneficiaries
+    .filter((beneficiary) => beneficiary.category === 'pregnant' || beneficiary.category === 'lactating')
+    .map((beneficiary) => ({
+      id: `MAT-${beneficiary.id.slice(4)}`,
+      beneficiaryId: beneficiary.id,
+      centreCode: beneficiary.centreCode,
+      stage: beneficiary.category as 'pregnant' | 'lactating',
+      registeredOn: beneficiary.registrationDate,
+    }));
+
+  const homeVisitBeneficiaries = beneficiaries.filter((_, index) => index % 5 === 0);
+  const homeVisits: DemoHomeVisitRecord[] = homeVisitBeneficiaries.map((beneficiary, index) => ({
+    id: `HVIS-${String(index + 1).padStart(4, '0')}`,
+    beneficiaryId: beneficiary.id,
+    centreCode: beneficiary.centreCode,
+    workerId: beneficiary.assignedAww,
+    visitDate: dateDaysBeforeDemo(1 + ((index * 3) % 22)),
+    status: index % 4 === 0 ? 'scheduled' : 'completed',
+    note: 'Synthetic programme follow-up; no clinical outcome recorded.',
+  }));
+
+  const serviceRecords: DemoServiceRecord[] = beneficiaries.map((beneficiary, index) => ({
+    id: `SERV-${String(index + 1).padStart(4, '0')}`,
+    beneficiaryId: beneficiary.id,
+    centreCode: beneficiary.centreCode,
+    workerId: beneficiary.assignedAww,
+    serviceType: beneficiary.category === 'child_under_6'
+      ? (index % 3 === 0 ? 'supplementary_nutrition' : 'growth_monitoring')
+      : 'nutrition_counselling',
+    serviceDate: beneficiary.lastMeasurementDate || beneficiary.registrationDate,
+    status: index % 9 === 0 ? 'scheduled' : 'recorded',
+  }));
+
+  const reviewHistory: DemoReviewHistoryRecord[] = cases.map((caseItem) => ({
+    id: `REV-${caseItem.actionId}`,
+    actionId: caseItem.actionId,
+    beneficiaryId: caseItem.id,
+    centreCode: caseItem.centreCode,
+    reviewerId: caseItem.status === 'Pending Verification' ? caseItem.assignedAww : 'LS-01',
+    status: caseItem.status === 'Under Review' || caseItem.isVerified ? 'reviewed' : 'pending',
+    ...(caseItem.status === 'Under Review' || caseItem.isVerified ? { reviewedOn: DEMO_TODAY } : {}),
+  }));
+
+  const verificationRecords: DemoVerificationRecord[] = cases.map((caseItem) => ({
+    id: `VER-${caseItem.actionId}`,
+    actionId: caseItem.actionId,
+    beneficiaryId: caseItem.id,
+    centreCode: caseItem.centreCode,
+    status: caseItem.isVerified ? 'resolved' : 'open',
+    openedOn: DEMO_TODAY,
+    ...(caseItem.isVerified ? { resolvedOn: DEMO_TODAY } : {}),
+  }));
+
+  // Keep the stable referral collection as the owner of lifecycle state. These
+  // records are returned here for persistence and scoped read-only views.
+  void referrals;
+  return {
+    centres: CANONICAL_CENTRES.map((centre) => ({ ...centre })),
+    workers: CANONICAL_WORKERS.map((worker) => ({ ...worker })),
+    homeVisits,
+    maternalProfiles,
+    serviceRecords,
+    reviewHistory,
+    verificationRecords,
+  };
+}
+
 // Deterministic proof hash generator (no Math.random)
 function generateDeterministicProofHash(counter: number, prefixCode: number = 4829): string {
   const p1 = ((counter * prefixCode + 1357) % 65536).toString(16).padStart(4, '0');
@@ -976,6 +1519,7 @@ class MockStore {
   private rules: RuleDefinition[] = [];
   private referrals: ReferralRecord[] = [];
   private auditLog: AuditLedgerEntry[] = [];
+  private aiDecisions: AIDecisionRecord[] = [];
   private listeners: Set<() => void> = new Set();
 
   constructor() {
@@ -1004,6 +1548,7 @@ class MockStore {
           this.rules = parsed.rules;
           this.referrals = Array.isArray(parsed.referrals) ? parsed.referrals : [];
           this.auditLog = Array.isArray(parsed.auditLog) ? parsed.auditLog : [];
+          this.aiDecisions = Array.isArray(parsed.aiDecisions) ? parsed.aiDecisions : [];
           return;
         }
       }
@@ -1019,6 +1564,7 @@ class MockStore {
     this.rules = seed.rules;
     this.referrals = seed.referrals;
     this.auditLog = seed.auditLog;
+    this.aiDecisions = [];
   }
 
   private saveState() {
@@ -1031,6 +1577,7 @@ class MockStore {
           rules: this.rules,
           referrals: this.referrals,
           auditLog: this.auditLog,
+          aiDecisions: this.aiDecisions,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       }
@@ -1074,16 +1621,66 @@ class MockStore {
   // =========================================================================
   // BENEFICIARY OPERATIONS WITH ROLE SCOPING
   // =========================================================================
-  public getBeneficiaries(scope?: { role?: UserRole | null; centreCode?: string }): BeneficiaryRecord[] {
-    if (scope?.role === 'AWW') {
-      const targetCentre = scope.centreCode || 'AWC-702';
-      return this.beneficiaries.filter((b) => b.centreCode === targetCentre);
-    }
+  public getBeneficiaries(scope?: DemoScope): BeneficiaryRecord[] {
+    const centres = centresForDemoScope(scope);
+    if (centres) return this.beneficiaries.filter((beneficiary) => centres.includes(beneficiary.centreCode));
     return [...this.beneficiaries];
   }
 
-  public getBeneficiaryById(id: string): BeneficiaryRecord | undefined {
-    return this.beneficiaries.find((b) => b.id === id);
+  public getBeneficiaryById(id: string, scope?: DemoScope): BeneficiaryRecord | undefined {
+    const beneficiary = this.beneficiaries.find((b) => b.id === id);
+    if (!beneficiary || (scope && !scopeAllowsCentre(scope, beneficiary.centreCode))) return undefined;
+    return beneficiary;
+  }
+
+  public getCentres(scope?: DemoScope): DemoCentreRecord[] {
+    const centres = centresForDemoScope(scope);
+    return CANONICAL_CENTRES
+      .filter((centre) => !centres || centres.includes(centre.id))
+      .map((centre) => ({ ...centre }));
+  }
+
+  public getWorkers(scope?: DemoScope): DemoWorkerRecord[] {
+    const centres = centresForDemoScope(scope);
+    return CANONICAL_WORKERS
+      .filter((worker) => !centres || (worker.centreCode && centres.includes(worker.centreCode)))
+      .map((worker) => ({ ...worker }));
+  }
+
+  public getTasks(scope?: DemoScope): DemoTaskRecord[] {
+    return this.getCases(scope).map((caseItem) => ({
+      id: `TASK-${caseItem.actionId}`,
+      beneficiaryId: caseItem.id,
+      centreCode: caseItem.centreCode,
+      ownerId: caseItem.assignedAww,
+      status: caseItem.isVerified || caseItem.status === 'Resolved'
+        ? 'closed'
+        : caseItem.acknowledgedAt
+          ? 'acknowledged'
+          : caseItem.status === 'Under Review'
+            ? 'in_progress'
+            : 'assigned',
+      dueDate: caseItem.dueDate,
+      caseStatus: caseItem.status,
+    }));
+  }
+
+  public getHomeVisits(scope?: DemoScope): DemoHomeVisitRecord[] {
+    const centres = centresForDemoScope(scope);
+    const { homeVisits } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    return homeVisits.filter((visit) => !centres || centres.includes(visit.centreCode));
+  }
+
+  public getMaternalProfiles(scope?: DemoScope): DemoMaternalProfileRecord[] {
+    const centres = centresForDemoScope(scope);
+    const { maternalProfiles } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    return maternalProfiles.filter((profile) => !centres || centres.includes(profile.centreCode));
+  }
+
+  public getServiceRecords(scope?: DemoScope): DemoServiceRecord[] {
+    const centres = centresForDemoScope(scope);
+    const { serviceRecords } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    return serviceRecords.filter((record) => !centres || centres.includes(record.centreCode));
   }
 
   public addBeneficiary(
@@ -1097,17 +1694,40 @@ class MockStore {
       birthWeight?: number;
       customId?: string;
     },
-    actorContext?: { actorId?: string; role?: UserRole | null }
+    actorContext?: DemoScope
   ): { id: string; error?: string } {
     // Validation
-    if (!ben.dob) return { id: '', error: 'Date of birth is required.' };
-
-    // Enforce role permission check
-    if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
-      return { id: '', error: `Role ${actorContext.role} cannot register beneficiaries directly.` };
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(ben.dob) || Number.isNaN(Date.parse(`${ben.dob}T00:00:00Z`)) || new Date(`${ben.dob}T00:00:00Z`).toISOString().slice(0, 10) !== ben.dob || ben.dob > getTodayISODate()) {
+      return { id: '', error: 'Enter a valid date of birth that is not in the future.' };
+    }
+    if (!['Male', 'Female', 'Other'].includes(ben.gender) || !['child_under_6', 'pregnant', 'lactating', 'adolescent'].includes(ben.category)) {
+      return { id: '', error: 'Select a supported category and gender value.' };
+    }
+    if (ben.birthWeight !== undefined && (!Number.isFinite(ben.birthWeight) || ben.birthWeight < 0.5 || ben.birthWeight > 10)) {
+      return { id: '', error: 'Birth weight must be between 0.5 and 10 kg.' };
+    }
+    if (ben.category === 'child_under_6' && ben.birthWeight === undefined) {
+      return { id: '', error: 'Enter the child’s recorded birth weight before registration.' };
     }
 
-    const nextBenNum = 2000 + this.beneficiaries.length;
+    // Enforce role permission check
+    if (actorContext?.role !== 'AWW') {
+      return { id: '', error: `Role ${actorContext?.role || 'unknown'} cannot register beneficiaries directly.` };
+    }
+
+    const categoryAge = calculateAge(ben.dob, getTodayISODate(), ben.category, ben.gender);
+    if (ben.category === 'child_under_6' && categoryAge.completedMonths >= 72) {
+      return { id: '', error: 'A child registration must be under 6 years old.' };
+    }
+    if (ben.category === 'adolescent' && (ben.gender !== 'Female' || categoryAge.completedMonths < 120 || categoryAge.completedMonths >= 240)) {
+      return { id: '', error: 'Adolescent girls must be female and between 10 and 19 years old.' };
+    }
+    if ((ben.category === 'pregnant' || ben.category === 'lactating') && ben.gender !== 'Female') {
+      return { id: '', error: 'Pregnant women and lactating mothers must be recorded as female.' };
+    }
+
+    let nextBenNum = 2000 + this.beneficiaries.length;
+    while (this.beneficiaries.some((beneficiary) => beneficiary.id === `BEN-${nextBenNum}`)) nextBenNum++;
     let candidateId = ben.customId || `BEN-${nextBenNum}`;
 
     // Prevent duplicate IDs
@@ -1118,57 +1738,41 @@ class MockStore {
       candidateId = `BEN-${nextBenNum + 7}`;
     }
 
-    const birthWeight = ben.birthWeight || 2.9;
-    const actorId = actorContext?.actorId || ben.assignedAww || 'AWW-409';
-    const centreCode = ben.centreCode || 'AWC-702';
+    const birthWeight = ben.birthWeight;
+    const actorId = actorContext?.actorId || 'AWW-409';
+    const centreCode = actorContext?.centreCode || (actorContext?.actorId && DEMO_AWW_CENTRES[actorContext.actorId]) || 'AWC-702';
+    if (!centresForDemoScope(actorContext)?.includes(centreCode) || (ben.centreCode && ben.centreCode !== centreCode)) {
+      return { id: '', error: 'AWW registration is limited to the assigned demo centre.' };
+    }
 
     const newRecord: BeneficiaryRecord = {
       id: candidateId,
+      name: fictionalBeneficiaryName(this.beneficiaries.length, ben.gender),
       dob: ben.dob,
       gender: ben.gender,
       category: ben.category,
       caregiverKinship: ben.caregiverKinship || 'Mother',
       centreCode,
       assignedAww: actorId,
-      birthWeight,
       status: 'Active',
-      registrationDate: DEMO_CURRENT_DATE,
-      lastMeasurementDate: DEMO_CURRENT_DATE,
-      lastWeight: birthWeight,
-      lastHeight: 50.0,
+      registrationDate: getTodayISODate(),
       hasActiveFlag: false,
     };
+    if (ben.category === 'child_under_6' && birthWeight !== undefined) {
+      newRecord.birthWeight = birthWeight;
+    }
 
     this.beneficiaries.unshift(newRecord);
-
-    const baselineMeasurementId = `MEA-${1200 + this.measurements.length}`;
-
-    // Create baseline measurement entry
-    this.measurements.unshift({
-      id: baselineMeasurementId,
-      beneficiaryId: candidateId,
-      date: DEMO_CURRENT_DATE,
-      ageMonths: calculateAge(ben.dob, DEMO_CURRENT_DATE).completedMonths,
-      weightKg: birthWeight,
-      heightCm: 50.0,
-      hasEdema: false,
-      posture: 'recumbent',
-      recordedBy: actorId,
-      qualityFlags: [],
-      clinicalFlags: [],
-      isVerified: true,
-      notes: 'Initial intake baseline metric recorded at registration.',
-    });
 
     // Create baseline casework log
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId: `REG-${candidateId.replace('BEN-', '')}`,
       palId: candidateId,
       actor: actorId,
       actionType: 'Beneficiary Registration',
-      deltaSummary: `New ${ben.category} registered at ${centreCode}. Baseline weight ${birthWeight} kg recorded.`,
+      deltaSummary: `New ${ben.category} registered at ${centreCode}.${birthWeight === undefined ? '' : ` Birth weight ${birthWeight} kg recorded.`}`,
       proofHash: generateDeterministicProofHash(this.auditLog.length + 1, 3571),
       status: 'Logged',
     });
@@ -1180,7 +1784,15 @@ class MockStore {
   // =========================================================================
   // MEASUREMENT & SCREENING INTAKE
   // =========================================================================
-  public getMeasurements(beneficiaryId?: string): MeasurementRecord[] {
+  public getMeasurements(beneficiaryId?: string, scope?: DemoScope): MeasurementRecord[] {
+    if (scope) {
+      const centres = centresForDemoScope(scope) || [];
+      return this.measurements.filter((measurement) => {
+        if (beneficiaryId && measurement.beneficiaryId !== beneficiaryId) return false;
+        const beneficiary = this.getBeneficiaryById(measurement.beneficiaryId);
+        return Boolean(beneficiary && centres.includes(beneficiary.centreCode));
+      });
+    }
     if (!beneficiaryId) return [...this.measurements];
     return this.measurements.filter((m) => m.beneficiaryId === beneficiaryId);
   }
@@ -1197,22 +1809,29 @@ class MockStore {
       notes?: string;
       actor?: string;
     },
-    actorContext?: { actorId?: string; role?: UserRole | null }
+    actorContext?: DemoScope
   ): { success: boolean; measurementId?: string; flags: string[]; caseCreated?: string; error?: string } {
     // Check permission: CDPO and DPO cannot record measurements
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'record_measurement')) {
       return {
         success: false,
         flags: [],
-        error: `Role ${actorContext.role} cannot record field measurements. Restricted to AWW and Lady Supervisor.`,
+        error: `Role ${actorContext?.role || 'unknown'} cannot record field measurements. Restricted to AWW and Lady Supervisor.`,
       };
     }
 
     const ben = this.getBeneficiaryById(params.beneficiaryId);
     if (!ben) return { success: false, flags: [], error: 'Beneficiary not found.' };
+    const permittedCentres = centresForDemoScope(actorContext);
+    if (permittedCentres && !permittedCentres.includes(ben.centreCode)) {
+      return { success: false, flags: [], error: 'Measurement is outside the assigned demo organization scope.' };
+    }
+    if (ben.category !== 'child_under_6') {
+      return { success: false, flags: [], error: 'Anthropometric measurement entry is currently available for children only.' };
+    }
 
-    const measurementDate = params.measurementDate === undefined ? DEMO_CURRENT_DATE : params.measurementDate;
-    const inputError = validateMeasurementInput(params.weightKg, params.heightCm, measurementDate);
+    const measurementDate = params.measurementDate === undefined ? getTodayISODate() : params.measurementDate;
+    const inputError = validateMeasurementInput(params.weightKg, params.heightCm, measurementDate, getTodayISODate());
     if (inputError) return { success: false, flags: [], error: inputError };
 
     if (this.measurements.some((m) => m.beneficiaryId === ben.id && m.date === measurementDate)) {
@@ -1228,23 +1847,20 @@ class MockStore {
     // Retrieve previous measurement
     const previous = this.measurements
       .filter((m) => m.beneficiaryId === params.beneficiaryId)
-      .sort((a, b) => b.date.localeCompare(a.date))[0] || {
-      weight: ben.lastWeight || ben.birthWeight,
-      height: ben.lastHeight || 50.0,
-      date: ben.lastMeasurementDate || ben.registrationDate,
-    };
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
 
     // Run screening heuristic engine with active custom rules
     const evaluation = evaluateMeasurementEntry({
       currentWeight: params.weightKg,
       currentHeight: params.heightCm,
       measurementDate,
+      referenceDate: getTodayISODate(),
       dob: ben.dob,
-      previousRecord: {
-        weight: 'weightKg' in previous ? previous.weightKg : previous.weight,
-        height: 'heightCm' in previous ? previous.heightCm : previous.height,
-        date: previous.date,
-      },
+      previousRecord: previous ? {
+          weight: previous.weightKg,
+          height: previous.heightCm,
+          date: previous.date,
+        } : undefined,
       muacCm: params.muacCm,
       hasBilateralEdema: params.hasEdema,
       customRules: this.rules,
@@ -1260,6 +1876,10 @@ class MockStore {
 
     const age = calculateAge(ben.dob, measurementDate);
     const measurementId = `MEA-${1200 + this.measurements.length}`;
+    const actionableFlags = [
+      ...evaluation.qualityFlags.filter((flag) => flag.code !== 'INFO-NO-HISTORY'),
+      ...evaluation.clinicalFlags,
+    ];
 
     const newMeasurement: MeasurementRecord = {
       id: measurementId,
@@ -1274,7 +1894,7 @@ class MockStore {
       recordedBy: actor,
       qualityFlags: evaluation.qualityFlags.map((f) => f.name),
       clinicalFlags: evaluation.clinicalFlags.map((f) => f.name),
-      isVerified: evaluation.flags.length === 0,
+      isVerified: actionableFlags.length === 0,
       notes: params.notes,
     };
 
@@ -1284,12 +1904,12 @@ class MockStore {
     ben.lastMeasurementDate = measurementDate;
     ben.lastWeight = params.weightKg;
     ben.lastHeight = params.heightCm;
-    ben.hasActiveFlag = evaluation.flags.length > 0;
+    ben.hasActiveFlag = actionableFlags.length > 0;
 
     let caseCreatedId: string | undefined;
 
     // If anomalous or clinical flags present, generate or update Action Queue Case
-    if (evaluation.flags.length > 0) {
+    if (actionableFlags.length > 0) {
       const actionId = `ACT-${2100 + this.cases.length}`;
       const primaryFlag = evaluation.flags[0];
       const isUrgent = evaluation.primaryPriority === 'Urgent';
@@ -1308,13 +1928,15 @@ class MockStore {
         ruleCode: primaryFlag.code,
         ruleName: primaryFlag.name,
         triggerDetail: primaryFlag.triggerDetail,
-        prevWeight: (previous as any).weightKg || (previous as any).weight || 0,
-        prevHeight: (previous as any).heightCm || (previous as any).height || 0,
-        prevDate: previous.date,
+        prevWeight: previous?.weightKg ?? 0,
+        prevHeight: previous?.heightCm ?? 0,
+        prevDate: previous?.date ?? '',
         flaggedWeight: params.weightKg,
         flaggedHeight: params.heightCm,
         flaggedDate: measurementDate,
-        weightDelta: `${evaluation.weightDeltaKg > 0 ? '+' : ''}${evaluation.weightDeltaKg.toFixed(2)} kg in ${evaluation.daysElapsed}d`,
+        weightDelta: primaryFlag.code === 'RUL-02'
+          ? `${evaluation.heightDeltaCm > 0 ? '+' : ''}${evaluation.heightDeltaCm.toFixed(1)} cm (Height) in ${evaluation.daysElapsed}d`
+          : `${evaluation.weightDeltaKg > 0 ? '+' : ''}${evaluation.weightDeltaKg.toFixed(2)} kg in ${evaluation.daysElapsed}d`,
         priority: evaluation.primaryPriority,
         priorityColor:
           evaluation.primaryPriority === 'Urgent'
@@ -1328,7 +1950,7 @@ class MockStore {
         assignedActor: ben.assignedAww,
         escalationHistory: [
           {
-            timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: new Date().toISOString(),
             fromTier: 1,
             toTier: 1,
             fromActor: 'Rule Engine',
@@ -1344,7 +1966,7 @@ class MockStore {
       // Add to audit trail
       this.auditLog.unshift({
         id: `LED-${String(8922 + this.auditLog.length)}`,
-        timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: new Date().toISOString(),
         actionId,
         palId: ben.id,
         actor,
@@ -1367,34 +1989,40 @@ class MockStore {
   // =========================================================================
   // ACTION CASES & MULTI-TIER ESCALATION WITH ROLE SCOPING
   // =========================================================================
-  public getCases(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): BeneficiaryCase[] {
-    if (scope?.role === 'AWW') {
-      const targetCentre = scope.centreCode || 'AWC-702';
-      const actor = scope.actorId || 'AWW-409';
-      return this.cases.filter((c) => c.centreCode === targetCentre || c.assignedAww === actor || c.assignedActor === actor);
-    }
-    return [...this.cases];
+  public getCases(scope?: DemoScope): BeneficiaryCase[] {
+    const centres = centresForDemoScope(scope);
+    const scopedCases = centres
+      ? this.cases.filter((item) => centres.includes(item.centreCode || this.getBeneficiaryById(item.id)?.centreCode || ''))
+      : [...this.cases];
+    if (scope?.role === 'AWW') return scope.actorId ? scopedCases.filter((item) => item.assignedAww === scope.actorId) : [];
+    return scopedCases;
   }
 
-  public getCaseById(id: string): BeneficiaryCase | undefined {
-    return this.cases.find((c) => c.id === id || c.actionId === id);
+  public getCaseById(id: string, scope?: DemoScope): BeneficiaryCase | undefined {
+    const caseItem = this.cases.find((c) => c.id === id || c.actionId === id);
+    if (!caseItem || (scope && !scopeAllowsCentre(scope, caseItem.centreCode))
+      || (scope?.role === 'AWW' && (!scope.actorId || caseItem.assignedAww !== scope.actorId))) return undefined;
+    return caseItem;
   }
 
-  public acknowledgeCase(actionId: string, actorContext?: string | { actorId?: string; role?: UserRole | null }): boolean {
+  public acknowledgeCase(actionId: string, actorContext?: string | DemoScope): boolean {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'acknowledge_case')) return false;
     const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
     if (idx === -1) return false;
+    const targetCase = this.cases[idx];
+    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, targetCase.centreCode || this.getBeneficiaryById(targetCase.id)?.centreCode)) return false;
+    if (role === 'AWW' && (typeof actorContext !== 'object' || !actorContext.actorId || targetCase.assignedAww !== actorContext.actorId)) return false;
 
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
 
     this.cases[idx].status = 'Under Review';
-    this.cases[idx].acknowledgedAt = '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    this.cases[idx].acknowledgedAt = new Date().toISOString();
     this.cases[idx].acknowledgedBy = actor;
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId,
       palId: this.cases[idx].id,
       actor,
@@ -1412,16 +2040,19 @@ class MockStore {
     actionId: string,
     assignedActor: string,
     dueDate: string,
-    actorContext?: { actorId?: string; role?: UserRole | null }
+    actorContext?: DemoScope
   ): { success: boolean; error?: string } {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'assign_owner')) {
-      return { success: false, error: `Role ${actorContext.role} cannot assign owners. Restricted to Supervisor and CDPO.` };
+      return { success: false, error: `Role ${actorContext?.role || 'unknown'} cannot assign owners. Restricted to Supervisor and CDPO.` };
     }
 
     const idx = this.cases.findIndex((c) => c.actionId === actionId || c.id === actionId);
     if (idx === -1) return { success: false, error: 'Case not found.' };
 
     const target = this.cases[idx];
+    if (!scopeAllowsCentre(actorContext, target.centreCode || this.getBeneficiaryById(target.id)?.centreCode)) {
+      return { success: false, error: 'Case is outside the assigned demo organization scope.' };
+    }
     target.assignedActor = assignedActor;
     target.dueDate = dueDate;
 
@@ -1429,7 +2060,7 @@ class MockStore {
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId,
       palId: target.id,
       actor,
@@ -1447,7 +2078,7 @@ class MockStore {
     actionId: string,
     targetTier: 1 | 2 | 3 | 4,
     reason: string,
-    actorContext?: string | { actorId?: string; role?: UserRole | null }
+    actorContext?: string | DemoScope
   ): boolean {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'escalate')) return false;
@@ -1455,6 +2086,7 @@ class MockStore {
     if (idx === -1) return false;
 
     const targetCase = this.cases[idx];
+    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, targetCase.centreCode || this.getBeneficiaryById(targetCase.id)?.centreCode)) return false;
     const tierInfo = ESCALATION_TIERS[targetTier];
     if (!tierInfo) return false;
 
@@ -1472,7 +2104,7 @@ class MockStore {
     }
 
     targetCase.escalationHistory.unshift({
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       fromTier,
       toTier: targetTier,
       fromActor: actor,
@@ -1482,7 +2114,7 @@ class MockStore {
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId,
       palId: targetCase.id,
       actor,
@@ -1501,7 +2133,7 @@ class MockStore {
     verifiedWeight: number,
     verifiedHeight: number,
     notes: string,
-    actorContext?: string | { actorId?: string; role?: UserRole | null }
+    actorContext?: string | DemoScope
   ): boolean {
     if (!Number.isFinite(verifiedWeight) || verifiedWeight <= 0 || !Number.isFinite(verifiedHeight) || verifiedHeight <= 0) {
       return false;
@@ -1517,6 +2149,7 @@ class MockStore {
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'AWW-409';
 
     const target = this.cases[caseIndex];
+    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, target.centreCode || this.getBeneficiaryById(target.id)?.centreCode)) return false;
     const hashPart1 = ((actionId.length * 3721 + Math.round(verifiedWeight * 100)) % 65536).toString(16).padStart(4, '0');
     const hashPart2 = ((Math.round(verifiedHeight * 10) + 1234) % 65536).toString(16).padStart(4, '0');
     const verificationHash = `0x${hashPart1}...${hashPart2}`;
@@ -1545,7 +2178,7 @@ class MockStore {
 
     const newAudit: AuditLedgerEntry = {
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId: target.actionId,
       palId: target.id,
       actor,
@@ -1563,16 +2196,9 @@ class MockStore {
   // =========================================================================
   // REFERRALS & FOLLOW-UP WORKFLOW WITH ROLE SCOPING
   // =========================================================================
-  public getReferrals(scope?: { role?: UserRole | null; centreCode?: string; actorId?: string }): ReferralRecord[] {
-    if (scope?.role === 'AWW') {
-      const targetCentre = scope.centreCode || 'AWC-702';
-      const actor = scope.actorId || 'AWW-409';
-      return this.referrals.filter((r) => {
-        if (r.owner === actor) return true;
-        const ben = this.getBeneficiaryById(r.beneficiaryId);
-        return ben?.centreCode === targetCentre;
-      });
-    }
+  public getReferrals(scope?: DemoScope): ReferralRecord[] {
+    const centres = centresForDemoScope(scope);
+    if (centres) return this.referrals.filter((referral) => centres.includes(this.getBeneficiaryById(referral.beneficiaryId)?.centreCode || ''));
     return [...this.referrals];
   }
 
@@ -1589,16 +2215,28 @@ class MockStore {
       priority?: 'Urgent' | 'High' | 'Routine';
       owner?: string;
     },
-    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
+    actorContext?: DemoScope
   ): { success: boolean; referralId?: string; error?: string } {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'create_referral')) {
-      return { success: false, error: `Role ${actorContext.role} cannot initiate clinical referrals.` };
+      return { success: false, error: `Role ${actorContext?.role || 'unknown'} cannot initiate clinical referrals.` };
+    }
+    if (actorContext.role === 'AWW' && !actorContext.actorId) {
+      return { success: false, error: 'AWW referral creation requires an authenticated worker identity.' };
     }
 
     const ben = this.getBeneficiaryById(data.beneficiaryId);
     if (!ben) return { success: false, error: 'Beneficiary not found.' };
+    if (!scopeAllowsCentre(actorContext, ben.centreCode)) {
+      return { success: false, error: 'Referral target is outside the assigned demo organization scope.' };
+    }
     if (!data.reason.trim() || !data.dueDate.trim()) {
       return { success: false, error: 'A referral reason and due date are required.' };
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.dueDate)
+      || Number.isNaN(Date.parse(`${data.dueDate}T00:00:00Z`))
+      || new Date(`${data.dueDate}T00:00:00Z`).toISOString().slice(0, 10) !== data.dueDate
+      || data.dueDate < getTodayISODate()) {
+      return { success: false, error: 'Enter a valid referral due date that is today or later.' };
     }
     if (actorContext.role === 'AWW' && ben.centreCode !== (actorContext.centreCode || 'AWC-702')) {
       return { success: false, error: 'AWW referral creation is limited to the worker\'s centre.' };
@@ -1607,8 +2245,10 @@ class MockStore {
       return { success: false, error: 'AWW referrals must remain assigned to the creating worker.' };
     }
 
-    const refId = `REF-${504 + this.referrals.length}`;
-    const age = calculateAge(ben.dob, DEMO_CURRENT_DATE);
+    let nextReferralNumber = 504 + this.referrals.length;
+    while (this.referrals.some((referral) => referral.id === `REF-${nextReferralNumber}`)) nextReferralNumber++;
+    const refId = `REF-${nextReferralNumber}`;
+    const age = calculateAge(ben.dob, getTodayISODate());
     const owner = actorContext.role === 'AWW'
       ? actorContext.actorId || ben.assignedAww || 'AWW-409'
       : data.owner || actorContext.actorId || ben.assignedAww || 'AWW-409';
@@ -1619,7 +2259,7 @@ class MockStore {
       ageDisplay: age.ageDisplay,
       reason: data.reason.trim(),
       destination: data.destination,
-      referralDate: DEMO_CURRENT_DATE,
+      referralDate: getTodayISODate(),
       owner,
       dueDate: data.dueDate,
       status: 'Pending',
@@ -1632,7 +2272,7 @@ class MockStore {
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId: refId,
       palId: ben.id,
       actor: owner,
@@ -1653,24 +2293,21 @@ class MockStore {
       findings: string;
       actor?: string;
     },
-    actorContext?: { actorId?: string; role?: UserRole | null; centreCode?: string }
+    actorContext?: DemoScope
   ): boolean {
     if (!actorContext?.role || !canPerformAction(actorContext.role, 'log_follow_up')) return false;
+    if (actorContext.role === 'AWW' && !actorContext.actorId) return false;
     if (!attempt.findings.trim() || !['Home Visit', 'Phone Call', 'AWC Consultation'].includes(attempt.method)) return false;
     const rIdx = this.referrals.findIndex((r) => r.id === refId);
     if (rIdx === -1) return false;
 
     const target = this.referrals[rIdx];
-    if (actorContext.role === 'AWW') {
-      const beneficiary = this.getBeneficiaryById(target.beneficiaryId);
-      const actorId = actorContext.actorId || 'AWW-409';
-      const centreCode = actorContext.centreCode || 'AWC-702';
-      if (target.owner !== actorId && beneficiary?.centreCode !== centreCode) return false;
-    }
+    const beneficiary = this.getBeneficiaryById(target.beneficiaryId);
+    if (!scopeAllowsCentre(actorContext, beneficiary?.centreCode)) return false;
     const actor = actorContext.actorId || attempt.actor || 'AWW-409';
     const newAttempt: ReferralFollowUp = {
       id: `FU-${target.followUpAttempts.length + 1}`,
-      date: DEMO_CURRENT_DATE,
+      date: getTodayISODate(),
       actor,
       method: attempt.method,
       findings: attempt.findings.trim(),
@@ -1683,7 +2320,7 @@ class MockStore {
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId: refId,
       palId: target.beneficiaryId,
       actor,
@@ -1701,7 +2338,7 @@ class MockStore {
     refId: string,
     outcome: string,
     nextSteps: string,
-    actorContext?: string | { actorId?: string; role?: UserRole | null; outcomeConfirmed?: boolean }
+    actorContext?: string | (DemoScope & { outcomeConfirmed?: boolean })
   ): { success: boolean; error?: string } {
     const role = typeof actorContext === 'object' ? actorContext?.role : undefined;
     if (!role || !canPerformAction(role, 'resolve_referral')) {
@@ -1710,7 +2347,7 @@ class MockStore {
     if (!outcome.trim()) {
       return { success: false, error: 'Select a clinical outcome before closing the referral.' };
     }
-    if (typeof actorContext !== 'object' || actorContext.outcomeConfirmed !== true) {
+    if (!actorContext || typeof actorContext !== 'object' || actorContext.outcomeConfirmed !== true) {
       return { success: false, error: 'Confirm that the selected clinical outcome is supported by a verified record.' };
     }
     if (nextSteps.trim().length < 10) {
@@ -1720,17 +2357,21 @@ class MockStore {
     const rIdx = this.referrals.findIndex((r) => r.id === refId);
     if (rIdx === -1) return { success: false, error: 'Referral not found.' };
 
+    const target = this.referrals[rIdx];
+    if (!scopeAllowsCentre(typeof actorContext === 'object' ? actorContext : undefined, this.getBeneficiaryById(target.beneficiaryId)?.centreCode)) {
+      return { success: false, error: 'Referral is outside the assigned demo organization scope.' };
+    }
+
     if (this.referrals[rIdx].status === 'Completed') {
       return { success: false, error: 'Referral is already completed.' };
     }
 
     const actor = typeof actorContext === 'string' ? actorContext : actorContext?.actorId || 'Sector Supervisor (LS-01)';
 
-    const target = this.referrals[rIdx];
     target.status = 'Completed';
     target.finalOutcome = outcome.trim();
     target.outcomeConfirmed = true;
-    target.outcomeDate = DEMO_CURRENT_DATE;
+    target.outcomeDate = getTodayISODate();
     target.nextSteps = nextSteps.trim();
 
     const ben = this.getBeneficiaryById(target.beneficiaryId);
@@ -1740,7 +2381,7 @@ class MockStore {
 
     this.auditLog.unshift({
       id: `LED-${String(8922 + this.auditLog.length)}`,
-      timestamp: '24 Oct 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toISOString(),
       actionId: refId,
       palId: target.beneficiaryId,
       actor,
@@ -1818,20 +2459,127 @@ class MockStore {
     return id;
   }
 
-  public getAuditLog(scope?: { role?: UserRole | null }): AuditLedgerEntry[] {
-    if (scope?.role === 'AWW') {
-      return []; // AWW has no audit ledger access per matrix
-    }
+  public getAuditLog(scope?: DemoScope): AuditLedgerEntry[] {
+    if (scope?.role === 'AWW' || scope?.role === 'DPO' || scope?.role === 'User' || scope?.role === 'System Administrator' || scope?.role === 'Rule Administrator') return [];
+    const centres = centresForDemoScope(scope);
+    if (centres) return this.auditLog.filter((entry) => {
+      const caseItem = this.cases.find((item) => item.actionId === entry.actionId || item.id === entry.palId);
+      const beneficiary = this.getBeneficiaryById(entry.palId);
+      return centres.includes(caseItem?.centreCode || beneficiary?.centreCode || '');
+    });
     return [...this.auditLog];
+  }
+
+
+  // =========================================================================
+  // AI DECISIONS & AUDIT OPERATIONS
+  // =========================================================================
+  public getAIDecisions(scope?: DemoScope): AIDecisionRecord[] {
+    const centres = centresForDemoScope(scope);
+    if (!centres) return [...this.aiDecisions];
+    return this.aiDecisions.filter((dec) => centres.includes(dec.centreCode));
+  }
+
+  public recordAIDecision(
+    payload: {
+      beneficiaryId: string;
+      caseActionId: string;
+      suggestionId: string;
+      decision: 'accept' | 'reject' | 'modify';
+      actionCode: string;
+      actionNotes?: string;
+      rejectionReason?: string;
+      centreCode?: string;
+    },
+    actorContext?: DemoScope
+  ): { success: boolean; id?: string; error?: string } {
+    const role = actorContext?.role || 'AWW';
+    const actorId = actorContext?.actorId || 'AWW-409';
+
+    if (role === 'DPO') {
+      return { success: false, error: 'DPO persona is view-only and cannot record casework decisions.' };
+    }
+
+    if (!['accept', 'reject', 'modify'].includes(payload.decision)) {
+      return { success: false, error: 'Decision must be one of: accept, reject, modify.' };
+    }
+
+    if (payload.decision === 'reject' && !payload.rejectionReason?.trim()) {
+      return { success: false, error: 'A justification reason is required when rejecting a suggestion.' };
+    }
+
+    if (payload.decision === 'modify' && !payload.actionNotes?.trim()) {
+      return { success: false, error: 'Modified action notes are required when choosing modify.' };
+    }
+
+    // Role-based authority checks
+    if (payload.actionCode === 'supervisor_verification' && role === 'AWW') {
+      return { success: false, error: 'Lady Supervisor (LS) or CDPO role is required to authorize supervisory verifications.' };
+    }
+
+    const effectiveCentre = payload.centreCode || actorContext?.centreCode || 'AWC-702';
+    const allowedCentres = centresForDemoScope(actorContext);
+    if (allowedCentres && !allowedCentres.includes(effectiveCentre)) {
+      return { success: false, error: 'Cannot record decision outside assigned administrative centre jurisdiction.' };
+    }
+
+    const decisionId = `DEC-${2000 + this.aiDecisions.length + 1}`;
+    const newDecision: AIDecisionRecord = {
+      id: decisionId,
+      beneficiaryId: payload.beneficiaryId,
+      caseActionId: payload.caseActionId,
+      suggestionId: payload.suggestionId,
+      decision: payload.decision,
+      actionCode: payload.actionCode,
+      actionNotes: payload.actionNotes?.trim(),
+      rejectionReason: payload.rejectionReason?.trim(),
+      actorId,
+      actorRole: role,
+      centreCode: effectiveCentre,
+      timestamp: getTodayISODate(),
+    };
+
+    this.aiDecisions.push(newDecision);
+
+    // Append to audit log
+    this.auditLog.push({
+      id: `AUD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: getTodayISODate(),
+      actionId: payload.caseActionId,
+      palId: payload.beneficiaryId,
+      actor: actorId,
+      actionType: `AI Decision: ${payload.decision.toUpperCase()}`,
+      deltaSummary: `${payload.actionCode}: ${payload.decision === 'reject' ? payload.rejectionReason : payload.actionNotes || 'Accepted recommendation'}`,
+      proofHash: `SHA-DEC-${payload.caseActionId.slice(4)}`,
+      status: 'Logged',
+    });
+
+    // If accepted, update matching case notes / acknowledgment
+    const targetCase = this.cases.find((c) => c.actionId === payload.caseActionId);
+    if (targetCase && payload.decision === 'accept') {
+      if (!targetCase.acknowledgedAt) {
+        targetCase.acknowledgedAt = getTodayISODate();
+      }
+    }
+
+    this.saveState();
+    this.notify();
+    return { success: true, id: decisionId };
   }
 
   // =========================================================================
   // DYNAMIC POPULATION & REPORTING METRICS WITH SCOPE
   // =========================================================================
-  public getMetrics(scope?: { role?: UserRole | null; centreCode?: string }) {
-    const bens = this.getBeneficiaries(scope);
-    const cases = this.getCases(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
-    const referrals = this.getReferrals(scope ? { role: scope.role, centreCode: scope.centreCode } : undefined);
+  public getMetrics(scope?: DemoScope) {
+    const districtAggregate = !scope?.role || scope.role === 'User' || scope.role === 'DPO';
+    const bens = districtAggregate ? [...this.beneficiaries] : this.getBeneficiaries(scope);
+    const cases = districtAggregate ? [...this.cases] : this.getCases(scope);
+    const referrals = districtAggregate ? [...this.referrals] : this.getReferrals(scope);
+    const measurements = districtAggregate ? this.getMeasurements() : this.getMeasurements(undefined, scope);
+    const tasks = districtAggregate ? this.getTasks() : this.getTasks(scope);
+    const homeVisits = districtAggregate ? this.getHomeVisits() : this.getHomeVisits(scope);
+    const serviceRecords = districtAggregate ? this.getServiceRecords() : this.getServiceRecords(scope);
+    const maternalProfiles = districtAggregate ? this.getMaternalProfiles() : this.getMaternalProfiles(scope);
 
     const total = bens.length;
 
@@ -1842,21 +2590,25 @@ class MockStore {
     let children3to6y = 0;
     let adolescentGirls = 0;
     let staleCount = 0;
+    let pendingMeasurements = 0;
 
     bens.forEach((b) => {
-      const age = calculateAge(b.dob, DEMO_CURRENT_DATE, b.category);
+      const age = calculateAge(b.dob, DEMO_CURRENT_DATE, b.category, b.gender);
       if (b.category === 'pregnant') pregnantWomen++;
       else if (b.category === 'lactating') lactatingMothers++;
-      else if (b.category === 'adolescent' || age.cohort === 'adolescentGirls') adolescentGirls++;
+      else if (age.cohort === 'adolescentGirls') adolescentGirls++;
       else if (age.cohort === 'children0to6m') children0to6m++;
       else if (age.cohort === 'children6mTo3y') children6mTo3y++;
       else children3to6y++;
 
-      if (b.lastMeasurementDate) {
-        const p1 = new Date(b.lastMeasurementDate);
-        const p2 = new Date(DEMO_CURRENT_DATE);
-        const diffDays = Math.round((p2.getTime() - p1.getTime()) / (1000 * 3600 * 24));
-        if (diffDays > 35) staleCount++;
+      if (b.category === 'child_under_6') {
+        const daysSinceMeasurement = b.lastMeasurementDate
+          ? getDaysUntilDate(b.lastMeasurementDate, getTodayISODate())
+          : undefined;
+        if (daysSinceMeasurement === undefined || daysSinceMeasurement > 35 || daysSinceMeasurement < 0) {
+          staleCount++;
+          pendingMeasurements++;
+        }
       }
     });
 
@@ -1882,14 +2634,79 @@ class MockStore {
       totalChildren,
       totalMothers,
       staleCount,
+      pendingMeasurements,
       urgentCases,
       attentionCases,
       pendingCases,
       resolvedCases,
       openReferrals,
+      upcomingFollowUps: referrals.filter((referral) => referral.status !== 'Completed'
+        && (getDaysUntilDate(referral.dueDate) ?? -1) >= 0
+        && (getDaysUntilDate(referral.dueDate) ?? 99) <= 7).length,
+      overdueFollowUps: referrals.filter((referral) => referral.status !== 'Completed'
+        && (getDaysUntilDate(referral.dueDate) ?? 0) < 0).length,
       completedReferrals,
-      subtext: `${totalChildren} children • ${totalMothers} mothers • ${adolescentGirls} adolescent girls`,
+      measurementCount: measurements.length,
+      verifiedMeasurementCount: measurements.filter((measurement) => measurement.isVerified).length,
+      taskCount: tasks.length,
+      openTasks: tasks.filter((task) => task.status !== 'closed').length,
+      overdueTasks: tasks.filter((task) => task.status !== 'closed' && (getDaysUntilDate(task.dueDate) ?? 1) < 0).length,
+      assignedTasks: tasks.filter((task) => task.status === 'assigned').length,
+      inProgressTasks: tasks.filter((task) => task.status === 'acknowledged' || task.status === 'in_progress').length,
+      closedTasks: tasks.filter((task) => task.status === 'closed').length,
+      homeVisitCount: homeVisits.length,
+      scheduledHomeVisits: homeVisits.filter((visit) => visit.status === 'scheduled').length,
+      serviceRecordCount: serviceRecords.length,
+      maternalProfileCount: maternalProfiles.length,
+      centreCount: districtAggregate ? CANONICAL_CENTRES.length : this.getCentres(scope).length,
+      subtext: `${totalChildren} children (0–6 years) • ${adolescentGirls} adolescent girls • ${pregnantWomen} pregnant women • ${lactatingMothers} lactating mothers`,
     };
+  }
+
+  public getCohortSummaries(scope?: DemoScope) {
+    const districtAggregate = !scope?.role || scope.role === 'User' || scope.role === 'DPO';
+    const beneficiaries = districtAggregate ? [...this.beneficiaries] : this.getBeneficiaries(scope);
+    const beneficiaryIds = new Set(beneficiaries.map((beneficiary) => beneficiary.id));
+    const cases = (districtAggregate ? this.cases : this.getCases(scope))
+      .filter((caseItem) => beneficiaryIds.has(caseItem.id));
+    const referrals = (districtAggregate ? this.referrals : this.getReferrals(scope))
+      .filter((referral) => beneficiaryIds.has(referral.beneficiaryId));
+    const measurements = (districtAggregate ? this.getMeasurements() : this.getMeasurements(undefined, scope))
+      .filter((measurement) => beneficiaryIds.has(measurement.beneficiaryId));
+    const cohorts = [
+      'children0to6m',
+      'children6mTo3y',
+      'children3to6y',
+      'adolescentGirls',
+      'pregnant',
+      'lactating',
+    ] as const;
+
+    return cohorts.map((id) => {
+      const members = beneficiaries.filter((beneficiary) => {
+        if (id === 'pregnant' || id === 'lactating') return beneficiary.category === id;
+        return calculateAge(beneficiary.dob, DEMO_CURRENT_DATE, beneficiary.category, beneficiary.gender).cohort === id;
+      });
+      const memberIds = new Set(members.map((beneficiary) => beneficiary.id));
+      const cohortCases = cases.filter((caseItem) => memberIds.has(caseItem.id));
+      const cohortReferrals = referrals.filter((referral) => memberIds.has(referral.beneficiaryId));
+      return {
+        id,
+        count: members.length,
+        females: members.filter((beneficiary) => beneficiary.gender === 'Female').length,
+        males: members.filter((beneficiary) => beneficiary.gender === 'Male').length,
+        active: members.filter((beneficiary) => beneficiary.status === 'Active').length,
+        underMonitoring: members.filter((beneficiary) => beneficiary.status === 'Under Monitoring').length,
+        referred: members.filter((beneficiary) => beneficiary.status === 'Referred').length,
+        stale: members.filter((beneficiary) => beneficiary.lastMeasurementDate
+          && (Date.parse(`${DEMO_CURRENT_DATE}T00:00:00Z`) - Date.parse(`${beneficiary.lastMeasurementDate}T00:00:00Z`)) / 86400000 > 35).length,
+        caseCount: cohortCases.length,
+        openCaseCount: cohortCases.filter((caseItem) => !caseItem.isVerified).length,
+        measurementCount: measurements.filter((measurement) => memberIds.has(measurement.beneficiaryId)).length,
+        referralCount: cohortReferrals.length,
+        openReferralCount: cohortReferrals.filter((referral) => referral.status !== 'Completed').length,
+      };
+    });
   }
 }
 

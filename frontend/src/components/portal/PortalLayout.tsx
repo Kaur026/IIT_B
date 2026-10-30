@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogOut, RotateCcw, X, Lock, Eye, ShieldCheck, UserCheck } from 'lucide-react';
+import {
+  LogOut,
+  RotateCcw,
+  X,
+  Lock,
+  Eye,
+  ShieldCheck,
+  UserCheck,
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  Scale,
+  ListTodo,
+  CheckCircle2,
+  HeartHandshake,
+  FileBarChart2,
+  Sliders,
+  User as UserIcon,
+} from 'lucide-react';
 import { SkeletonShimmer } from '../common/SkeletonShimmer';
 import { mockStore } from '../../store/mockStore.ts';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
-import { getNavItemsForRole, ROLE_CONFIGS } from '../../utils/permissions';
+import { canAccessPath, getNavItemsForRole, ROLE_CONFIGS } from '../../utils/permissions';
+import { isMockDemoEnabled } from '../../utils/demoMode';
+import { shouldBlockMockWorkflowForProviderSession, shouldShowMockDataDisclosure } from '../../utils/dataSourcePresentation';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -18,7 +38,10 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { isStaff, isReadOnlyDemo, staffUser, role, logoutStaff, requireStaffAction } = useAuth();
+  const {
+    isStaff, isReadOnlyDemo, staffUser, role, logoutStaff, requireStaffAction,
+    supabaseSession, signOutSupabase,
+  } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,10 +54,13 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   // Role-driven navigation tabs from permissions config
   const navItems = getNavItemsForRole(role);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (isStaff) {
       logoutStaff();
       showToast('Signed Out', 'Exited role simulation. Returned to public overview.', 'info');
+    } else if (supabaseSession) {
+      await signOutSupabase();
+      showToast('Signed Out', 'Supabase account session ended.', 'info');
     }
     navigate('/');
   };
@@ -48,43 +74,125 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
     setIsResetModalOpen(false);
     showToast(
       'Demo Dataset Restored',
-      'Canonical baseline data restored (133 beneficiaries, 35 cases, 8 rules). All screens updated.',
+      'Canonical synthetic dataset restored (600 beneficiaries). All screens updated.',
       'success'
     );
   };
 
-  const isCurrentActive = (itemPath: string) => {
-    if (itemPath === '/dashboard') {
-      return location.pathname === '/dashboard';
+  const getNavIcon = (id: string) => {
+    switch (id) {
+      case 'dashboard':
+      case 'district-overview':
+        return LayoutDashboard;
+      case 'beneficiaries':
+      case 'beneficiary-stats':
+      case 'all-centres':
+      case 'centres':
+        return Users;
+      case 'register':
+        return UserPlus;
+      case 'measurements':
+      case 'measurement-review':
+      case 'measurement-monitoring':
+        return Scale;
+      case 'queue':
+      case 'my-cases':
+      case 'action-queue':
+        return ListTodo;
+      case 'verification-queue':
+        return CheckCircle2;
+      case 'referrals':
+      case 'referrals-overview':
+        return HeartHandshake;
+      case 'reports':
+      case 'centre-performance':
+      case 'screening-trends':
+        return FileBarChart2;
+      case 'audit-logs':
+        return ShieldCheck;
+      case 'rules':
+      case 'rule-settings':
+      case 'screening-testbench':
+      case 'rule-test-results':
+      case 'system-settings':
+        return Sliders;
+      case 'profile':
+      case 'staff-roles':
+      case 'user-access':
+        return UserIcon;
+      default:
+        return LayoutDashboard;
     }
-    if (itemPath === '/beneficiaries') {
+  };
+
+  const isCurrentActive = (item: typeof navItems[0]) => {
+    if (item.href.includes('#')) {
+      const [path, hash] = item.href.split('#');
+      return location.pathname === path && location.hash === `#${hash}`;
+    }
+    if (item.href.includes('?')) {
+      const [path, query] = item.href.split('?');
+      return location.pathname === path && location.search.includes(query);
+    }
+    if (item.href === '/dashboard') {
+      return location.pathname === '/dashboard' && !location.hash;
+    }
+    if (item.href === '/queue') {
+      return location.pathname === '/queue' && !location.search.includes('view=verification');
+    }
+    if (item.href === '/beneficiaries/register') {
+      return location.pathname === '/beneficiaries/register';
+    }
+    if (item.href === '/beneficiaries') {
       return (
-        location.pathname === '/beneficiaries' ||
-        location.pathname === '/beneficiaries/register' ||
-        location.pathname.startsWith('/beneficiaries/BEN-')
+        (location.pathname === '/beneficiaries' || location.pathname.startsWith('/beneficiaries/BEN-')) &&
+        location.pathname !== '/beneficiaries/register' &&
+        !location.search.includes('view=centres')
       );
     }
-    return location.pathname === itemPath || location.pathname.startsWith(`${itemPath}/`);
+    if (item.href === '/centres') {
+      return location.pathname === '/centres' || (location.pathname === '/beneficiaries' && location.search.includes('view=centres'));
+    }
+    return location.pathname === item.href;
+  };
+
+  const handleNavClick = (href: string) => {
+    if (href.includes('#')) {
+      const [path, hash] = href.split('#');
+      if (location.pathname !== path) {
+        navigate(href);
+      } else {
+        window.location.hash = hash;
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    } else {
+      navigate(href);
+    }
   };
 
   const currentRoleConfig = role ? ROLE_CONFIGS[role] : null;
+  const mockDemoEnabled = isMockDemoEnabled(import.meta.env);
+  const blockMockWorkflow = shouldBlockMockWorkflowForProviderSession(location.pathname, Boolean(supabaseSession));
+  const showMockDataDisclosure = !blockMockWorkflow && shouldShowMockDataDisclosure(
+    location.pathname,
+    Boolean(supabaseSession),
+    mockDemoEnabled,
+  );
+  const demoToolsEnabled = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demoTools') === '1';
 
   return (
-    <div className="min-h-screen bg-[#F5F9FC] text-[#0E1B2B] flex flex-col antialiased selection:bg-[#CFEFD8] selection:text-[#0E1B2B] relative">
+    <div className="min-h-screen bg-[#F5F9FC] text-[#17365D] flex flex-col antialiased selection:bg-[#BBD5F0] selection:text-[#17365D] relative">
       {/* Subtle background gradient wash */}
       <div
-        className="fixed inset-0 pointer-events-none bg-gradient-to-br from-[#CFEFD8]/15 via-[#F5F9FC] to-[#D6E6F7]/25 -z-10"
+        className="fixed inset-0 pointer-events-none bg-gradient-to-br from-[#E8F2FC]/40 via-[#F5F9FC] to-[#F8FBFF]/60 -z-10"
         aria-hidden="true"
       />
 
       {/* Fixed Header Stack */}
       <header className="sticky top-0 z-40 w-full transition-all duration-200">
-        {/* Top Sandbox Notice */}
-        <div className="bg-[#0E1B2B] text-white/90 text-[11px] py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#CFEFD8]" />
-          <span>Student research prototype • 100% synthetic data • Not an official Government of India service</span>
-        </div>
-
         {/* Main Navigation Bar */}
         <div
           className={`w-full transition-all duration-300 border-b ${
@@ -108,34 +216,35 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                   <span className="font-semibold text-sm tracking-tight text-[#0E1B2B] group-hover:text-[#1F8A83] transition-colors leading-none">
                     Poshan Action Layer
                   </span>
-                  <span className="text-[10px] text-[#5B6B7C] font-mono mt-0.5">STUDENT PROTOTYPE</span>
                 </div>
               </Link>
             </div>
 
             {/* Center Navigation Links driven by role permissions */}
-            <nav className="hidden xl:flex items-center gap-1 relative bg-slate-100/70 p-1 rounded-full border border-slate-200/50">
+            <nav className="hidden lg:flex items-center gap-0.5 sm:gap-1 relative bg-slate-100/80 p-1 rounded-full border border-slate-200/60 shadow-xs max-w-3xl overflow-x-auto">
               {navItems.map((item) => {
-                const active = isCurrentActive(item.href);
+                const active = isCurrentActive(item);
+                const Icon = getNavIcon(item.id);
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => navigate(item.href)}
-                    className={`relative px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors z-10 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83] ${
-                      active ? 'text-[#0E1B2B]' : 'text-[#5B6B7C] hover:text-[#0E1B2B]'
+                    onClick={() => handleNavClick(item.href)}
+                    className={`relative px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-full transition-colors z-10 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 whitespace-nowrap ${
+                      active ? 'text-slate-900 font-bold' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {active && (
                       <motion.div
                         layoutId="portalActivePill"
-                        className="absolute inset-0 bg-white rounded-full -z-10 shadow-sm border border-slate-200/40"
+                        className="absolute inset-0 bg-white rounded-full -z-10 shadow-sm border border-slate-200/60"
                         transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                       />
                     )}
+                    <Icon className="w-3.5 h-3.5 shrink-0 opacity-70" />
                     <span>{item.name}</span>
                     {item.scopeBadge && (
-                      <span className="text-[9px] font-mono uppercase bg-slate-200/60 px-1.5 py-0.2 rounded text-slate-600">
+                      <span className="text-[9px] font-mono uppercase bg-blue-100/80 text-blue-800 px-1.5 py-0.5 rounded font-semibold">
                         {item.scopeBadge}
                       </span>
                     )}
@@ -149,7 +258,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
               {isStaff ? (
                 <>
                   {/* Reset Demo Data Action Button */}
-                  <motion.button
+                  {demoToolsEnabled && role !== 'System Administrator' && role !== 'Rule Administrator' && <motion.button
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
                     type="button"
@@ -160,10 +269,10 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                     <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
                     <span className="hidden md:inline">Reset Demo Data</span>
                     <span className="md:hidden text-[11px]">Reset</span>
-                  </motion.button>
+                  </motion.button>}
 
                   {/* Role Persona Badge (No personal names) */}
-                  <Link
+                  {canAccessPath(role, '/profile').allowed && <Link
                     to="/profile"
                     className="hidden sm:flex items-center gap-2 pl-2 pr-3 py-1 bg-slate-100 hover:bg-slate-200/70 rounded-full border border-slate-200 transition-colors"
                     title="View Active Persona Profile"
@@ -180,17 +289,17 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                         {currentRoleConfig?.label || staffUser?.roleLabel}
                       </span>
                     </div>
-                  </Link>
+                  </Link>}
 
                   {/* Switch Persona Button */}
-                  <Link
+                  {mockDemoEnabled && <Link
                     to="/signin"
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F8A83] bg-[#CFEFD8]/40 hover:bg-[#CFEFD8]/80 px-2.5 py-1.5 rounded-full border border-[#1F8A83]/20 transition-colors"
-                    title="Switch demo simulation role"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-[#17365D] bg-[#E8F2FC] hover:bg-[#BBD5F0]/60 px-2.5 py-1.5 rounded-full border border-[#BBD5F0] transition-colors"
+                    title="Switch the browser-local mock demo persona"
                   >
                     <UserCheck className="w-3 h-3" />
-                    <span className="hidden lg:inline">Switch Role</span>
-                  </Link>
+                    <span className="hidden lg:inline">Switch Demo Role</span>
+                  </Link>}
 
                   <motion.button
                     whileHover={{ y: -1 }}
@@ -198,11 +307,21 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                     type="button"
                     onClick={handleSignOut}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 bg-white hover:bg-rose-50 px-2.5 sm:px-3 py-1.5 rounded-full border border-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 shadow-xs"
-                    title="End role simulation session"
+                    title="End browser-local demo session"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Exit Simulation</span>
                   </motion.button>
+                </>
+              ) : supabaseSession ? (
+                <>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-900" title="Provider session; frontend casework remains synthetic demo data">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Authenticated account</span>
+                  </div>
+                  <button type="button" onClick={handleSignOut} className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 bg-white px-2.5 sm:px-3 py-1.5 rounded-full border border-slate-200" title="Sign out of Supabase">
+                    <LogOut className="w-3.5 h-3.5" /><span>Sign Out</span>
+                  </button>
                 </>
               ) : (
                 <>
@@ -216,43 +335,50 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                   </div>
 
                   {/* Role Simulation Sign In Action */}
-                  <Link
+                  {mockDemoEnabled && <Link
                     to="/signin"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#0E1B2B] hover:bg-black px-3.5 py-1.5 rounded-full shadow-xs transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
-                    title="Simulate AWW, Supervisor, CDPO, or DPO persona"
+                    title="Open the browser-local mock-data role demonstration"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#CFEFD8]" />
-                    <span>Role Simulation</span>
-                  </Link>
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#BBD5F0]" />
+                    <span>Staff Sign In</span>
+                  </Link>}
 
                   {/* Return to overview */}
                   <Link
                     to="/"
                     className="hidden sm:inline-flex items-center text-xs font-medium text-[#5B6B7C] hover:text-[#0E1B2B] px-2 py-1 rounded-full hover:bg-slate-100 transition-colors"
                   >
-                    Overview
+                    Back to Home
                   </Link>
                 </>
               )}
             </div>
           </div>
 
-          {/* Mobile / Compact Horizontal Nav Bar */}
-          <div className="xl:hidden flex items-center gap-1 overflow-x-auto px-4 pt-2 pb-1 scrollbar-none border-t border-slate-100 mt-2">
+          {/* Mobile / Tablet Compact Horizontal Nav Bar */}
+          <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto px-4 pt-2.5 pb-1.5 scrollbar-none border-t border-slate-100 mt-2 bg-slate-50/50">
             {navItems.map((item) => {
-              const active = isCurrentActive(item.href);
+              const active = isCurrentActive(item);
+              const Icon = getNavIcon(item.id);
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => navigate(item.href)}
-                  className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap transition-colors flex items-center gap-1 ${
+                  onClick={() => handleNavClick(item.href)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                     active
-                      ? 'bg-white text-[#0E1B2B] shadow-sm border border-slate-200/60'
-                      : 'bg-slate-100/70 text-[#5B6B7C]'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
                   }`}
                 >
+                  <Icon className="w-3.5 h-3.5 shrink-0 opacity-80" />
                   <span>{item.name}</span>
+                  {item.scopeBadge && (
+                    <span className={`text-[9px] font-mono uppercase px-1 rounded ${active ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-600'}`}>
+                      {item.scopeBadge}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -271,7 +397,14 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             <SkeletonShimmer durationMs={400}>
-              {children}
+              {blockMockWorkflow ? (
+                <section className="rounded-3xl border border-amber-200 bg-white p-6" role="status" aria-labelledby="mock-workflow-unavailable-title">
+                  <h1 id="mock-workflow-unavailable-title" className="text-xl font-semibold text-slate-900">This workflow is not connected to your account</h1>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    This screen uses browser-local synthetic demo records. They are unavailable in a provider session and are never substituted for account data.
+                  </p>
+                </section>
+              ) : children}
             </SkeletonShimmer>
           </motion.div>
         </AnimatePresence>
@@ -281,7 +414,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       <footer className="w-full bg-white border-t border-slate-200/70 py-6 px-4 sm:px-6 mt-12 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-center sm:text-left leading-relaxed">
-            Poshan Action Layer • Academic Student Prototype for Frontline Nutrition Monitoring • 100% synthetic data • 2026.
+            Poshan Action Layer · Synthetic data only · 2026.
           </p>
           <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
             <span>Active Scope: {currentRoleConfig ? `${currentRoleConfig.scopeLevel} (${staffUser?.centreCode || staffUser?.sectorCode || staffUser?.projectCode || 'District'})` : 'Public Aggregate'}</span>
@@ -309,7 +442,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                     <RotateCcw className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 id="reset-modal-title" className="font-semibold text-slate-900 text-base leading-snug">
+                    <h3 id="reset-modal-title" className="font-bold text-slate-900 text-base leading-snug">
                       Reset Demo Data to Baseline?
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -332,8 +465,8 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
                   This action will clear all user-created records from your local storage session and restore the original seed dataset:
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-slate-700 font-mono text-[11px]">
-                  <li>133 synthetic beneficiaries (scoped across AWC centres)</li>
-                  <li>35 multi-tier anomaly action cases</li>
+                  <li>600 synthetic beneficiaries (scoped across 5 AWC centres)</li>
+                  <li>Multi-tier anomaly casework queue and priority screening</li>
                   <li>8 configurable anthropometric screening rules</li>
                   <li>Clinical referrals, baseline measurements & audit ledger</li>
                 </ul>

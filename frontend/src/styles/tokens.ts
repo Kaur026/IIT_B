@@ -7,16 +7,23 @@ export const tokens = {
   colors: {
     // Canvas & Typography
     canvas: '#F5F9FC',
-    ink: '#0E1B2B',
-    secondary: '#5B6B7C',
-    muted: '#8A99A8',
-    border: 'rgba(14, 27, 43, 0.08)',
+    ink: '#17365D',
+    secondary: '#52708F',
+    muted: '#52708F',
+    border: '#BBD5F0',
     borderLight: 'rgba(255, 255, 255, 0.6)',
 
-    // Gradient Panel (32px radius, mint to sky with faint radial highlight)
-    mint: '#CFEFD8',
-    sky: '#D6E6F7',
-    panelGradient: 'linear-gradient(135deg, #CFEFD8 0%, #D6E6F7 100%)',
+    // Poshan Light Blue Theme Tokens
+    boxBg: '#E8F2FC',
+    boxBorder: '#BBD5F0',
+    mainText: '#17365D',
+    secondaryText: '#52708F',
+    innerCardBg: '#F8FBFF',
+
+    // Gradient Panel (32px radius, light blue theme)
+    mint: '#BBD5F0',
+    sky: '#E8F2FC',
+    panelGradient: 'linear-gradient(135deg, #E8F2FC 0%, #F8FBFF 100%)',
     panelGradientOverlay: 'radial-gradient(ellipse at 15% 15%, rgba(255, 255, 255, 0.5) 0%, transparent 60%)',
 
     // Status Chips (12% tinted fills, never saturated/neon)
@@ -79,14 +86,14 @@ export const tokens = {
 
     // Legacy compatibility aliases for existing components
     pageBg: '#F5F9FC',
-    textHeading: '#0E1B2B',
-    textBody: '#5B6B7C',
-    textMuted: '#8A99A8',
-    cardBg: '#FFFFFF',
-    cardBgFrosted: 'rgba(255, 255, 255, 0.55)',
-    brandBlue: '#3A6FD8',
-    mintGradientStart: '#CFEFD8',
-    skyGradientEnd: '#D6E6F7',
+    textHeading: '#17365D',
+    textBody: '#17365D',
+    textMuted: '#52708F',
+    cardBg: '#E8F2FC',
+    cardBgFrosted: '#F8FBFF',
+    brandBlue: '#2457F5',
+    mintGradientStart: '#E8F2FC',
+    skyGradientEnd: '#F8FBFF',
   },
 
   radius: {

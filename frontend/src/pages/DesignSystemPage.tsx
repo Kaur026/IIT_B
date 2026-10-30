@@ -36,14 +36,14 @@ export const DesignSystemPage: React.FC = () => {
 
   const chartTones = [
     { name: 'Electric Cobalt', hex: '#2457F5' },
-    { name: 'Soft Sage', hex: '#C9DCCF' },
+    { name: 'Soft Blue Border', hex: '#BBD5F0' },
     { name: 'Cool White', hex: '#F5F7FB' },
     { name: 'Pure White', hex: '#FFFFFF' },
     { name: 'Deep Navy', hex: '#172B4D' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F9FC] text-[#0E1B2B] relative selection:bg-[#CFEFD8] selection:text-[#0E1B2B] pb-24">
+    <div className="min-h-screen bg-[#F5F9FC] text-[#17365D] relative selection:bg-[#BBD5F0] selection:text-[#17365D] pb-24">
       {/* Background radial drift */}
       <div className="ambient-orb-mint w-[600px] h-[600px] -top-40 -left-40" />
       <div className="ambient-orb-sky w-[700px] h-[700px] top-[20%] -right-60" />
@@ -172,7 +172,7 @@ export const DesignSystemPage: React.FC = () => {
                   <span>32px Radius Panel with 4% Film-Grain</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-light tracking-[-0.02em] leading-tight text-[#0E1B2B] mb-4">
-                  Gradient Panel (#CFEFD8 to #D6E6F7)
+                  Gradient Panel (#E8F2FC to #F8FBFF)
                 </h2>
                 <p className="text-sm text-[#0E1B2B]/80 leading-relaxed mb-6">
                   Rendered with radial top-left light highlights and an SVG feTurbulence film-grain overlay blending in multiply mode.
@@ -258,7 +258,7 @@ export const DesignSystemPage: React.FC = () => {
                 <div className="border-b border-black/5 pb-4">
                   <div className="text-xs font-mono text-[#5B6B7C] mb-1">Body • Inter 15/24</div>
                   <p className="text-[15px] leading-6 text-[#5B6B7C] max-w-2xl">
-                    Student research prototype that helps Anganwadi supervisors see which flagged child-nutrition records need attention today.
+                    An interface concept for reviewing flagged child-nutrition records.
                     Flags are never clinical diagnoses; humans verify every field update.
                   </p>
                 </div>
@@ -486,7 +486,7 @@ export const DesignSystemPage: React.FC = () => {
                 className="p-4 rounded-2xl bg-white border border-black/5 hover:border-black/15 hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-4"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#CFEFD8]/60 text-[#0F5E66] flex items-center justify-center font-bold text-xs font-mono">
+                  <div className="w-10 h-10 rounded-full bg-[#E8F2FC] text-[#17365D] border border-[#BBD5F0] flex items-center justify-center font-bold text-xs font-mono">
                     BEN
                   </div>
                   <div>
@@ -598,9 +598,9 @@ export const DesignSystemPage: React.FC = () => {
               </div>
 
               <div className="p-6 space-y-6 flex-1">
-                <div className="p-4 rounded-2xl bg-[#CFEFD8]/30 border border-[#CFEFD8]">
-                  <div className="text-xs font-medium text-[#0F5E66] mb-1">Example Rule R-07 • Demo</div>
-                  <p className="text-xs text-[#0F5E66]/90">
+                <div className="p-4 rounded-2xl bg-[#E8F2FC] border border-[#BBD5F0]">
+                  <div className="text-xs font-medium text-[#17365D] mb-1">Example Rule R-07 • Demo</div>
+                  <p className="text-xs text-[#52708F]">
                     Flagged for physical verification: 8.5 kg to 12.3 kg (+3.8 kg in 28 days).
                   </p>
                 </div>

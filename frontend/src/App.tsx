@@ -15,6 +15,8 @@ import { ReferralsPage } from './pages/ReferralsPage';
 import { RuleSettingsPage } from './pages/RuleSettingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
+import { SyntheticWorkflowPage } from './pages/SyntheticWorkflowPage';
+import { SyntheticOperationsPage } from './pages/SyntheticOperationsPage';
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
             {/* Public Landing & Sign In (Role Simulation) */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/signin" element={<SignInPage />} />
+            <Route path="/synthetic-workflow" element={import.meta.env.DEV ? <SyntheticWorkflowPage /> : <Navigate to="/" replace />} />
+            <Route path="/synthetic-operations" element={import.meta.env.DEV ? <SyntheticOperationsPage /> : <Navigate to="/" replace />} />
 
             {/* Dashboard: Public aggregate-only overview or authenticated role briefing */}
             <Route
@@ -43,6 +47,17 @@ export default function App() {
                 <RoleRoute>
                   <PortalLayout>
                     <BeneficiaryListPage />
+                  </PortalLayout>
+                </RoleRoute>
+              }
+            />
+            {/* 1b. Centre-Wise Operational Overview (Supervisory & CDPO) */}
+            <Route
+              path="/centres"
+              element={
+                <RoleRoute>
+                  <PortalLayout>
+                    <BeneficiaryListPage initialView="centres" />
                   </PortalLayout>
                 </RoleRoute>
               }

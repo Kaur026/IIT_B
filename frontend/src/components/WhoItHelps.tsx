@@ -66,7 +66,7 @@ export const WhoItHelps: React.FC = () => {
       {/* Two Column Header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-16">
         <div className="lg:col-span-7">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#0F172A] tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight leading-tight">
             Designed for every tier of frontline care
           </h2>
         </div>

@@ -26,19 +26,50 @@ import { DataBadge } from '../components/common/DataBadge';
 
 export const ReportsPage: React.FC = () => {
   const { showToast } = useToast();
-  const { isReadOnlyDemo, isStaff, role } = useAuth();
+  const { isReadOnlyDemo, isStaff, role, staffUser } = useAuth();
+  const isAggregateOnly = isReadOnlyDemo || role === 'User';
+  const reportScope = {
+    role,
+    centreCode: staffUser?.centreCode,
+    sectorCode: staffUser?.sectorCode,
+    projectCode: staffUser?.projectCode,
+    actorId: staffUser?.id,
+  };
+  const reportMetrics = mockStore.getMetrics(reportScope);
+  const taskTotal = Math.max(1, reportMetrics.taskCount);
+  const assignedTaskShare = reportMetrics.assignedTasks / taskTotal;
+  const inProgressTaskShare = reportMetrics.inProgressTasks / taskTotal;
+  const closedTaskShare = reportMetrics.closedTasks / taskTotal;
+  const measurementVerificationRate = reportMetrics.measurementCount
+    ? Number(((reportMetrics.verifiedMeasurementCount / reportMetrics.measurementCount) * 100).toFixed(1))
+    : 0;
+  const caseResolutionRate = reportMetrics.pendingCases + reportMetrics.resolvedCases
+    ? Number(((reportMetrics.resolvedCases / (reportMetrics.pendingCases + reportMetrics.resolvedCases)) * 100).toFixed(1))
+    : 0;
+  const referralCompletionRate = reportMetrics.openReferrals + reportMetrics.completedReferrals
+    ? Number(((reportMetrics.completedReferrals / (reportMetrics.openReferrals + reportMetrics.completedReferrals)) * 100).toFixed(1))
+    : 0;
 
   const [selectedAudit, setSelectedAudit] = useState<AuditLedgerEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [auditEntries, setAuditEntries] = useState<AuditLedgerEntry[]>([]);
 
   useEffect(() => {
-    setAuditEntries(mockStore.getAuditLog({ role }));
+    setAuditEntries(mockStore.getAuditLog(reportScope));
     const unsubscribe = mockStore.subscribe(() => {
-      setAuditEntries(mockStore.getAuditLog({ role }));
+      setAuditEntries(mockStore.getAuditLog(reportScope));
     });
     return unsubscribe;
-  }, [role]);
+  }, [role, staffUser]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#audit-log') {
+      const el = document.getElementById('audit-log');
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    }
+  }, []);
 
   const handleDownload = (reportName: string, format: string) => {
     if (format.toUpperCase() === 'PDF') {
@@ -54,41 +85,42 @@ export const ReportsPage: React.FC = () => {
     try {
       let csvContent = '';
       if (reportName.includes('SAM') || reportName.includes('Clinical')) {
-        if (isReadOnlyDemo) {
+        if (isAggregateOnly) {
           // Public mode: Aggregate, non-identifying synthetic summary
-          const headers = ['Facility Level', 'Clinical Category', 'Active Referrals', 'Destination Facility', 'Coordination Role', 'Status'];
+          const headers = ['Reporting Level', 'Clinical Category', 'Active Referrals', 'Status'];
           const rows = [
-            ['ICDS Sector 4', 'Severe Acute Malnutrition (SAM)', 2, 'District NRC Varanasi', 'Sector Lady Supervisor', 'Active Treatment'],
-            ['ICDS Sector 4', 'Moderate Acute Malnutrition (MAM)', 1, 'Primary Health Centre (PHC)', 'ANM / Medical Officer', 'Under Surveillance'],
+            ['District aggregate', 'Synthetic referrals', reportMetrics.openReferrals, 'Open follow-up'],
           ];
           csvContent = exportToCsvString(headers, rows);
         } else {
           // Staff mode: Authorized detailed line list
-          const referrals = mockStore.getReferrals({ role });
+          const referrals = mockStore.getReferrals(reportScope);
           const headers = ['Referral ID', 'Beneficiary ID', 'Age', 'Reason', 'Destination', 'Date', 'Owner', 'Status', 'Outcome'];
           const rows = referrals.map((r) => [r.id, r.beneficiaryId, r.ageDisplay, r.reason, r.destination, r.referralDate, r.owner, r.status, r.finalOutcome || 'Pending']);
           csvContent = exportToCsvString(headers, rows);
         }
       } else if (reportName.includes('Scale') || reportName.includes('Calibration') || reportName.includes('Offset')) {
-        if (isReadOnlyDemo) {
-          // Public mode: Aggregate center-level calibration summary
-          const headers = ['Sector Zone', 'AWC Centre', 'Inspected Scales', 'Calibrated Zero Tare', 'Compliance Rate', 'Certified Date'];
+        if (isAggregateOnly) {
+          // Aggregate mode: one synthetic district total with no centre-level rows.
+          const measurements = role === 'DPO' || role === 'User' || !role
+            ? mockStore.getMeasurements()
+            : mockStore.getMeasurements(undefined, reportScope);
+          const orderedDates = measurements.map((measurement) => measurement.date).sort();
+          const latestMeasurementDate = orderedDates[orderedDates.length - 1] || 'No measurements';
+          const headers = ['Reporting Level', 'Measurements', 'Verified Measurements', 'Verification Rate', 'Latest Measurement Date'];
           const rows = [
-            ['Kashi Gramin', 'AWC-701', 3, 3, '100%', '2026-10-20'],
-            ['Kashi Gramin', 'AWC-702', 3, 3, '100%', '2026-10-22'],
-            ['Kashi Gramin', 'AWC-703', 2, 2, '100%', '2026-10-21'],
-            ['Kashi Gramin', 'AWC-704', 3, 3, '100%', '2026-10-23'],
+            ['District aggregate', reportMetrics.measurementCount, reportMetrics.verifiedMeasurementCount, `${measurementVerificationRate}%`, latestMeasurementDate],
           ];
           csvContent = exportToCsvString(headers, rows);
         } else {
           // Staff mode: Case-level line list
-          const cases = mockStore.getCases({ role });
+          const cases = mockStore.getCases(reportScope);
           const headers = ['Action ID', 'Beneficiary ID', 'Rule Code', 'Rule Name', 'Prev Weight', 'Flagged Weight', 'Delta', 'Status', 'Verified Weight'];
           const rows = cases.map((c) => [c.actionId, c.id, c.ruleCode, c.ruleName, c.prevWeight, c.flaggedWeight, c.weightDelta, c.status, c.verifiedWeight || 'Pending']);
           csvContent = exportToCsvString(headers, rows);
         }
       } else {
-        if (isReadOnlyDemo) {
+        if (isAggregateOnly) {
           // Public mode: Anonymized aggregate audit entries
           const headers = ['Audit ID', 'Timestamp', 'Center ID', 'Cohort Group', 'Staff Actor', 'Action Type', 'Delta Summary', 'Proof Status'];
           const rows = auditEntries.map((e, idx) => [
@@ -135,10 +167,10 @@ export const ReportsPage: React.FC = () => {
   };
 
   const handleRefreshActivity = () => {
-    setAuditEntries(mockStore.getAuditLog({ role }));
+    setAuditEntries(mockStore.getAuditLog(reportScope));
     showToast(
       'Activity Refreshed',
-      'Tamper-evident audit trail synchronized with local sector session cache.',
+      'Reloaded synthetic entries from the browser-local demo store.',
       'info'
     );
   };
@@ -167,21 +199,16 @@ export const ReportsPage: React.FC = () => {
           <div className="flex items-center gap-2 mb-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Cryptographic Accountability Trail</span>
+              <span>Synthetic Audit Log · Demo Only</span>
             </div>
-            {isReadOnlyDemo && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-semibold text-[#2457F5]">
-                <span>Demo Mode — Synthetic Data</span>
-              </span>
-            )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
             Activity Log &amp; Sector Reports
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
-            {isReadOnlyDemo
-              ? 'Aggregated monthly indicators, resolution distributions, and non-identifying synthetic sector reports for AWC #702.'
-              : 'Reconciled monthly indicators, supervisory resolution distribution, and exportable line-lists for Poshan Tracker integration and district reviews.'}
+            {isAggregateOnly
+              ? 'Aggregate-only synthetic indicators and illustrative reports. Individual audit rows are restricted.'
+              : 'Browser-local synthetic indicators, supervisory workflow records, and exports. No backend connection is active.'}
           </p>
         </div>
 
@@ -210,7 +237,7 @@ export const ReportsPage: React.FC = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.08 }}
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 p-6 sm:p-8 shadow-sm"
+        className="bg-[#E8F2FC] rounded-[28px] border border-[#BBD5F0] p-6 sm:p-8 shadow-sm"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Donut Chart (5 cols) */}
@@ -218,7 +245,6 @@ export const ReportsPage: React.FC = () => {
             <div className="relative w-44 h-44 shrink-0">
               <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                 <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F1F5F9" strokeWidth="11" />
-                {/* 68% Typos (Blue) */}
                 <motion.circle
                   cx="50"
                   cy="50"
@@ -228,10 +254,9 @@ export const ReportsPage: React.FC = () => {
                   strokeWidth="11"
                   strokeDasharray="238.76"
                   initial={{ strokeDashoffset: 238.76 }}
-                  animate={{ strokeDashoffset: 238.76 * (1 - 0.68) }}
+                  animate={{ strokeDashoffset: 238.76 * (1 - assignedTaskShare) }}
                   transition={{ duration: 1.1, ease: 'easeOut' }}
                 />
-                {/* 22% NRC (Purple) */}
                 <motion.circle
                   cx="50"
                   cy="50"
@@ -240,16 +265,15 @@ export const ReportsPage: React.FC = () => {
                   stroke="#A855F7"
                   strokeWidth="11"
                   strokeDasharray="238.76"
-                  strokeDashoffset={238.76 * (1 - 0.22)}
+                  strokeDashoffset={238.76 * (1 - inProgressTaskShare)}
                   style={{
                     transformOrigin: '50% 50%',
-                    transform: 'rotate(244.8deg)',
+                    transform: `rotate(${assignedTaskShare * 360}deg)`,
                   }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                 />
-                {/* 10% Active (Green) */}
                 <motion.circle
                   cx="50"
                   cy="50"
@@ -258,10 +282,10 @@ export const ReportsPage: React.FC = () => {
                   stroke="#10B981"
                   strokeWidth="11"
                   strokeDasharray="238.76"
-                  strokeDashoffset={238.76 * (1 - 0.1)}
+                  strokeDashoffset={238.76 * (1 - closedTaskShare)}
                   style={{
                     transformOrigin: '50% 50%',
-                    transform: 'rotate(324deg)',
+                    transform: `rotate(${(assignedTaskShare + inProgressTaskShare) * 360}deg)`,
                   }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -269,9 +293,9 @@ export const ReportsPage: React.FC = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-2xl font-light text-[#0F172A] tracking-tight">38</span>
+                <span className="text-2xl font-light text-[#0F172A] tracking-tight">{reportMetrics.taskCount}</span>
                 <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                  Resolved
+                  Tasks
                 </span>
               </div>
             </div>
@@ -279,18 +303,18 @@ export const ReportsPage: React.FC = () => {
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#2457F5]" />
-                <span className="font-semibold text-slate-700">68%</span>
-                <span className="text-slate-500">Data Entry Typos Corrected</span>
+                <span className="font-semibold text-slate-700">{(assignedTaskShare * 100).toFixed(1)}%</span>
+                <span className="text-slate-500">Assigned tasks</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-purple-500" />
-                <span className="font-semibold text-slate-700">22%</span>
-                <span className="text-slate-500">Clinical Escalations / NRC</span>
+                <span className="font-semibold text-slate-700">{(inProgressTaskShare * 100).toFixed(1)}%</span>
+                <span className="text-slate-500">Tasks in progress</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span className="font-semibold text-slate-700">10%</span>
-                <span className="text-slate-500">Active Field Re-weighs</span>
+                <span className="font-semibold text-slate-700">{(closedTaskShare * 100).toFixed(1)}%</span>
+                <span className="text-slate-500">Closed tasks</span>
               </div>
             </div>
           </div>
@@ -300,13 +324,13 @@ export const ReportsPage: React.FC = () => {
             <div>
               <div className="flex justify-between text-xs mb-1">
                 <span className="font-medium text-slate-700">Supervisory Physical Verification Coverage</span>
-                <span className="font-bold text-[#0F172A]">94.7% (38 / 40 cases)</span>
+                <span className="font-bold text-[#0F172A]">{caseResolutionRate}% ({reportMetrics.resolvedCases} / {reportMetrics.pendingCases + reportMetrics.resolvedCases} cases)</span>
               </div>
               <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-emerald-500 rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: '94.7%' }}
+                  animate={{ width: `${caseResolutionRate}%` }}
                   transition={{ duration: 1.0, ease: 'easeOut' }}
                 />
               </div>
@@ -314,14 +338,14 @@ export const ReportsPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-700">Spring Scale Calibration Spot-Check Adherence</span>
-                <span className="font-bold text-[#0F172A]">100% (6 / 6 AWCs)</span>
+                <span className="font-medium text-slate-700">Recorded Measurement Verification</span>
+                <span className="font-bold text-[#0F172A]">{measurementVerificationRate}% ({reportMetrics.verifiedMeasurementCount} / {reportMetrics.measurementCount})</span>
               </div>
               <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-blue-600 rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
+                  animate={{ width: `${measurementVerificationRate}%` }}
                   transition={{ duration: 1.0, ease: 'easeOut', delay: 0.1 }}
                 />
               </div>
@@ -329,14 +353,14 @@ export const ReportsPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-700">NRC Severe Malnutrition Referral Turnaround</span>
-                <span className="font-bold text-[#0F172A]">1.2 days (Target &lt; 2.0d)</span>
+                <span className="font-medium text-slate-700">Completed Referral Follow-ups</span>
+                <span className="font-bold text-[#0F172A]">{referralCompletionRate}% ({reportMetrics.completedReferrals} / {reportMetrics.openReferrals + reportMetrics.completedReferrals})</span>
               </div>
               <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-purple-500 rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: '85%' }}
+                  animate={{ width: `${referralCompletionRate}%` }}
                   transition={{ duration: 1.0, ease: 'easeOut', delay: 0.2 }}
                 />
               </div>
@@ -347,39 +371,39 @@ export const ReportsPage: React.FC = () => {
 
       {/* 4 Scheduled Sector Reports Cards */}
       <div>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
           Scheduled Sector Dossiers & Exports
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
-              title: 'Monthly Sector Reconciliation (MPR)',
-              subtitle: `October 2026 • ${mockStore.getMetrics().total} Beneficiaries`,
-              desc: 'Official monthly progress register reconciling nutrition indicators across Rampur AWCs.',
+              title: isAggregateOnly ? 'District Aggregate Reconciliation' : 'Monthly Sector Reconciliation (MPR)',
+              subtitle: `October 2026 • ${mockStore.getMetrics(reportScope).total} Beneficiaries`,
+              desc: isAggregateOnly ? 'Synthetic district-level aggregate indicators. Individual records are not included.' : 'Synthetic monthly progress register for the assigned organizational scope.',
               format: 'PDF',
               badge: 'Consolidated',
               badgeColor: 'bg-emerald-100 text-emerald-800',
             },
             {
-              title: 'Frontline Scale Offset Analysis',
-              subtitle: 'AWW Calibration Spot-Checks',
-              desc: 'Identifies terminal digit preference and spring scale tare drift across 6 center zones.',
+              title: isAggregateOnly ? 'District Equipment Calibration Summary' : 'Frontline Scale Offset Analysis',
+              subtitle: isAggregateOnly ? 'District-wide synthetic aggregate' : 'AWW Calibration Spot-Checks',
+              desc: isAggregateOnly ? 'Aggregate calibration counts only; centre-level rows and individual records are omitted.' : 'Synthetic terminal digit and spring scale summaries for the assigned scope.',
               format: 'CSV',
               badge: 'Quality Audit',
               badgeColor: 'bg-blue-100 text-blue-800',
             },
             {
-              title: 'SAM / MAM Clinical Line List',
-              subtitle: 'Active Medical Referrals',
-              desc: 'Detailed line list of 3 children undergoing therapeutic care with Sector PHC MO.',
+              title: isAggregateOnly ? 'Clinical Referral Aggregate Summary' : 'SAM / MAM Clinical Line List',
+              subtitle: isAggregateOnly ? 'District-level aggregate only' : 'Active Medical Referrals',
+              desc: isAggregateOnly ? 'Synthetic referral counts by broad category only; no beneficiary, case, or referral details.' : 'Synthetic detailed referral report for the assigned organizational scope.',
               format: 'CSV',
               badge: 'High Priority',
               badgeColor: 'bg-rose-100 text-rose-800',
             },
             {
-              title: 'Supervisory SLA Compliance Audit',
-              subtitle: 'Frontline Timeliness Scorecard',
-              desc: 'Immutable verification turnaround timestamps for district administrative review.',
+              title: isAggregateOnly ? 'District SLA Compliance Summary' : 'Supervisory SLA Compliance Audit',
+              subtitle: isAggregateOnly ? 'Aggregate indicators only' : 'Frontline Timeliness Scorecard',
+              desc: isAggregateOnly ? 'Synthetic district-level SLA aggregates. Individual audit history is restricted.' : 'Synthetic verification turnaround summary for the assigned organizational scope.',
               format: 'PDF',
               badge: 'Governance',
               badgeColor: 'bg-purple-100 text-purple-800',
@@ -391,7 +415,7 @@ export const ReportsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: idx * 0.06 }}
               whileHover={{ y: -2, transition: { duration: 0.15 } }}
-              className="bg-white/85 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              className="bg-[#E8F2FC] rounded-2xl p-5 border border-[#BBD5F0] shadow-sm flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -423,14 +447,15 @@ export const ReportsPage: React.FC = () => {
 
       {/* Frontline Action Ledger Table with Hash Inspection Popover */}
       <motion.div
+        id="audit-log"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.25 }}
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 shadow-sm overflow-hidden"
+        className="bg-[#E8F2FC] rounded-[28px] border border-[#BBD5F0] shadow-sm overflow-hidden"
       >
         <div className="p-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="font-semibold text-sm text-[#0F172A]">
+            <h2 className="font-bold text-sm text-[#0F172A]">
               Frontline Verification Audit Ledger
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -459,13 +484,13 @@ export const ReportsPage: React.FC = () => {
                 <th className="py-3 px-4">Action Type</th>
                 <th className="py-3 px-4">Operator</th>
                 <th className="py-3 px-4">Biometric Delta</th>
-                <th className="py-3 px-4">Audit Proof / Inspect</th>
+                <th className="py-3 px-4">Demo Record / Inspect</th>
                 <th className="py-3 px-5 text-right">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredLedger.map((row) => (
-                <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
+            {filteredLedger.map((row) => (
+                <tr key={row.id} className="hover:bg-[#F8FBFF] transition-colors">
                   <td className="py-3.5 px-5"><DataBadge variant="date" className="font-mono tabular-nums">{row.timestamp}</DataBadge></td>
                   <td className="py-3.5 px-4">
                     <div className="flex flex-wrap gap-1.5">
@@ -500,7 +525,8 @@ export const ReportsPage: React.FC = () => {
                     </span>
                   </td>
                 </tr>
-              ))}
+            ))}
+            {filteredLedger.length === 0 && <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-500">{isAggregateOnly ? 'Individual audit entries are restricted for aggregate-only access.' : 'No audit entries match this search.'}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -508,7 +534,7 @@ export const ReportsPage: React.FC = () => {
 
       {/* Cryptographic Proof Inspection Popover / Modal with Esc Close */}
       <AnimatePresence>
-        {selectedAudit && (
+        {!isAggregateOnly && selectedAudit && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
@@ -527,7 +553,7 @@ export const ReportsPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-emerald-600" />
                   <h3 className="font-semibold text-sm text-[#0F172A]">
-                    Inspect Cryptographic Audit Proof
+                    Inspect Synthetic Audit Record
                   </h3>
                 </div>
                 <button
@@ -557,24 +583,24 @@ export const ReportsPage: React.FC = () => {
                   <DataBadge variant="date" className="font-mono">{selectedAudit.timestamp}</DataBadge>
                 </div>
                 <div className="pt-2 border-t border-slate-200">
-                  <span className="text-slate-500 block mb-1">SHA-256 Ledger Hash Digest:</span>
+                  <span className="text-slate-500 block mb-1">Illustrative demo token (not cryptographic proof):</span>
                   <span className="font-mono text-[10px] break-all bg-white p-2 rounded block border border-slate-200 text-slate-700">
-                    4f9c1b3e7789a2046dbf71a93821ce30aef02c7b508f2ac419d8820f891bca42
+                    {selectedAudit.proofHash}
                   </span>
                 </div>
               </div>
 
-              {isReadOnlyDemo && (
+              {isAggregateOnly && (
                 <div className="p-3 bg-blue-50 rounded-2xl border border-blue-200 text-blue-900 text-xs flex items-start gap-2">
                   <Lock className="w-4 h-4 text-[#2457F5] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold">Privacy Governance:</span> In public demo mode, personal child names and IDs are replaced with anonymized cohort identifiers. Authorized staff can sign in to view identifiable casework records.
+                    <span className="font-semibold">Aggregate-only view:</span> Individual records are hidden. No external identity provider is configured.
                   </div>
                 </div>
               )}
 
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                This verification event was physically countersigned using supervisory mobile key at AWC #702 Kashi Gramin (demo).
+                This record exists only in the browser-local synthetic demo store. It does not prove a real-world event or signature.
               </p>
 
               <div className="flex justify-end">

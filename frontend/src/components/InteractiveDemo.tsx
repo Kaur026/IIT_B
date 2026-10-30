@@ -120,7 +120,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
       {/* Two Column Header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-12">
         <div className="lg:col-span-7">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#0F172A] tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight leading-tight">
             From flag to resolved case
           </h2>
         </div>
@@ -182,9 +182,9 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
           })}
 
           {/* Core Principle Callout */}
-          <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-blue-50/60 border border-emerald-100 text-xs text-slate-600 leading-relaxed">
+          <div className="mt-4 p-4 rounded-2xl bg-[#E8F2FC] border border-[#BBD5F0] text-xs text-[#52708F] leading-relaxed">
             <div className="flex items-center gap-1.5 font-semibold text-slate-900 mb-1">
-              <ShieldAlert className="w-4 h-4 text-emerald-600 shrink-0" />
+              <ShieldAlert className="w-4 h-4 text-blue-600 shrink-0" />
               <span>Immutable Ledger Principle</span>
             </div>
             Original readings remain preserved in the central record for retrospective audit. Human
@@ -193,7 +193,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
         </div>
 
         {/* Right Column: Large Interactive Card with Before/After Slider (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_12px_40px_rgba(15,23,42,0.06)] border border-slate-100 flex flex-col gap-6">
+        <div className="lg:col-span-8 bg-[#E8F2FC] rounded-[28px] p-6 sm:p-8 shadow-[0_12px_40px_rgba(23,54,93,0.06)] border border-[#BBD5F0] flex flex-col gap-6">
           {/* Top Metadata Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
@@ -209,7 +209,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
                   Demo Record
                 </span>
               </div>
-              <h3 className="text-xl font-medium text-slate-900 tracking-tight mt-1">
+              <h3 className="text-xl font-semibold text-slate-900 tracking-tight mt-1">
                 {activeCase.flagTitle}
               </h3>
             </div>
@@ -293,13 +293,13 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
 
               {/* Right Side: Verified reading (clipped by sliderPosition) */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-slate-50 p-6 flex flex-col justify-between"
+                className="absolute inset-0 bg-gradient-to-br from-[#E8F2FC] via-[#F8FBFF] to-white p-6 flex flex-col justify-between"
                 style={{
                   clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`,
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="inline-block px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-semibold text-xs ml-auto">
+                  <span className="inline-block px-2.5 py-1 rounded-md bg-[#F8FBFF] text-blue-800 border border-[#BBD5F0] font-semibold text-xs ml-auto">
                     Verified Measurement
                   </span>
                 </div>
@@ -310,16 +310,16 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
                   </div>
                   <div className="text-sm text-slate-600 mt-1">
                     Height: <span className="font-medium">{activeCase.verifiedReading.heightCm} cm</span>
-                    <span className="ml-2 font-mono text-xs font-semibold text-emerald-700">
+                    <span className="ml-2 font-mono text-xs font-semibold text-blue-700">
                       (Correction: {weightDiff.formatted})
                     </span>
                   </div>
-                  <p className="text-xs text-emerald-800 bg-emerald-100/70 p-2.5 rounded-xl mt-3 font-medium leading-snug text-left">
+                  <p className="text-xs text-slate-700 bg-slate-100 p-2.5 rounded-xl mt-3 font-medium leading-snug text-left border border-slate-200">
                     {activeCase.verifiedReading.note}
                   </p>
                 </div>
 
-                <div className="text-[11px] text-emerald-700 font-mono text-right">
+                <div className="text-[11px] text-blue-700 font-mono text-right">
                   Verified by: {activeCase.assignedTo} on {activeCase.verifiedReading.date}
                 </div>
               </div>
@@ -437,7 +437,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onOpenDemo }) 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs font-medium flex items-center gap-2"
+                className="p-3 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl text-xs font-medium flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{feedbackMessage}</span>

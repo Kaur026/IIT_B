@@ -1,6 +1,6 @@
 {
   "name": "Remix Remix Remix Poshan Action Layer",
-  "description": "Student research prototype for frontline Anganwadi casework, verification workflows, and plausible growth monitoring.",
+  "description": "Casework workflow concepts using synthetic data. Not a government service.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

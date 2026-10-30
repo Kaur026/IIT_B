@@ -1,4 +1,4 @@
-"""End-to-end tests for BE2's added safety/workflow routes (synthetic only)."""
+﻿"""End-to-end tests for BE2's added safety/workflow routes (synthetic only)."""
 
 import tempfile
 import unittest
@@ -33,6 +33,7 @@ class CompleteWorkflowApiTests(unittest.TestCase):
         self.app = create_app(
             store=self.store,
             seed_demo=True,
+            auth_mode="demo",
             closure_policies=DEMO_CLOSURE_POLICY,
             maternal_enabled=True,
             maternal_allowed_roles=("supervisor",),
@@ -115,7 +116,7 @@ class CompleteWorkflowApiTests(unittest.TestCase):
 
     def test_closure_fails_closed_without_approved_case_policy(self):
         store = PrototypeStore(":memory:")
-        app = create_app(store=store, seed_demo=True, closure_policies={}, offline_queue_dir=Path(self.temp.name) / "empty")
+        app = create_app(store=store, seed_demo=True, auth_mode="demo", closure_policies={}, offline_queue_dir=Path(self.temp.name) / "empty")
         client = TestClient(app)
         try:
             created = client.post("/api/tasks", headers=self.sup, json={"flag_id": "FLAG-C0001-BASELINE"})
@@ -149,7 +150,8 @@ class CompleteWorkflowApiTests(unittest.TestCase):
             ("attend", {}, "attended"),
             ("record_outcome", {"outcome_code": "appointment_recorded"}, "outcome_recorded"),
         ):
-            result = self.client.post(f"/api/referrals/{referral_id}/actions", headers=self.worker, json={
+            action_headers = self.sup if action == "record_outcome" else self.worker
+            result = self.client.post(f"/api/referrals/{referral_id}/actions", headers=action_headers, json={
                 "action": action, "on": "2026-10-15", **extra,
             })
             self.assertEqual(result.status_code, 200, result.text)
@@ -157,6 +159,24 @@ class CompleteWorkflowApiTests(unittest.TestCase):
         self.assertEqual(len(self.store.list_audit(entity_type="referral", entity_id=referral_id)), 4)
 
     def test_access_exception_is_coded_human_review_and_audited(self):
+        # Workers may report a coded process barrier only for their assigned case.
+        self.store.add_beneficiary({
+            "beneficiary_id": "C-OTHER", "centre_id": "AWC-001",
+            "assigned_worker_id": "W08", "source_row": {"beneficiary_id": "C-OTHER"},
+        })
+        other_case = self.client.post("/api/access-exceptions", headers=self.worker, json={
+            "beneficiary_id": "C-OTHER", "exception_type": "document_unavailable",
+        })
+        self.assertEqual(other_case.status_code, 403, other_case.text)
+        self.assertEqual(self.store.list_audit(entity_type="access_exception"), [])
+
+        # Reporting roles without create permission cannot open exceptions.
+        unauthorized = self.client.post("/api/access-exceptions", headers={"X-Demo-Actor": "demo-nodal"}, json={
+            "beneficiary_id": "C0001", "exception_type": "document_unavailable",
+        })
+        self.assertEqual(unauthorized.status_code, 403, unauthorized.text)
+        self.assertEqual(self.store.list_audit(entity_type="access_exception"), [])
+
         created = self.client.post("/api/access-exceptions", headers=self.worker, json={
             "beneficiary_id": "C0001", "exception_type": "pending_mobile_verification",
             "on": "2026-10-15",
@@ -172,6 +192,12 @@ class CompleteWorkflowApiTests(unittest.TestCase):
             "aadhaar_number": "not-stored",
         })
         self.assertEqual(bad.status_code, 422)
+
+        worker_resolve = self.client.post(f"/api/access-exceptions/{record['exception_id']}/resolve", headers=self.worker, json={
+            "resolution_code": "manual_review_completed", "on": "2026-10-16",
+        })
+        self.assertEqual(worker_resolve.status_code, 403, worker_resolve.text)
+        self.assertEqual(len(self.store.list_audit(entity_type="access_exception", entity_id=record["exception_id"])), 1)
 
         resolved = self.client.post(f"/api/access-exceptions/{record['exception_id']}/resolve", headers=self.sup, json={
             "resolution_code": "manual_review_completed", "on": "2026-10-16",
@@ -212,7 +238,7 @@ class CompleteWorkflowApiTests(unittest.TestCase):
 
     def test_maternal_route_defaults_disabled(self):
         store = PrototypeStore(":memory:")
-        app = create_app(store=store, seed_demo=True, maternal_enabled=False)
+        app = create_app(store=store, seed_demo=True, auth_mode="demo", maternal_enabled=False)
         client = TestClient(app)
         try:
             response = client.post("/api/maternal-followups", headers=self.sup, json={

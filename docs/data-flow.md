@@ -2,6 +2,8 @@
 
 ## Frontend journey
 
+The original Dashboard, Action Queue, and Referrals routes use browser-local `mockStore`; each remains an explicitly synthetic demo. In development builds, links open `/synthetic-workflow` or `/synthetic-operations`, separate pages that call B2 through `frontend/src/services/b2Api.ts`. They require a provider session and an active profile returned by B2. B2 currently has no configured trusted authentication adapters, so protected API requests remain unavailable with the required disabled-auth setting. No mock records are substituted when B2 fails, and no demo IDs are mapped to B2 IDs.
+
 ```mermaid
 flowchart TD
   Visit[Open /] --> Landing[Landing page]
@@ -15,7 +17,7 @@ flowchart TD
   PublicDash --> Store
 ```
 
-The route list and route guards are in `frontend/src/App.tsx` and `context/AuthContext.tsx`; session roles are simulated by the UI. Public dashboard access and browser persistence do not imply backend access control or durable shared records. Some screens are illustrative; inspect their implementation before treating a displayed workflow as a connected service.
+The original demo route list and role guards are in `frontend/src/App.tsx` and `context/AuthContext.tsx`; those role labels are UI state and do not imply backend access control or durable shared records. The synthetic workspace uses the provider session token for the server profile/API request, but that is not sufficient for access until B2 can resolve trusted assignments and scope.
 
 ## B1 input, checks, decisions, and settings
 
@@ -53,11 +55,11 @@ flowchart TD
   Conflict -. no remote transport .-> Server[Caller-provided in-memory server snapshot]
 ```
 
-Task/referral operations are direct Python calls. `sync.py` can persist a local queue and reconcile against an in-memory state passed by a caller; it does not connect to an actual server. Roles/capacity checks are separate helpers and require callers to invoke them. The escalation timing documented in Member 3's handoff is a placeholder assumption, not validated operational or clinical guidance.
+The B2 FastAPI prototype exposes routes for saved workflow operations using the local SQLite prototype store. `sync.py` can persist a local queue and reconcile against an in-memory state passed by a caller; it does not connect to an actual server. Protected API access defaults to disabled. Do not enable demo identities in the normal application. Roles/capacity helpers are not frontend authentication. The escalation timing documented in Member 3's handoff is a placeholder assumption, not validated operational or clinical guidance.
 
 ## Validation and errors
 
-B1 checks return issue dictionaries with codes, messages, suggestions, and affected measurements; rule settings raise `RuleSettingsError` for invalid requests. B2 functions validate arguments and raise module-specific `ValueError` subclasses; task/referral objects remain caller-managed. Frontend casework utilities validate local inputs and the UI reports interactions through toast/context patterns. None of these error paths crosses a network boundary because no API exists.
+B1 checks return issue dictionaries with codes, messages, suggestions, and affected measurements; rule settings raise `RuleSettingsError` for invalid requests. B2 functions validate arguments and raise module-specific `ValueError` subclasses; the FastAPI wrapper returns JSON errors and sanitizes request validation details. Original demo pages validate local inputs and report local interactions; separate synthetic workspace pages validate B2 responses and verify writes with fresh reads where the contract supports it. See [backend/frontend contract](backend-frontend-contract.md) and [synthetic operations contract](synthetic-operations-contract.md).
 
 ## Testing and execution flow
 
@@ -67,7 +69,7 @@ flowchart LR
   nplint[npm run lint] --> TS[TypeScript no-emit check]
   npbuild[npm run build] --> Vite[Vite production bundle]
   B1test[python B1/test_be1.py] --> Temp[Temporary copied B1 data]
-  B2test[python -m unittest B2.test_tasks B2.test_day2 -v] --> B2checks[B2 unit tests]
+  B2test[python -m unittest B2.test_beneficiaries B2.test_authorization B2.test_tasks B2.test_day2 -v] --> B2checks[non-API unit tests]
 ```
 
 The checks are separate and do not validate an end-to-end integrated flow. See root setup commands and module READMEs.

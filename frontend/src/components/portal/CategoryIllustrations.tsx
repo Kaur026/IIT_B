@@ -1,6 +1,7 @@
 import React from 'react';
 
 export type CategoryType =
+  | 'children'
   | 'pregnant'
   | 'lactating'
   | 'children0to6m'
@@ -15,6 +16,7 @@ interface CategoryIllustrationProps {
 }
 
 export const CATEGORY_IMAGE_PATHS: Record<CategoryType, string> = {
+  children: '/assets/categories/children-6m-3y.svg',
   pregnant: '/assets/categories/pregnant-women.svg',
   lactating: '/assets/categories/lactating-mothers.svg',
   children0to6m: '/assets/categories/children-0-6m.svg',
@@ -24,6 +26,7 @@ export const CATEGORY_IMAGE_PATHS: Record<CategoryType, string> = {
 };
 
 export const CATEGORY_ALT_TEXTS: Record<CategoryType, string> = {
+  children: 'Illustration of children receiving age-appropriate nutrition and care',
   pregnant: 'Illustration of pregnant woman with supportive maternal care',
   lactating: 'Illustration of lactating mother cradling and nursing newborn infant',
   children0to6m: 'Illustration of infant 0-6 months swaddled in cradle',

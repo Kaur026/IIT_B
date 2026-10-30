@@ -12,6 +12,11 @@ from B2.demo_clock import DateLike, parse_date
 from B2.tasks import OUTCOME_OPTIONS
 
 
+def _canonical_confirmation_role(role: str) -> str:
+    value = str(role or "").strip().lower()
+    return {"worker": "aww", "supervisor": "ls", "anm_block": "ls"}.get(value, value)
+
+
 class ClosureError(ValueError):
     """Raised when a closure policy or confirmation is invalid/incomplete."""
 
@@ -43,6 +48,8 @@ def policy_for(policies: dict, case_type: str):
             return None
         seen.add(key)
         valid.append({"key": key.strip(), "role": role.strip()})
+    if len({_canonical_confirmation_role(item["role"]) for item in valid}) < 2:
+        return None
     return {"policy_version": version.strip(),
             "case_type": case_type, "confirmations": valid,
             "outcome_required": selected.get("outcome_required", True) is True}
@@ -59,7 +66,7 @@ def record_confirmation(confirmations: list, policy: dict, confirmation_key: str
     required = next((item for item in policy["confirmations"] if item["key"] == key), None)
     if required is None:
         raise ClosureError("confirmation_key is not required by the approved policy.")
-    if role != required["role"]:
+    if _canonical_confirmation_role(role) != _canonical_confirmation_role(required["role"]):
         raise ClosureError("actor role does not match the required confirmation role.")
     if not actor:
         raise ClosureError("actor_id is required.")

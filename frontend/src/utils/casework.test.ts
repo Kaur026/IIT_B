@@ -11,8 +11,18 @@ import {
   exportToCsvString,
   DEMO_CURRENT_DATE,
   ESCALATION_TIERS,
+  getTodayISODate,
 } from './casework.ts';
 import { mockStore } from '../store/mockStore.ts';
+import { canAccessPath, canPerformAction, canRenderVerificationAction, getNavItemsForRole, isUserRole, isValidDemoPersona, ROLE_CONFIGS, PERMISSION_MATRIX } from './permissions.ts';
+import { isMockBackedRoute, shouldBlockMockWorkflowForProviderSession, shouldShowMockDataDisclosure } from './dataSourcePresentation.ts';
+import { readFileSync } from 'node:fs';
+
+const dateAfterDays = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
 
 test('calculateWeightDifference calculates accurate diff and formatting', () => {
   const result = calculateWeightDifference(14.2, 10.4);
@@ -56,6 +66,22 @@ test('calculateAge calculates exact completed months and cohorts', () => {
   assert.equal(infant.completedYears, 0);
   assert.equal(infant.cohort, 'children0to6m');
   assert.equal(infant.recommendedMeasurementPosture, 'recumbent');
+
+  const sixMonthBoundary = calculateAge('2026-04-24', DEMO_CURRENT_DATE);
+  assert.equal(sixMonthBoundary.completedMonths, 6);
+  assert.equal(sixMonthBoundary.cohort, 'children6mTo3y');
+
+  const threeYearBoundary = calculateAge('2023-10-24', DEMO_CURRENT_DATE);
+  assert.equal(threeYearBoundary.completedMonths, 36);
+  assert.equal(threeYearBoundary.cohort, 'children3to6y');
+
+  const adolescentGirl = calculateAge('2016-10-24', DEMO_CURRENT_DATE, 'adolescent', 'Female');
+  assert.equal(adolescentGirl.completedYears, 10);
+  assert.equal(adolescentGirl.cohort, 'adolescentGirls');
+
+  const twentiethBirthday = calculateAge('2006-10-24', DEMO_CURRENT_DATE, 'adolescent', 'Female');
+  assert.equal(twentiethBirthday.completedYears, 20);
+  assert.notEqual(twentiethBirthday.cohort, 'adolescentGirls');
 
   // Toddler 14 months old (DOB: 2025-08-10)
   const toddler = calculateAge('2025-08-10', DEMO_CURRENT_DATE);
@@ -173,12 +199,10 @@ test('Escalation tiers progress through 4 levels with validation', () => {
   assert.equal(tier4.allowed, false);
 });
 
-import { canAccessPath, canPerformAction, canRenderVerificationAction, getNavItemsForRole, ROLE_CONFIGS, PERMISSION_MATRIX } from './permissions.ts';
-
-test('Action Queue does not render the verification submit action for DPO or other unauthorized roles', () => {
+test('Only an independent LS can render the measurement verification action', () => {
   assert.equal(canRenderVerificationAction('DPO'), false);
   assert.equal(canRenderVerificationAction('CDPO'), false);
-  assert.equal(canRenderVerificationAction('AWW'), true);
+  assert.equal(canRenderVerificationAction('AWW'), false);
   assert.equal(canRenderVerificationAction('LS'), true);
 });
 
@@ -209,7 +233,7 @@ test('mockStore maintains internal consistency, registration, and reset', () => 
   assert.ok(metrics.total >= 130);
   assert.equal(metrics.pendingCases, cases.filter((c) => !c.isVerified).length);
 
-  // Test registration creates beneficiary and baseline measurement
+  // Registration stores birth weight but does not invent an anthropometric measurement.
   const regResult = mockStore.addBeneficiary({
     dob: '2026-04-10',
     gender: 'Female',
@@ -225,8 +249,7 @@ test('mockStore maintains internal consistency, registration, and reset', () => 
   assert.equal(found?.centreCode, 'AWC-702');
 
   const measurements = mockStore.getMeasurements(regResult.id);
-  assert.equal(measurements.length, 1);
-  assert.equal(measurements[0].weightKg, 3.1);
+  assert.equal(measurements.length, 0);
 
   // Test reset restores canonical state
   mockStore.resetToDemoSeed();
@@ -266,7 +289,7 @@ test('mockStore rejects invalid and duplicate measurements without mutating stor
     }
   }
 
-  for (const measurementDate of ['', '2026-2-03', '2026-02-31', '2026-10-25']) {
+  for (const measurementDate of ['', '2026-2-03', '2026-02-31', dateAfterDays(1)]) {
     const result = mockStore.recordMeasurement({
       beneficiaryId: registration.id,
       weightKg: 3.2,
@@ -283,9 +306,18 @@ test('mockStore rejects invalid and duplicate measurements without mutating stor
     weightKg: 3.2,
     heightCm: 50.5,
   }, { role: 'AWW', actorId: 'AWW-409' });
-  assert.equal(omittedDate.success, false);
-  assert.match(omittedDate.error || '', /already exists/);
-  assert.equal(snapshot(), baselineSnapshot);
+  assert.equal(omittedDate.success, true);
+  assert.equal(mockStore.getMeasurements(registration.id)[0].date, getTodayISODate());
+  const afterOmittedDateSnapshot = snapshot();
+
+  const duplicateToday = mockStore.recordMeasurement({
+    beneficiaryId: registration.id,
+    weightKg: 3.3,
+    heightCm: 51,
+  }, { role: 'AWW', actorId: 'AWW-409' });
+  assert.equal(duplicateToday.success, false);
+  assert.match(duplicateToday.error || '', /already exists/);
+  assert.equal(snapshot(), afterOmittedDateSnapshot);
 
   const first = mockStore.recordMeasurement({
     beneficiaryId: registration.id,
@@ -370,7 +402,7 @@ test('DPO is view-only for case and referral mutations while existing role permi
   });
   const before = snapshot();
 
-  assert.equal(canPerformAction('AWW', 're_measure'), true);
+  assert.equal(canPerformAction('AWW', 're_measure'), false);
   assert.equal(canPerformAction('LS', 're_measure'), true);
   assert.equal(canPerformAction('LS', 'escalate'), true);
   assert.equal(canPerformAction('CDPO', 'assign_owner'), true);
@@ -402,6 +434,7 @@ test('referral closure requires an explicitly confirmed outcome and meaningful n
     gender: 'Female',
     category: 'child_under_6',
     centreCode: 'AWC-702',
+    birthWeight: 3.1,
   }, { role: 'AWW', actorId: 'AWW-409' });
   assert.ok(beneficiary.id);
   for (let index = 0; index < 3; index += 1) {
@@ -409,7 +442,7 @@ test('referral closure requires an explicitly confirmed outcome and meaningful n
       beneficiaryId: beneficiary.id,
       reason: `Synthetic referral fixture ${index + 1}`,
       destination: 'Primary Health Centre (PHC)',
-      dueDate: '2026-10-31',
+      dueDate: dateAfterDays(1),
     }, { role: 'AWW', actorId: 'AWW-409' });
     assert.ok(fixtureReferral.success);
   }
@@ -417,7 +450,7 @@ test('referral closure requires an explicitly confirmed outcome and meaningful n
     beneficiaryId: beneficiary.id,
     reason: 'Synthetic test referral',
     destination: 'Primary Health Centre (PHC)',
-    dueDate: '2026-10-31',
+    dueDate: dateAfterDays(1),
   }, { role: 'AWW', actorId: 'AWW-409' });
   assert.ok(created.success && created.referralId);
   assert.notEqual(created.referralId, 'REF-507', 'resolution test uses an isolated synthetic ID, not the pending REF-507 context record');
@@ -461,38 +494,33 @@ test('referral closure requires an explicitly confirmed outcome and meaningful n
 
 test('AWW referral creation and follow-up are scoped to the worker centre', () => {
   mockStore.resetToDemoSeed();
-  const beneficiary = mockStore.addBeneficiary({
-    dob: '2025-01-01',
-    gender: 'Female',
-    category: 'child_under_6',
-    centreCode: 'AWC-999',
-  }, { role: 'LS', actorId: 'LS-01' });
-  assert.ok(beneficiary.id);
+  const beneficiary = mockStore.getBeneficiaries().find((item) => item.centreCode === 'AWC-703');
+  assert.ok(beneficiary);
   const referral = mockStore.createReferral({
-    beneficiaryId: beneficiary.id,
+    beneficiaryId: beneficiary!.id,
     reason: 'Synthetic centre-scope test',
     destination: 'Primary Health Centre (PHC)',
-    dueDate: '2026-10-31',
+    dueDate: dateAfterDays(1),
   }, { role: 'LS', actorId: 'LS-01' });
   assert.ok(referral.success && referral.referralId);
 
   const snapshot = JSON.stringify({
-    beneficiary: mockStore.getBeneficiaryById(beneficiary.id),
+    beneficiary: mockStore.getBeneficiaryById(beneficiary!.id),
     referral: mockStore.getReferralById(referral.referralId!),
     audit: mockStore.getAuditLog(),
   });
   assert.equal(mockStore.createReferral({
-    beneficiaryId: beneficiary.id,
+    beneficiaryId: beneficiary!.id,
     reason: 'Unauthorized cross-centre test',
     destination: 'Primary Health Centre (PHC)',
-    dueDate: '2026-10-31',
+    dueDate: dateAfterDays(1),
   }, { role: 'AWW', actorId: 'AWW-409', centreCode: 'AWC-702' }).success, false);
   assert.equal(mockStore.addFollowUpAttempt(referral.referralId!, {
     method: 'Phone Call',
     findings: 'Unauthorized cross-centre follow-up test.',
   }, { role: 'AWW', actorId: 'AWW-409', centreCode: 'AWC-702' }), false);
   assert.equal(JSON.stringify({
-    beneficiary: mockStore.getBeneficiaryById(beneficiary.id),
+    beneficiary: mockStore.getBeneficiaryById(beneficiary!.id),
     referral: mockStore.getReferralById(referral.referralId!),
     audit: mockStore.getAuditLog(),
   }), snapshot, 'cross-centre rejections must not mutate referral, beneficiary, or audit data');
@@ -543,7 +571,8 @@ test('public demo displays synchronized shared metrics across dashboard, benefic
 
   // 1. Beneficiary total matches
   assert.equal(beneficiaries.length, metrics.total, 'Total beneficiaries in list must match dashboard total');
-  assert.equal(metrics.total, 133, 'Total synthetic beneficiaries is 133');
+  assert.equal(metrics.total, 600, 'Total synthetic beneficiaries is 600');
+  assert.equal(metrics.adolescentGirls, 50, 'Adolescent girls have a separate count');
 
   // 2. Cohort breakdown sum equals total
   const cohortSum =
@@ -558,12 +587,22 @@ test('public demo displays synchronized shared metrics across dashboard, benefic
   assert.ok(metrics.children6mTo3y > 0, 'Toddlers 6m-3y count is positive');
   assert.ok(metrics.children3to6y > 0, 'Children 3-6y count is positive');
   assert.equal(metrics.totalChildren, metrics.children0to6m + metrics.children6mTo3y + metrics.children3to6y);
+  const categoryPercentages = [
+    metrics.children0to6m,
+    metrics.children6mTo3y,
+    metrics.children3to6y,
+    metrics.adolescentGirls,
+    metrics.pregnantWomen,
+    metrics.lactatingMothers,
+  ].map((count) => Number(((count / metrics.total) * 100).toFixed(1)));
+  assert.ok(Math.abs(categoryPercentages.reduce((sum, percentage) => sum + percentage, 0) - 100) <= 0.1);
 
   // 3. Casework metrics match
   assert.equal(cases.length, 35, 'Total action queue cases is 35');
   assert.equal(cases.filter((c) => !c.isVerified).length, metrics.pendingCases);
   assert.equal(cases.filter((c) => c.priority === 'Urgent' && !c.isVerified).length, metrics.urgentCases);
-  assert.equal(referrals.length, 3, 'Total clinical referrals is 3');
+  assert.equal(referrals.length, 7, 'Seeded referrals and generated workflow records are all included');
+  assert.equal(referrals.filter((referral) => referral.status !== 'Completed').length, metrics.openReferrals);
 });
 
 test('role-based access control and navigation conforms to permission matrix', () => {
@@ -583,7 +622,7 @@ test('role-based access control and navigation conforms to permission matrix', (
   assert.equal(canAccessPath('AWW', '/reports').allowed, false, 'AWW cannot access audit ledger');
   assert.equal(canAccessPath('AWW', '/rules').allowed, false, 'AWW cannot access rules settings');
   assert.equal(canPerformAction('AWW', 'record_measurement'), true);
-  assert.equal(canPerformAction('AWW', 're_measure'), true);
+  assert.equal(canPerformAction('AWW', 're_measure'), false, 'AWW cannot verify or approve measurements');
   assert.equal(canPerformAction('AWW', 'assign_owner'), false);
   assert.equal(canPerformAction('AWW', 'edit_rules'), false);
 
@@ -594,16 +633,107 @@ test('role-based access control and navigation conforms to permission matrix', (
   assert.equal(canPerformAction('LS', 'assign_owner'), true);
   assert.equal(canPerformAction('LS', 'edit_rules'), false, 'LS can only view rules');
 
-  // CDPO: can edit rules and assign owners; cannot record field measurements
-  assert.equal(canPerformAction('CDPO', 'edit_rules'), true);
+  // CDPO can coordinate tasks but cannot directly change screening rules.
+  assert.equal(canPerformAction('CDPO', 'edit_rules'), false);
   assert.equal(canPerformAction('CDPO', 'assign_owner'), true);
   assert.equal(canPerformAction('CDPO', 'record_measurement'), false);
 
-  // DPO: view-only for casework mutations
+  // Rule Administrator may draft and submit but no role can approve until authority is configured.
+  assert.equal(canPerformAction('Rule Administrator', 'draft_rule_change'), true);
+  assert.equal(canPerformAction('Rule Administrator', 'submit_rule_change'), true);
+  assert.equal(canPerformAction('Rule Administrator', 'approve_rule_change'), false);
+  assert.equal(canPerformAction('System Administrator', 'manage_users'), true);
+  assert.equal(canPerformAction('System Administrator', 'view_beneficiary_detail'), false);
+
+  // DPO: aggregate only by default, with no beneficiary detail or casework routes.
   assert.equal(canPerformAction('DPO', 'record_measurement'), false);
   assert.equal(canPerformAction('DPO', 'assign_owner'), false);
   assert.equal(canPerformAction('DPO', 'edit_rules'), false);
   assert.equal(canAccessPath('DPO', '/reports').allowed, true);
+  assert.equal(canAccessPath('DPO', '/beneficiaries').allowed, false);
+  assert.equal(canAccessPath('DPO', '/queue').allowed, false);
+  assert.equal(canAccessPath('DPO', '/referrals').allowed, false);
+
+  assert.equal(canAccessPath('User', '/dashboard').allowed, true);
+  assert.equal(canAccessPath('User', '/beneficiaries').allowed, false);
+  assert.equal(canAccessPath('Rule Administrator', '/rules').allowed, true);
+  assert.equal(canAccessPath('System Administrator', '/admin/users').allowed, false);
+  assert.equal(canAccessPath('CDPO', '/unlisted-route').allowed, false);
+});
+
+test('every demo role receives only routes allowed by its policy, including direct URLs', () => {
+  const paths = [
+    '/dashboard', '/beneficiaries', '/beneficiaries/register', '/beneficiaries/BEN-0142',
+    '/measurements', '/queue', '/referrals', '/reports', '/rules', '/profile', '/centres', '/admin/users',
+  ];
+  const allowed: Record<string, string[]> = {
+    User: ['/dashboard'],
+    AWW: ['/dashboard', '/beneficiaries', '/beneficiaries/register', '/beneficiaries/BEN-0142', '/measurements', '/queue', '/referrals', '/profile'],
+    LS: ['/dashboard', '/beneficiaries', '/beneficiaries/BEN-0142', '/measurements', '/queue', '/referrals', '/reports', '/rules', '/profile', '/centres'],
+    CDPO: ['/dashboard', '/beneficiaries', '/beneficiaries/BEN-0142', '/measurements', '/queue', '/referrals', '/reports', '/rules', '/profile', '/centres'],
+    DPO: ['/dashboard', '/reports', '/profile', '/centres'],
+    'System Administrator': ['/dashboard', '/rules', '/reports', '/profile', '/centres'],
+    'Rule Administrator': ['/dashboard', '/rules', '/reports', '/profile'],
+  };
+
+  for (const [role, permittedPaths] of Object.entries(allowed)) {
+    for (const path of paths) {
+      assert.equal(canAccessPath(role as any, path).allowed, permittedPaths.includes(path), `${role} direct navigation to ${path}`);
+    }
+    for (const item of getNavItemsForRole(role as any)) {
+      assert.equal(canAccessPath(role as any, item.href).allowed, true, `${role} navigation item ${item.href} must be allowed by the route guard`);
+    }
+  }
+
+  assert.deepEqual(getNavItemsForRole('LS').map((item) => item.name), [
+    'Dashboard',
+    'Beneficiaries',
+    'Measurement Review',
+    'Verification Queue',
+    'My Cases',
+    'Referrals & Follow-ups',
+    'Reports',
+    'Staff Profile',
+  ]);
+  assert.deepEqual(getNavItemsForRole('CDPO').map((item) => item.name), [
+    'Dashboard',
+    'Beneficiaries',
+    'All Centres',
+    'Measurement Monitoring',
+    'Action Queue',
+    'Referrals',
+    'Reports',
+    'Staff Profile',
+  ]);
+  assert.deepEqual(getNavItemsForRole('DPO').map((item) => item.name), [
+    'District Overview',
+    'Centre Performance',
+    'Beneficiary Statistics',
+    'Screening Trends',
+    'Referrals Overview',
+    'Reports',
+    'Audit Logs',
+    'Staff Profile',
+  ]);
+  assert.deepEqual(getNavItemsForRole('System Administrator').map((item) => item.name), [
+    'Dashboard',
+    'Audit Logs',
+    'Staff Profile',
+  ]);
+  assert.deepEqual(getNavItemsForRole('Rule Administrator').map((item) => item.name), [
+    'Dashboard',
+    'Rule Settings',
+    'Screening Test Bench',
+    'Rule Test Results',
+    'Audit Logs',
+    'Staff Profile',
+  ]);
+  assert.equal(canAccessPath('DPO', '/profile').allowed, true, 'DPO can view staff profile');
+  assert.equal(canAccessPath('DPO', '/beneficiaries').allowed, false, 'DPO cannot access beneficiary line records');
+  assert.equal(canAccessPath('DPO', '/queue').allowed, false, 'DPO cannot access casework action queue');
+  assert.equal(canAccessPath('DPO', '/measurements').allowed, false, 'DPO cannot access measurement entry');
+  assert.equal(canAccessPath('System Administrator', '/beneficiaries/BEN-0142').allowed, false);
+  assert.equal(canAccessPath('Rule Administrator', '/queue').allowed, false);
 });
 
 test('store selectors scope data by role and centreCode', () => {
@@ -616,8 +746,23 @@ test('store selectors scope data by role and centreCode', () => {
 
   // CDPO sees all beneficiaries across the sector/project
   const allBens = mockStore.getBeneficiaries({ role: 'CDPO' });
-  assert.equal(allBens.length, 133);
+  assert.equal(allBens.length, 600);
   assert.ok(allBens.length >= awwBens.length);
+
+  const lsBens = mockStore.getBeneficiaries({ role: 'LS', sectorCode: 'Sector-4' });
+  assert.ok(lsBens.length >= awwBens.length);
+  assert.ok(lsBens.every((b) => ['AWC-702', 'AWC-703', 'AWC-704'].includes(b.centreCode)));
+  assert.equal(mockStore.getBeneficiaries({ role: 'LS', sectorCode: 'Other-Sector' }).length, 0);
+  assert.equal(mockStore.getBeneficiaries({ role: 'DPO' }).length, 0, 'DPO detail selector is aggregate-only');
+  assert.equal(mockStore.getMetrics({ role: 'DPO' }).total, 600, 'DPO may receive aggregate counts');
+  assert.equal(mockStore.getAuditLog({ role: 'DPO' }).length, 0, 'DPO cannot see identifiable audit rows by default');
+  assert.equal(mockStore.getBeneficiaries({ role: 'User' }).length, 0);
+  assert.equal(mockStore.getCases({ role: 'User' }).length, 0);
+  assert.equal(mockStore.getReferrals({ role: null }).length, 0);
+  assert.equal(mockStore.getMeasurements(undefined, { role: 'DPO' }).length, 0);
+  assert.ok(mockStore.getMeasurements(undefined, { role: 'AWW', centreCode: 'AWC-702' }).every((measurement) => mockStore.getBeneficiaryById(measurement.beneficiaryId)?.centreCode === 'AWC-702'));
+  assert.equal(mockStore.getBeneficiaries({ role: 'System Administrator' }).length, 0);
+  assert.equal(mockStore.getCases({ role: 'Rule Administrator' }).length, 0);
 
   // AWW cannot view audit ledger (returns empty list)
   const awwAudit = mockStore.getAuditLog({ role: 'AWW' });
@@ -626,6 +771,36 @@ test('store selectors scope data by role and centreCode', () => {
   // LS can view full audit ledger
   const lsAudit = mockStore.getAuditLog({ role: 'LS' });
   assert.ok(lsAudit.length > 0);
+  assert.equal(mockStore.getAuditLog({ role: 'LS', sectorCode: 'Other-Sector' }).length, 0);
+});
+
+test('mock mutations reject registration and casework outside role scope', () => {
+  mockStore.resetToDemoSeed();
+  const outsideCentre = mockStore.getBeneficiaries().find((item) => item.centreCode === 'AWC-703');
+  const caseItem = mockStore.getCases().find((item) => item.centreCode === 'AWC-702');
+  assert.ok(outsideCentre && caseItem);
+  const before = JSON.stringify({ beneficiaries: mockStore.getBeneficiaries(), cases: mockStore.getCases(), measurements: mockStore.getMeasurements(), audit: mockStore.getAuditLog() });
+
+  const lsRegistration = mockStore.addBeneficiary({
+    dob: '2025-01-01', gender: 'Female', category: 'child_under_6', centreCode: 'AWC-702',
+  }, { role: 'LS', actorId: 'LS-01' });
+  assert.equal(lsRegistration.id, '', 'LS cannot use the beneficiary registration operation');
+  assert.equal(mockStore.recordMeasurement({ beneficiaryId: outsideCentre!.id, weightKg: 8, heightCm: 77, measurementDate: '2026-10-24' }, { role: 'AWW', actorId: 'AWW-409', centreCode: 'AWC-702' }).success, false);
+  assert.equal(mockStore.verifyCase(caseItem!.actionId, 8, 77, 'Synthetic out-of-sector attempt', { role: 'LS', sectorCode: 'Other-Sector' }), false);
+  assert.equal(JSON.stringify({ beneficiaries: mockStore.getBeneficiaries(), cases: mockStore.getCases(), measurements: mockStore.getMeasurements(), audit: mockStore.getAuditLog() }), before);
+});
+
+test('demo persona validation rejects unknown roles and altered identifiers', () => {
+  const createdAt = '2026-10-24T12:00:00.000Z';
+  const valid = { id: ROLE_CONFIGS.AWW.defaultId, role: 'AWW', roleLabel: ROLE_CONFIGS.AWW.label, signedInAt: createdAt };
+  assert.equal(isUserRole('AWW'), true);
+  assert.equal(isUserRole('District Superuser'), false);
+  assert.equal(isValidDemoPersona(valid), true);
+  assert.equal(isValidDemoPersona({ ...valid, id: 'AWW-OTHER' }), false);
+  assert.equal(isValidDemoPersona({ ...valid, role: 'Administrator' }), false);
+  assert.equal(canAccessPath('District Superuser' as any, '/dashboard').allowed, false);
+  assert.equal(canAccessPath('System Administrator', '/beneficiaries').allowed, false);
+  assert.equal(canAccessPath('Rule Administrator', '/rules').allowed, true);
 });
 
 test('report exports use synthetic IDs only and zero personal names', () => {
@@ -653,4 +828,48 @@ test('guided workflow defines the 6-step closed-loop lifecycle from flag to clos
   assert.match(workflowSteps[3], /Escalation/);
   assert.match(workflowSteps[4], /Outcome/);
   assert.match(workflowSteps[5], /Audit/);
+});
+
+test('dashboard and beneficiary workflows use only the browser-local synthetic dataset', () => {
+  const dashboard = readFileSync(new URL('../pages/DashboardPage.tsx', import.meta.url), 'utf8');
+  const mockDashboard = readFileSync(new URL('../pages/MockDashboardView.tsx', import.meta.url), 'utf8');
+  const beneficiaries = readFileSync(new URL('../pages/BeneficiaryListPage.tsx', import.meta.url), 'utf8');
+  const measurements = readFileSync(new URL('../pages/MeasurementPage.tsx', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../App.tsx', import.meta.url), 'utf8');
+  const queue = readFileSync(new URL('../pages/ActionQueuePage.tsx', import.meta.url), 'utf8');
+  const referrals = readFileSync(new URL('../pages/ReferralsPage.tsx', import.meta.url), 'utf8');
+  const operations = readFileSync(new URL('../pages/SyntheticOperationsPage.tsx', import.meta.url), 'utf8');
+  const portal = readFileSync(new URL('../components/portal/PortalLayout.tsx', import.meta.url), 'utf8');
+  assert.match(dashboard, /MockDashboardView as DashboardPage/);
+  assert.match(mockDashboard, /mockStore\.getMetrics/);
+  assert.match(beneficiaries, /mockStore\.getBeneficiaries/);
+  assert.match(measurements, /mockStore\.getBeneficiaries/);
+  assert.doesNotMatch([beneficiaries, measurements].join('\n'), /PreparedRecordsViews|preparedRecordsApi|preparedDataApi/);
+  assert.doesNotMatch(app, /B1ChildExplorerPage|prepared-preview/);
+  assert.doesNotMatch(portal, /Prepared Data Overview|prepared dataset|prepared source files/);
+  assert.match(queue, /mockStore\.getCases/);
+  assert.match(referrals, /mockStore\.getReferrals/);
+  assert.doesNotMatch(portal, /Browser-local mock data and actions only/);
+  assert.match(portal, /shouldShowMockDataDisclosure/);
+  assert.doesNotMatch(portal, /deterministic browser-local synthetic records only/);
+  assert.equal(shouldShowMockDataDisclosure('/dashboard', false, true), false, 'dashboard labels its synthetic mode directly');
+  assert.equal(shouldShowMockDataDisclosure('/beneficiaries', true, true), false, 'provider beneficiary view is unavailable rather than replaced with account data');
+  assert.equal(shouldShowMockDataDisclosure('/measurements', true, true), false, 'provider measurement view is unavailable rather than replaced with account data');
+  assert.equal(shouldShowMockDataDisclosure('/beneficiaries', false, true), true, 'the development demo path is visibly distinguished');
+  assert.equal(shouldShowMockDataDisclosure('/queue', true, false), true, 'mock workflows stay labelled even during provider sessions and production builds');
+  assert.equal(shouldShowMockDataDisclosure('/referrals', false, false), false, 'production without demo mode does not display demo pages');
+  assert.equal(operations.includes('mockStore'), false);
+  assert.match(operations, /No local demo records are used as a substitute/);
+  assert.match(operations, /B2 accepted the action, but a fresh referral-list read did not confirm/);
+});
+
+test('provider sessions cannot see browser-local workflows while retaining existing role restrictions', () => {
+  for (const path of ['/queue', '/referrals', '/reports', '/rules', '/profile', '/beneficiaries/register', '/beneficiaries/BEN-0142']) {
+    assert.equal(isMockBackedRoute(path), true, `${path} is a mock-backed screen`);
+    assert.equal(shouldBlockMockWorkflowForProviderSession(path, true), true, `${path} is blocked for provider sessions`);
+  }
+  for (const providerOnlyPath of ['/beneficiaries', '/measurements', '/dashboard']) {
+    assert.equal(shouldBlockMockWorkflowForProviderSession(providerOnlyPath, true), false, `${providerOnlyPath} retains its existing auth-scoped page behavior`);
+  }
+  assert.equal(shouldBlockMockWorkflowForProviderSession('/queue', false), false, 'the separate local demo path is preserved');
 });

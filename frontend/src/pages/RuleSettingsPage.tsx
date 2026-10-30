@@ -61,6 +61,16 @@ export const RuleSettingsPage: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const target = window.location.hash.slice(1);
+      const el = document.getElementById(target);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    }
+  }, []);
+
   // Esc key dismiss for Rule Inspector drawer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -81,7 +91,7 @@ export const RuleSettingsPage: React.FC = () => {
       return;
     }
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot toggle screening rules. Restricted to CDPO (view-only for other roles).`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot toggle screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
       return;
     }
     const r = rules.find((x) => x.id === ruleId);
@@ -104,7 +114,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleSaveRuleConfig = () => {
     if (!selectedRule) return;
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Restricted to CDPO.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
       return;
     }
     if (ruleThreshold <= 0 || ruleThreshold > 50) {
@@ -117,7 +127,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleConfirmedSave = () => {
     if (!selectedRule) return;
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Restricted to CDPO.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
       return;
     }
     mockStore.updateRuleThreshold(selectedRule.id, ruleThreshold, { actorId: staffUser?.id, role });
@@ -133,7 +143,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleCreateNewRule = (e: React.FormEvent) => {
     e.preventDefault();
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot create screening rules. Restricted to CDPO.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot create screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
       return;
     }
     if (!newRuleName.trim()) return;
@@ -177,7 +187,7 @@ export const RuleSettingsPage: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-[#2457F5]" />
             Non-Clinical Screening Engine
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
             Data Quality & Rule Settings
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
@@ -190,7 +200,7 @@ export const RuleSettingsPage: React.FC = () => {
           {!canEdit && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600">
               <Lock className="w-3.5 h-3.5 text-slate-400" />
-              <span>View Only — Rule editing requires CDPO access</span>
+              <span>View only — rule changes are unavailable until submission and approval are configured</span>
             </div>
           )}
           {canEdit && (
@@ -215,7 +225,7 @@ export const RuleSettingsPage: React.FC = () => {
             suffix: ' rules',
             subtext: '100% human-verified alerts',
             icon: Sliders,
-            badgeColor: 'bg-emerald-100 text-emerald-800',
+            badgeColor: 'bg-[#F8FBFF] text-blue-700 border border-[#BBD5F0]',
           },
           {
             label: 'Anomalies Caught (30d)',
@@ -223,7 +233,7 @@ export const RuleSettingsPage: React.FC = () => {
             suffix: ' triggers',
             subtext: '42 typos fixed • 5 clinical escalations',
             icon: ShieldAlert,
-            badgeColor: 'bg-blue-100 text-blue-800',
+            badgeColor: 'bg-[#F8FBFF] text-blue-700 border border-[#BBD5F0]',
           },
           {
             label: 'False Positive Ratio',
@@ -232,7 +242,7 @@ export const RuleSettingsPage: React.FC = () => {
             suffix: '%',
             subtext: 'Down from 12.8% after tuning',
             icon: CheckCircle2,
-            badgeColor: 'bg-purple-100 text-purple-800',
+            badgeColor: 'bg-[#F8FBFF] text-purple-700 border border-[#BBD5F0]',
           },
           {
             label: 'Supervisor SLA Compliance',
@@ -241,7 +251,7 @@ export const RuleSettingsPage: React.FC = () => {
             suffix: '%',
             subtext: 'Verified within 48h turnaround',
             icon: Clock,
-            badgeColor: 'bg-amber-100 text-amber-800',
+            badgeColor: 'bg-[#F8FBFF] text-amber-700 border border-[#BBD5F0]',
           },
         ].map((card, idx) => {
           const Icon = card.icon;
@@ -252,7 +262,7 @@ export const RuleSettingsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: idx * 0.06 }}
               whileHover={{ y: -2, transition: { duration: 0.15 } }}
-              className="bg-white/85 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              className="bg-[#E8F2FC] rounded-2xl p-5 border border-[#BBD5F0] shadow-sm flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-slate-500">{card.label}</span>
@@ -277,7 +287,7 @@ export const RuleSettingsPage: React.FC = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.2 }}
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 shadow-sm overflow-hidden"
+        id="rule-catalog" className="bg-[#E8F2FC] rounded-[28px] border border-[#BBD5F0] shadow-sm overflow-hidden"
       >
         {/* Category Filter Pills */}
         <div className="p-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -418,6 +428,209 @@ export const RuleSettingsPage: React.FC = () => {
         </div>
       </motion.div>
 
+      {/* 2. Interactive Screening Rule Test Bench Section (id="test-bench") */}
+      <motion.section
+        id="test-bench"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.25 }}
+        className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-5"
+        aria-label="Screening Test Bench"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
+                <Sliders className="w-4 h-4" />
+              </div>
+              <h2 className="text-base font-bold text-slate-900">
+                Interactive Screening Test Bench (Heuristic Sandbox)
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Simulate anthropometric variance and evaluate how screening rules intercept anomalies in real-time.
+            </p>
+          </div>
+          <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200 self-start sm:self-auto font-semibold">
+            Live Simulation Engine
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          {/* Left Inputs (7 cols) */}
+          <div className="md:col-span-7 space-y-4">
+            <div className="grid grid-cols-2 gap-3.5">
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  Previous Measured Weight (kg)
+                </label>
+                <input
+                  type="number"
+                  step="0.05"
+                  value={testPrevWeight}
+                  onChange={(e) => setTestPrevWeight(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  Current Measured Weight (kg)
+                </label>
+                <input
+                  type="number"
+                  step="0.05"
+                  value={testCurrWeight}
+                  onChange={(e) => setTestCurrWeight(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span>Rule Sensitivity Threshold (kg)</span>
+                <span className="font-mono text-blue-700">{ruleThreshold.toFixed(1)} kg</span>
+              </div>
+              <input
+                type="range"
+                min="0.5"
+                max="5.0"
+                step="0.1"
+                value={ruleThreshold}
+                onChange={(e) => setRuleThreshold(parseFloat(e.target.value))}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+              <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
+                <span>0.5 kg (High Sensitivity)</span>
+                <span>2.5 kg (Default)</span>
+                <span>5.0 kg (Low Sensitivity)</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+              ℹ️ Tests monthly weight velocity heuristic (Rule RUL-01 / RUL-03). In live frontline operation, anomalous readings exceeding the sensitivity threshold trigger immediate physical verification tasks.
+            </p>
+          </div>
+
+          {/* Right Simulation Output (5 cols) */}
+          <div className="md:col-span-5 bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 p-4 space-y-3 flex flex-col justify-between">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                Real-Time Simulation Output
+              </span>
+
+              <div className="mt-2 space-y-2 text-xs">
+                <div className="flex justify-between pb-1.5 border-b border-slate-100">
+                  <span className="text-slate-600">Evaluated Delta (Δ):</span>
+                  <span className={`font-mono font-bold ${testDelta < 0 ? 'text-rose-700' : 'text-slate-800'}`}>
+                    {testDelta >= 0 ? `+${testDelta.toFixed(2)}` : testDelta.toFixed(2)} kg
+                  </span>
+                </div>
+
+                <div className="flex justify-between pb-1.5 border-b border-slate-100">
+                  <span className="text-slate-600">Active Threshold:</span>
+                  <span className="font-mono font-semibold text-slate-700">{ruleThreshold.toFixed(2)} kg</span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-slate-700 font-semibold">Anomaly Intercept Status:</span>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    willFire
+                      ? 'bg-rose-100 text-rose-800 border border-rose-200 animate-pulse'
+                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                  }`}>
+                    {willFire ? '🚨 FLAG TRIGGERED' : '✓ NORMAL PROGRESSION'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={`p-3 rounded-xl border text-xs leading-relaxed ${
+              willFire ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-slate-50 border-slate-200 text-slate-800'
+            }`}>
+              {willFire ? (
+                <>
+                  <strong>Protocol Action:</strong> Biometric variance exceeds {ruleThreshold} kg. Automatically generates Tier-1 verification task assigned to sector supervisor.
+                </>
+              ) : (
+                <>
+                  <strong>Protocol Action:</strong> Biometric variance is within expected developmental parameters. Measurement automatically consolidated into longitudinal curve.
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* 3. Rule Test Results & 30-Day Firing Performance (id="rule-test-results") */}
+      <motion.section
+        id="rule-test-results"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.3 }}
+        className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4"
+        aria-label="Rule Test Results"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              Rule Test &amp; Firing Verification Results (30-Day Evaluation)
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Empirical triage outcomes, supervisory verification rates, and algorithm precision metrics across all 8 rules.
+            </p>
+          </div>
+          <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 font-mono">
+            Overall Precision: 95.8%
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-500 font-medium">
+                <th className="py-2.5 px-3">Rule ID</th>
+                <th className="py-2.5 px-3">Rule Heuristic Name</th>
+                <th className="py-2.5 px-3 text-right">30d Alerts</th>
+                <th className="py-2.5 px-3 text-right">Verified Genuine</th>
+                <th className="py-2.5 px-3 text-right">Tare Typo</th>
+                <th className="py-2.5 px-3 text-right">Precision %</th>
+                <th className="py-2.5 px-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-mono">
+              {[
+                { id: 'RUL-01', name: 'Rapid Weight Drop (Velocity)', count: 14, genuine: 11, typo: 3, precision: 92.8, status: 'Calibrated' },
+                { id: 'RUL-02', name: 'Negative Height Velocity', count: 6, genuine: 1, typo: 5, precision: 98.2, status: 'Calibrated' },
+                { id: 'RUL-03', name: 'Growth Stagnation (2 Consecutive)', count: 19, genuine: 17, typo: 2, precision: 94.7, status: 'Optimal' },
+                { id: 'RUL-04', name: 'Terminal Digit Clustering (.0/.5)', count: 8, genuine: 7, typo: 1, precision: 96.0, status: 'Calibrated' },
+                { id: 'RUL-05', name: 'Implausible Weight Spike (>3 kg)', count: 5, genuine: 0, typo: 5, precision: 100.0, status: 'Optimal' },
+                { id: 'RUL-06', name: 'Severe Acute Malnutrition (MUAC)', count: 4, genuine: 4, typo: 0, precision: 100.0, status: 'Optimal' },
+                { id: 'RUL-07', name: 'Maternal BMI Underweight (<18.5)', count: 12, genuine: 11, typo: 1, precision: 91.6, status: 'Active' },
+                { id: 'RUL-08', name: 'Adolescent Anemia / SAG Check', count: 7, genuine: 6, typo: 1, precision: 95.0, status: 'Active' },
+              ].map((res) => (
+                <tr key={res.id} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="py-3 px-3 font-bold text-slate-900">
+                    <DataBadge variant="rule">{res.id}</DataBadge>
+                  </td>
+                  <td className="py-3 px-3 text-slate-700 font-sans font-medium">{res.name}</td>
+                  <td className="py-3 px-3 text-right font-bold text-slate-900">{res.count}</td>
+                  <td className="py-3 px-3 text-right text-emerald-700">{res.genuine}</td>
+                  <td className="py-3 px-3 text-right text-amber-700">{res.typo}</td>
+                  <td className="py-3 px-3 text-right font-bold text-blue-700">{res.precision}%</td>
+                  <td className="py-3 px-3 text-center">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 font-sans">
+                      {res.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
+
       {/* Rule Inspector & Interactive Sandbox Drawer with Esc Close */}
       <AnimatePresence>
         {selectedRule && (
@@ -447,7 +660,7 @@ export const RuleSettingsPage: React.FC = () => {
                       <DataBadge variant="rule" className="font-mono">{selectedRule.id}</DataBadge>
                     </div>
                     <div>
-                      <h2 className="font-semibold text-lg text-[#0F172A]">
+                      <h2 className="font-bold text-lg text-[#0F172A]">
                         {selectedRule.name}
                       </h2>
                       <p className="text-xs text-slate-500">

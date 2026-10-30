@@ -23,11 +23,11 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ title }) => {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-light tracking-tight text-[#0F172A]">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0F172A]">
             {title}
           </h1>
           <p className="text-base text-slate-500 font-normal">
-            This screen is not part of the current prototype design.
+            This screen is not currently available.
           </p>
         </div>
 

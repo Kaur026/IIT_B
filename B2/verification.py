@@ -38,6 +38,16 @@ def _be1_modules():
     return data_checks, rules_engine
 
 
+def _age_months(date_of_birth, on):
+    if not date_of_birth:
+        return None
+    born, current = parse_date(date_of_birth), parse_date(on)
+    months = (current.year - born.year) * 12 + current.month - born.month
+    if current.day < born.day:
+        months -= 1
+    return months
+
+
 def build_flag_snapshot(beneficiary, measurement, evaluation, data_check, rule_version, created_at, flag_id=None):
     """Create an immutable flag snapshot grounded in saved source values."""
     reasons = evaluation.get("reasons", [])
@@ -83,6 +93,13 @@ def remeasure(store, beneficiary_id: str, values: dict, actor_id: str, recorded_
         raise VerificationError("No original measurement exists; cannot create a remeasurement.")
     previous = old_records[-1]
     source_row = dict(beneficiary.get("source_row", beneficiary))
+    source_row.update({
+        "child_id": beneficiary_id,
+        "assigned_worker_id": beneficiary.get("assigned_worker_id", ""),
+        "sex": beneficiary.get("sex", source_row.get("sex", "")),
+    })
+    if beneficiary.get("date_of_birth"):
+        source_row["age_months"] = _age_months(beneficiary["date_of_birth"], values.get("measurement_date") or recorded_at)
     merged = dict(source_row)
     merged.update({key: previous.get(key) for key in ALLOWED_MEASUREMENT_FIELDS if key in previous})
     merged.update(values)
@@ -108,14 +125,13 @@ def remeasure(store, beneficiary_id: str, values: dict, actor_id: str, recorded_
         "parent_measurement_id": previous["measurement_id"],
         "recorded_at": recorded_date,
         "recorded_by": actor_id.strip(),
+        "age_months": merged.get("age_months"),
         "measurement_valid": merged["measurement_valid"],
         "data_quality_issues": check.get("issues", []),
         "evaluation": evaluation,
         "label": "SYNTHETIC DATA / PROPOSED INTEGRATION",
         **{field: merged.get(field) for field in SOURCE_FIELDS},
     }
-    store.append_measurement(new_record)
-
     threshold_path = B1_DIR / "thresholds.json"
     try:
         rule_version = json.loads(threshold_path.read_text(encoding="utf-8")).get("version", "unknown")
@@ -129,5 +145,11 @@ def remeasure(store, beneficiary_id: str, values: dict, actor_id: str, recorded_
         rule_version,
         recorded_date,
     )
-    store.add_flag(flag)
+    save_pair = getattr(store, "save_measurement_and_flag", None)
+    if not callable(save_pair):
+        raise VerificationError("The configured repository does not support atomic measurement evaluation storage.")
+    try:
+        save_pair(new_record, flag)
+    except StoreError as exc:
+        raise VerificationError("Remeasurement and evaluation could not be saved.") from exc
     return {"measurement": new_record, "flag": flag}

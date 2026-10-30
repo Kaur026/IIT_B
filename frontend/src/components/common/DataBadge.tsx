@@ -20,16 +20,16 @@ interface DataBadgeProps {
 }
 
 const variantStyles: Record<DataBadgeVariant, string> = {
-  beneficiary: 'bg-[#F5F7FB] text-[#172B4D] border-[#2457F5]/30',
-  action: 'bg-[#C9DCCF] text-[#172B4D] border-[#172B4D]/20',
-  centre: 'bg-[#C9DCCF] text-[#172B4D] border-[#172B4D]/20',
-  rule: 'bg-[#F5F7FB] text-[#172B4D] border-[#2457F5]/30',
-  worker: 'bg-[#FFFFFF] text-[#172B4D] border-[#2457F5]/30',
-  previous: 'bg-[#C9DCCF]/55 text-[#172B4D] border-[#172B4D]/20',
+  beneficiary: 'bg-blue-50/90 text-blue-900 border-blue-200/80',
+  action: 'bg-slate-100 text-slate-800 border-slate-200/80',
+  centre: 'bg-sky-50 text-sky-900 border-sky-200/80',
+  rule: 'bg-purple-50 text-purple-900 border-purple-200/80',
+  worker: 'bg-indigo-50 text-indigo-900 border-indigo-200/80',
+  previous: 'bg-slate-100 text-slate-700 border-slate-200/80',
   flagged: 'bg-rose-50 text-rose-800 border-rose-200',
-  delta: 'bg-rose-100 text-rose-900 border-rose-200',
-  date: 'bg-[#F5F7FB] text-[#172B4D] border-[#2457F5]/25',
-  neutral: 'bg-[#C9DCCF]/55 text-[#172B4D] border-[#172B4D]/20',
+  delta: 'bg-rose-100/90 text-rose-900 border-rose-200',
+  date: 'bg-slate-50 text-slate-600 border-slate-200/80',
+  neutral: 'bg-slate-100 text-slate-700 border-slate-200/80',
 };
 
 export const DataBadge: React.FC<DataBadgeProps> = ({

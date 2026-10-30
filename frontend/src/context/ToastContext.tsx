@@ -34,8 +34,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const showPlaceholderToast = useCallback(
     (featureName?: string) => {
       showToast(
-        'Not part of the prototype',
-        featureName ? `"${featureName}" is an illustrative link not implemented in this research prototype.` : undefined,
+        'Feature unavailable',
+        featureName ? `"${featureName}" is an illustrative link not implemented in this interface.` : undefined,
         'info'
       );
     },
@@ -69,7 +69,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     ? 'bg-[#D8E7FA] text-[#0F172A]'
                     : toast.type === 'warning'
                     ? 'bg-[#FEF3C7] text-[#92400E]'
-                    : 'bg-[#CFEFD8] text-[#0F172A]'
+                    : 'bg-[#E8F2FC] text-[#17365D] border border-[#BBD5F0]'
                 }`}
               >
                 {toast.type === 'error' ? (

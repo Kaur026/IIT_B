@@ -33,24 +33,18 @@ BE1's `B1/README_BE1.md` and `B1/children.csv` provide:
 1. Open a terminal at the repository root (the directory containing `B1` and `B2`).
 2. Create and activate a virtual environment:
 
-   ```bat
+   ```powershell
    py -m venv .venv
    .venv\\Scripts\\activate
    ```
 
-3. Install the API and BE1 dependencies:
+3. With dependencies already provisioned, start the API while leaving auth disabled:
 
-   ```bat
-   python -m pip install -r B2/requirements.txt
-   ```
-
-4. Start the server:
-
-   ```bat
+   ```powershell
    python -m uvicorn B2.api:app --reload
    ```
 
-5. Open `http://127.0.0.1:8000/docs` for the local interactive API docs. Use one of the documented synthetic actor keys in the `X-Demo-Actor` header: `demo-worker`, `demo-supervisor`, `demo-cdpo`, `demo-nodal`, `demo-state`, or `demo-india`.
+4. `B2_AUTH_MODE=disabled` is the required normal configuration. Protected routes return `401` until trusted authentication and authorization adapters are configured. Do not enable demo mode to make the frontend workspace appear operational. `GET /api/health` is public.
 
 The service seeds only the existing synthetic BE1 `C0001` row. It stores a demo-only centre assignment (`AWC-001`) and a local SQLite file at `B2/.prototype.sqlite`. Do not add real or identifying information. Set `B2_DB_PATH` to use a different local path, or pass an in-memory `PrototypeStore` in tests. The local SQLite file is git-ignored.
 
@@ -66,11 +60,11 @@ The service seeds only the existing synthetic BE1 `C0001` row. It stores a demo-
 - `GET /api/next-actions/{flag_id}` and `POST /api/next-actions/{flag_id}/decision`
 - `GET /api/briefing?centre_id=...&as_of=YYYY-MM-DD`
 
-The route names are still a proposal and must be confirmed with BE1/FE1/FE2 before wiring. Explain/history/next-action are deterministic mock services; no external AI provider is called. Briefing counts are calculated from saved records in code. Accepted next-action decisions are logged for review and must be followed by the corresponding ordinary task/verification endpoint; the suggestion endpoint itself does not perform an action.
+The initial route names are a prototype contract; see `docs/backend-frontend-contract.md` for the current route set. The development-only `SyntheticWorkflowPage` and `SyntheticOperationsPage` call this API and do not use `mockStore` as a fallback. The original Dashboard, Action Queue, and Referrals pages remain separate browser-local demos. Explain/history/next-action are deterministic services; no external AI provider is called. Briefing counts are calculated from saved records in code. Accepted next-action decisions are logged for review and must be followed by the corresponding ordinary task/verification endpoint; the suggestion endpoint itself does not perform an action.
 
-`POST /api/verification` accepts the `beneficiary_id`, a `measurement` dictionary containing only `measurement_date`, `weight_kg`, `height_cm`, `muac_mm`, `oedema`, and/or `danger_sign`, plus `recorded_at` and optional `today`. It appends a new measurement with a link to the prior measurement; it never edits the original record. Data checks and flags are evaluated through BE1 modules.
+`POST /api/verification` accepts the `beneficiary_id`, a `measurement` dictionary containing only `measurement_date`, `weight_kg`, `height_cm`, `muac_mm`, `oedema`, and/or `danger_sign`, plus `recorded_at` and optional demo-only `today`. It appends a new measurement with a link to the prior measurement; it never edits the original record. Data checks and flags are evaluated through BE1 modules. Initial AWW measurement recording is `POST /api/measurements`; the route contract is in `docs/backend-frontend-contract.md`.
 
-Day 1 deliberately refuses `close` task actions. Two-key closure, referrals/DEIC, exception tracking, restricted maternal follow-up and offline save/sync remain later work; they need the stated handoffs and approvals. No treatment advice, automated eligibility, clinical diagnosis, AI-generated counts, Aadhaar/OTP storage, or live Poshan Tracker integration is implemented or claimed.
+The prototype has additional referral, exception, closure-confirmation, restricted maternal follow-up, briefing snapshot, and local offline-queue routes. Closure fails closed unless an approved policy is provided; maternal follow-up is disabled by default; task assignment/reassignment/escalation are unavailable outside demo mode until a trusted task-owner directory exists. Offline sync remains local simulation. No treatment advice, automated eligibility, clinical diagnosis, AI-generated counts, Aadhaar/OTP storage, or live Poshan Tracker integration is implemented or claimed.
 
 ## Run tests
 
@@ -80,7 +74,7 @@ From the repository root:
 python -m unittest discover -s B2 -p "test_*.py" -v
 ```
 
-This command runs the legacy standard-library unit tests plus API tests; FastAPI, pandas and httpx must be installed as above. It does not replace a team integration review or production security review.
+This command runs the standard-library unit tests plus API tests; the FastAPI tests require dependencies from `B2/requirements.txt`. Installing dependencies was not part of this implementation task. It does not replace a team integration review or production security review.
 
 ## Existing module assumptions
 

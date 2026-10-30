@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ListTodo,
@@ -31,6 +31,7 @@ import { canEscalateCase, ESCALATION_TIERS } from '../utils/casework.ts';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { canPerformAction, canRenderVerificationAction, ROLE_CONFIGS } from '../utils/permissions.ts';
+import { explainCase, suggestNextAction } from '../services/aiScreeningService.ts';
 
 const formatCaseReading = (weight?: number, height?: number, date?: string) => {
   const values = [
@@ -53,8 +54,11 @@ const buildCaseExplanation = (caseItem: BeneficiaryCase) => {
 
 export const ActionQueuePage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
   const { isReadOnlyDemo, role, staffUser, requireStaffAction } = useAuth();
+  const searchParams = new URLSearchParams(location.search);
+  const isVerificationView = searchParams.get('view') === 'verification';
 
   const [cases, setCases] = useState<BeneficiaryCase[]>([]);
   const [activeFilterTab, setActiveFilterTab] = useState<'all' | 'urgent' | 'drift' | 'sam' | 'visit'>('all');
@@ -70,6 +74,12 @@ export const ActionQueuePage: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  // AI Decision & Suggestion state
+  const [decisionChoice, setDecisionChoice] = useState<'accept' | 'modify' | 'reject'>('accept');
+  const [decisionNotes, setDecisionNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [decisionError, setDecisionError] = useState<string | null>(null);
 
   // Verification drawer form state
   const [verifiedWeight, setVerifiedWeight] = useState('');
@@ -105,6 +115,7 @@ export const ActionQueuePage: React.FC = () => {
 
   // Filtering
   const filteredCases = cases.filter((c) => {
+    if (isVerificationView && (c.isVerified || c.status !== 'Pending Verification')) return false;
     if (activeFilterTab !== 'all' && c.category !== activeFilterTab) return false;
     if (priorityFilter === 'urgent' && c.priority !== 'Urgent') return false;
     if (priorityFilter === 'attention' && c.priority !== 'Needs Attention') return false;
@@ -127,6 +138,11 @@ export const ActionQueuePage: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const pendingVerificationCount = cases.filter((caseItem) => !caseItem.isVerified).length;
+  const urgentCount = cases.filter((caseItem) => !caseItem.isVerified && caseItem.priority === 'Urgent').length;
+  const attentionCount = cases.filter((caseItem) => !caseItem.isVerified && caseItem.priority === 'Needs Attention').length;
+  const resolvedCount = cases.filter((caseItem) => caseItem.isVerified).length;
+  const referrals = mockStore.getReferrals({ role, centreCode: staffUser?.centreCode, actorId: staffUser?.id });
   const selectedRuleGuidance = selectedCase
     ? mockStore.getRules().find((rule) => rule.id === selectedCase.ruleCode)?.actionGenerated.trim() || undefined
     : undefined;
@@ -197,7 +213,7 @@ export const ActionQueuePage: React.FC = () => {
       `Action ${selectedCase.actionId} marked Under Review with timestamp. Scheduled for verification.`,
       'info'
     );
-    setSelectedCase((prev) => (prev ? { ...prev, status: 'Under Review', acknowledgedAt: '24 Oct 2026', acknowledgedBy: actorId } : null));
+    setSelectedCase((prev) => (prev ? { ...prev, status: 'Under Review', acknowledgedAt: new Date().toISOString(), acknowledgedBy: actorId } : null));
   };
 
   const handleOpenEscalateModal = () => {
@@ -264,6 +280,27 @@ export const ActionQueuePage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Supervisor Verification Queue Banner */}
+      {isVerificationView && (
+        <div className="p-4 bg-amber-50/90 rounded-2xl border border-amber-200 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold shrink-0">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-sm text-amber-900">Supervisor Verification Queue (Spot-Check Mode)</span>
+              <p className="text-amber-800 text-[11px] mt-0.5">Showing cases awaiting independent Salter spring scale confirmation before consolidation.</p>
+            </div>
+          </div>
+          <Link
+            to="/queue"
+            className="px-3.5 py-1.5 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold shadow-2xs self-start sm:self-auto shrink-0"
+          >
+            Show All Sector Cases ({cases.length})
+          </Link>
+        </div>
+      )}
+
       {/* Screen Header */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -276,11 +313,11 @@ export const ActionQueuePage: React.FC = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
             Human-in-the-Loop Triaging
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[#0F172A]">
-            Frontline Action Queue
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
+            {role === 'AWW' ? 'My Cases' : 'Frontline Action Queue'}
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
-            Prioritized worklist of 35 flagged anthropometric anomalies, physical measurement conflicts, and referral milestones requiring supervisory verification.
+            {`Showing ${filteredCases.length} of ${cases.length} scoped case records (${pendingVerificationCount} pending verification).`}
           </p>
         </div>
 
@@ -292,13 +329,13 @@ export const ActionQueuePage: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-[#2457F5]" />
             Rule Engine (8 Active)
           </Link>
-          <Link
-            to="/beneficiaries/BEN-0142"
+          {cases.length > 0 && <Link
+            to={`/beneficiaries/${cases[0]?.id || 'BEN-0142'}`}
             className="px-4 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-full transition-all shadow-sm flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>Spotlight: BEN-0142</span>
-          </Link>
+            <span>Spotlight: {cases[0]?.id || 'No assigned case'}</span>
+          </Link>}
         </div>
       </motion.div>
 
@@ -307,34 +344,33 @@ export const ActionQueuePage: React.FC = () => {
         {[
           {
             label: 'Pending Verification',
-            value: 7,
+            value: pendingVerificationCount,
             suffix: ' cases',
-            subtext: '4 Urgent • 3 Needs Attention',
+            subtext: `${urgentCount} Urgent • ${attentionCount} Needs Attention`,
             icon: AlertTriangle,
             badgeColor: 'bg-rose-100 text-rose-800',
           },
           {
-            label: 'Avg Verification Turnaround',
-            value: 1.4,
-            isDecimal: true,
-            suffix: ' days',
-            subtext: 'SLA Target: < 2.0 days',
+            label: 'Urgent Open Cases',
+            value: urgentCount,
+            suffix: ' cases',
+            subtext: 'Assigned casework requiring attention',
             icon: Clock,
-            badgeColor: 'bg-emerald-100 text-emerald-800',
+            badgeColor: 'bg-amber-100 text-amber-800',
           },
           {
-            label: 'Resolved This Month',
-            value: 38,
+            label: 'Resolved Cases',
+            value: resolvedCount,
             suffix: ' cases',
-            subtext: '94.7% supervisory SLA adherence',
+            subtext: 'Verified in the current scoped case list',
             icon: CheckCircle2,
             badgeColor: 'bg-blue-100 text-blue-800',
           },
           {
-            label: 'Escalated to NRC / MO',
-            value: 3,
+            label: 'Open Referrals',
+            value: referrals.filter((referral) => referral.status !== 'Completed').length,
             suffix: ' referrals',
-            subtext: '0 SAM with med. complications',
+            subtext: `${referrals.filter((referral) => referral.status === 'Follow-up In Progress').length} in follow-up`,
             icon: ShieldAlert,
             badgeColor: 'bg-purple-100 text-purple-800',
           },
@@ -347,7 +383,7 @@ export const ActionQueuePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: idx * 0.06 }}
               whileHover={{ y: -2, transition: { duration: 0.15 } }}
-              className="bg-white/85 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              className="bg-[#E8F2FC] rounded-2xl p-5 border border-[#BBD5F0] shadow-sm flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-slate-500">{card.label}</span>
@@ -357,7 +393,7 @@ export const ActionQueuePage: React.FC = () => {
               </div>
               <div className="mt-4">
                 <div className="text-2xl font-light tracking-tight text-[#0F172A] flex items-baseline gap-1">
-                  {card.isDecimal ? <span>{card.value}</span> : <AnimatedNumber value={card.value} />}
+                  <AnimatedNumber value={card.value} />
                   <span className="text-xs font-normal text-slate-500">{card.suffix}</span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1 font-medium">{card.subtext}</p>
@@ -372,7 +408,7 @@ export const ActionQueuePage: React.FC = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.2 }}
-        className="bg-white/90 backdrop-blur-md rounded-[28px] border border-slate-200/80 shadow-sm overflow-hidden"
+        className="bg-[#E8F2FC] rounded-[28px] border border-[#BBD5F0] shadow-sm overflow-hidden"
       >
         {/* Filter Bar with Sliding Pill Tabs */}
         <div className="p-5 border-b border-slate-200/70 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -380,10 +416,10 @@ export const ActionQueuePage: React.FC = () => {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 relative bg-slate-100/80 p-1.5 rounded-full border border-slate-200/60 max-w-full">
             {[
               { id: 'all', label: `All (${cases.length})` },
-              { id: 'urgent', label: 'Urgent Anomaly (12)' },
-              { id: 'drift', label: 'Measurement Drift (12)' },
-              { id: 'sam', label: 'SAM / MAM Flag (11)' },
-              { id: 'visit', label: 'Home Visit (0)' },
+              { id: 'urgent', label: `Urgent Anomaly (${cases.filter((item) => item.category === 'urgent').length})` },
+              { id: 'drift', label: `Measurement Drift (${cases.filter((item) => item.category === 'drift').length})` },
+              { id: 'sam', label: `SAM / MAM Flag (${cases.filter((item) => item.category === 'sam').length})` },
+              { id: 'visit', label: `Home Visit (${cases.filter((item) => item.category === 'visit').length})` },
             ].map((tab) => {
               const isActive = activeFilterTab === tab.id;
               return (
@@ -455,7 +491,7 @@ export const ActionQueuePage: React.FC = () => {
               <col style={{ width: 115 }} />
             </colgroup>
             <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-200/70 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+              <tr className="bg-[#E8F2FC] border-b border-[#BBD5F0] text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-5">Action & Beneficiary</th>
                 <th className="py-3 px-4">Biometric Concern & Trigger</th>
                 <th className="py-3 px-4">Comparison (Prev vs Flagged)</th>
@@ -524,16 +560,26 @@ export const ActionQueuePage: React.FC = () => {
                       <div className="space-y-1">
                         <div className="flex min-w-0 flex-nowrap items-center gap-1 rounded-lg border border-[#A9C6D9]/70 bg-[#E5EFF6]/70 px-2 py-1">
                           <span className="w-8 shrink-0 text-[10px] text-slate-500">Prev:</span>
-                          <DataBadge variant="previous" className="whitespace-nowrap font-mono tabular-nums">{item.prevWeight.toFixed(2)} kg</DataBadge>
+                          <DataBadge variant="previous" className="whitespace-nowrap font-mono tabular-nums">
+                            {item.ruleCode === 'RUL-02'
+                              ? `${typeof item.prevHeight === 'number' && Number.isFinite(item.prevHeight) ? item.prevHeight.toFixed(1) : '0.0'} cm`
+                              : `${item.prevWeight.toFixed(2)} kg`}
+                          </DataBadge>
                           <DataBadge variant="date" className="whitespace-nowrap font-mono tabular-nums">{item.prevDate}</DataBadge>
                         </div>
                         <div className="flex min-w-0 flex-nowrap items-center gap-1 rounded-lg border border-rose-200 bg-rose-50/80 px-2 py-1">
                           <span className="w-8 shrink-0 text-[10px] font-medium text-rose-700">Flag:</span>
-                          <DataBadge variant="flagged" className="whitespace-nowrap font-mono tabular-nums">{item.flaggedWeight.toFixed(2)} kg</DataBadge>
+                          <DataBadge variant="flagged" className="whitespace-nowrap font-mono tabular-nums">
+                            {item.ruleCode === 'RUL-02'
+                              ? `${typeof item.flaggedHeight === 'number' && Number.isFinite(item.flaggedHeight) ? item.flaggedHeight.toFixed(1) : '0.0'} cm`
+                              : `${item.flaggedWeight.toFixed(2)} kg`}
+                          </DataBadge>
                           <DataBadge variant="date" className="whitespace-nowrap font-mono tabular-nums">{item.flaggedDate}</DataBadge>
                         </div>
                         <div className="inline-flex min-h-6 items-center rounded-full border border-rose-200 bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-900 font-mono tabular-nums">
-                          Δ {item.weightDelta}
+                          Δ {item.ruleCode === 'RUL-02' && typeof item.prevHeight === 'number' && typeof item.flaggedHeight === 'number'
+                            ? `${(item.flaggedHeight - item.prevHeight).toFixed(1)} cm`
+                            : item.weightDelta}
                         </div>
                       </div>
                     </td>
@@ -661,7 +707,7 @@ export const ActionQueuePage: React.FC = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="font-semibold text-lg text-[#0F172A] flex flex-wrap items-center gap-2">
+                        <h2 className="font-bold text-lg text-[#0F172A] flex flex-wrap items-center gap-2">
                           Case <DataBadge variant="action" className="font-mono">{selectedCase.actionId}</DataBadge>
                         </h2>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${selectedCase.priorityColor}`}>
@@ -796,43 +842,211 @@ export const ActionQueuePage: React.FC = () => {
                     </p>
                     <div className="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
                       <Info className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Non-clinical heuristic: Flags extreme data drift before official consolidation. (Example rule • Demo)</span>
+                      <span>Non-clinical heuristic: Flags extreme data drift before official consolidation.</span>
                     </div>
                   </div>
 
-                  {/* Deterministic, field-grounded case explanation preview */}
-                  <div className="bg-blue-50/60 border border-blue-200/70 rounded-2xl p-4 space-y-2.5">
-                    <h4 className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
-                      <Info className="w-3.5 h-3.5 text-[#2457F5]" />
-                      <span>Explain This Case — Demo Preview</span>
-                    </h4>
-                    <p className="text-[11px] text-slate-700 leading-relaxed">
-                      {buildCaseExplanation(selectedCase)}
-                    </p>
-                    {selectedRuleGuidance && (
-                      <p className="text-[11px] text-slate-600 leading-relaxed border-t border-blue-200/70 pt-2">
-                        <span className="font-semibold text-slate-700">General rule guidance:</span>{' '}
-                        {selectedRuleGuidance}
-                      </p>
-                    )}
-                    <div className="border-t border-blue-200/70 pt-2 space-y-1.5">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h5 className="text-[11px] font-semibold text-[#0F172A]">Suggested Next Action</h5>
-                        <span className="rounded-full border border-blue-200 bg-white/70 px-2 py-0.5 text-[9px] font-semibold text-blue-800">
-                          Demo Preview — not live AI
-                        </span>
+                  {/* AI FEATURE 1: Explain Case (Record Grounded & Unit Accurate) */}
+                  {(() => {
+                    const explanation = explainCase({ caseItem: selectedCase });
+                    const suggestion = suggestNextAction({ caseItem: selectedCase });
+                    const existingDecision = mockStore.getAIDecisions().find((d) => d.caseActionId === selectedCase.actionId);
+
+                    const handleRecordDecision = () => {
+                      if (!requireStaffAction('record casework action decisions')) return;
+                      const res = mockStore.recordAIDecision({
+                        beneficiaryId: selectedCase.id,
+                        caseActionId: selectedCase.actionId,
+                        suggestionId: suggestion.suggestionId,
+                        decision: decisionChoice,
+                        actionCode: suggestion.actionCode,
+                        actionNotes: decisionChoice === 'modify' ? decisionNotes : undefined,
+                        rejectionReason: decisionChoice === 'reject' ? rejectionReason : undefined,
+                        centreCode: selectedCase.centreCode,
+                      }, { actorId: staffUser?.id, role, centreCode: staffUser?.centreCode });
+
+                      if (!res.success) {
+                        setDecisionError(res.error || 'Failed to record decision');
+                        showToast('Decision Blocked', res.error || 'Permission check failed', 'error');
+                      } else {
+                        setDecisionError(null);
+                        setDecisionNotes('');
+                        setRejectionReason('');
+                        showToast('Decision Logged', `Action decision (${decisionChoice.toUpperCase()}) recorded into casework audit ledger.`, 'success');
+                      }
+                    };
+
+                    return (
+                      <div className="space-y-4">
+                        {/* Explain Case Box */}
+                        <div className="bg-gradient-to-br from-blue-50/80 to-slate-50 border border-blue-200/80 rounded-2xl p-4 space-y-3 shadow-sm">
+                          <div className="flex items-center justify-between border-b border-blue-100 pb-2.5">
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="w-4 h-4 text-[#2457F5]" />
+                              <h4 className="text-xs font-semibold text-[#0F172A]">AI Case Explanation</h4>
+                            </div>
+                            <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold">
+                              {explanation.simulationLabel}
+                            </span>
+                          </div>
+
+                          <div className="space-y-2 text-xs">
+                            <p className="text-slate-800 font-medium leading-relaxed">
+                              {explanation.whyNeedsAttention}
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+                              <div className="bg-white p-2.5 rounded-xl border border-blue-100 space-y-1">
+                                <span className="text-slate-400 block text-[10px] font-semibold uppercase">Measurement Trajectory</span>
+                                <div className="font-mono text-slate-800 font-semibold">{explanation.comparison.previousValue} → {explanation.comparison.flaggedValue}</div>
+                                <div className="text-[10px] text-slate-500 font-mono">Delta: {explanation.comparison.difference}</div>
+                              </div>
+                              <div className="bg-white p-2.5 rounded-xl border border-blue-100 space-y-1">
+                                <span className="text-slate-400 block text-[10px] font-semibold uppercase">Inspection Scope</span>
+                                <div className="font-semibold text-slate-800">{selectedCase.centreCode} · AWW {selectedCase.assignedAww}</div>
+                                <div className="text-[10px] text-slate-500">Timeline: {selectedCase.prevDate || 'N/A'} to {selectedCase.flaggedDate}</div>
+                              </div>
+                            </div>
+
+                            {explanation.missingInformation.length > 0 && (
+                              <div className="p-2 rounded-xl bg-amber-50/70 border border-amber-200/60 text-[11px] text-amber-900 space-y-0.5">
+                                <span className="font-semibold text-[10px] uppercase text-amber-700 block">Missing Information Identified:</span>
+                                {explanation.missingInformation.map((item, idx) => (
+                                  <div key={idx} className="flex items-center gap-1.5">
+                                    <span className="w-1 h-1 rounded-full bg-amber-500" />
+                                    <span>{item}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* AI FEATURE 3 & 4: Suggest Next Action & Staff Decision */}
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              <h4 className="text-xs font-semibold text-[#0F172A]">AI Suggested Next Action</h4>
+                            </div>
+                            <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full border ${
+                              suggestion.priority === 'Urgent' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-amber-50 text-amber-800 border-amber-200'
+                            }`}>
+                              {suggestion.priority} Priority
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5 text-xs">
+                            <div className="font-semibold text-slate-900">{suggestion.title}</div>
+                            <p className="text-slate-600 text-[11px] leading-relaxed">{suggestion.description}</p>
+                            <p className="text-[10px] text-slate-400 italic"><strong>Rationale:</strong> {suggestion.rationale}</p>
+                          </div>
+
+                          {/* Existing Staff Decision Audit Trail */}
+                          {existingDecision ? (
+                            <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="font-semibold text-emerald-900 flex items-center gap-1.5">
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>Decision Recorded: {existingDecision.decision.toUpperCase()}</span>
+                                </span>
+                                <span className="text-[10px] font-mono text-emerald-700">{existingDecision.timestamp}</span>
+                              </div>
+                              <p className="text-[11px] text-emerald-800">
+                                Logged by staff worker <strong>{existingDecision.actorId}</strong> ({existingDecision.actorRole}).
+                              </p>
+                              {(existingDecision.actionNotes || existingDecision.rejectionReason) && (
+                                <p className="text-[10px] text-emerald-700 italic border-t border-emerald-200/60 pt-1 mt-1">
+                                  Notes: {existingDecision.actionNotes || existingDecision.rejectionReason}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="mt-3 space-y-3 pt-2 border-t border-slate-100">
+                              <span className="text-[11px] font-semibold text-slate-700 block">Review Suggestion & Record Decision:</span>
+                              <div className="grid grid-cols-3 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setDecisionChoice('accept')}
+                                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 ${
+                                    decisionChoice === 'accept'
+                                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                  <span>Accept</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDecisionChoice('modify')}
+                                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 ${
+                                    decisionChoice === 'modify'
+                                      ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                                      : 'bg-amber-50/60 text-amber-800 border-amber-200 hover:bg-amber-100/60'
+                                  }`}
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  <span>Modify</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDecisionChoice('reject')}
+                                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 ${
+                                    decisionChoice === 'reject'
+                                      ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                                      : 'bg-rose-50/60 text-rose-800 border-rose-200 hover:bg-rose-100/60'
+                                  }`}
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                  <span>Reject</span>
+                                </button>
+                              </div>
+
+                              {decisionChoice === 'modify' && (
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-slate-600">Modified Action Plan / Instructions:</label>
+                                  <textarea
+                                    rows={2}
+                                    value={decisionNotes}
+                                    onChange={(e) => setDecisionNotes(e.target.value)}
+                                    placeholder="Enter modified casework instructions..."
+                                    className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2457F5]"
+                                  />
+                                </div>
+                              )}
+
+                              {decisionChoice === 'reject' && (
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-rose-700">Rejection Justification (Required):</label>
+                                  <textarea
+                                    rows={2}
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Explain why this suggestion was declined..."
+                                    className="w-full text-xs bg-slate-50 border border-rose-200 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                                  />
+                                </div>
+                              )}
+
+                              {decisionError && (
+                                <div className="text-[11px] text-rose-600 font-medium">{decisionError}</div>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={handleRecordDecision}
+                                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-95"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Record Decision in Audit Ledger</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-700 leading-relaxed">
-                        {selectedRuleGuidance || 'No suggested workflow step is recorded for this rule.'}
-                      </p>
-                      <p className="text-[10px] text-slate-500 leading-relaxed">
-                        General rule guidance only; this is not an AI decision or a case-specific recommendation. This step has NOT been executed automatically.
-                      </p>
-                    </div>
-                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                      Rule-based demo preview, not AI-generated or a diagnosis. This flag requires human verification.
-                    </p>
-                  </div>
+                    );
+                  })()}
 
                   {/* Biometric Comparison Cards */}
                   <div>
@@ -877,7 +1091,11 @@ export const ActionQueuePage: React.FC = () => {
                           </div>
                           <div className="flex justify-between text-[11px]">
                             <span className="text-rose-700">Discrepancy:</span>
-                            <span className="font-bold text-rose-700">Δ {selectedCase.weightDelta}</span>
+                            <span className="font-bold text-rose-700">
+                                Δ {selectedCase.ruleCode === 'RUL-02' && typeof selectedCase.prevHeight === 'number' && typeof selectedCase.flaggedHeight === 'number'
+                                  ? `${(selectedCase.flaggedHeight - selectedCase.prevHeight).toFixed(1)} cm`
+                                  : selectedCase.weightDelta}
+                              </span>
                           </div>
                         </div>
                       </div>
@@ -1011,7 +1229,6 @@ export const ActionQueuePage: React.FC = () => {
                           </button>
                         ))}
                       </div>
-                      <p className="mt-1.5 text-[10px] text-slate-500">Demo selection only; it is not saved to the case record.</p>
                     </div>
 
                     <div>

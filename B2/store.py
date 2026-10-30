@@ -467,6 +467,48 @@ class PrototypeStore:
                 raise StoreError("measurement_id already exists; measurements are append-only.") from exc
         return payload
 
+    def save_measurement_and_flag(self, measurement, flag):
+        """Atomically persist one immutable measurement and its evaluated flag."""
+        if not isinstance(measurement, dict) or not isinstance(flag, dict):
+            raise StoreError("Measurement and flag records must be dictionaries.")
+        measurement_fields = {name: self._required(measurement, name) for name in (
+            "measurement_id", "beneficiary_id", "centre_id", "source", "recorded_at"
+        )}
+        flag_fields = {name: self._required(flag, name) for name in (
+            "flag_id", "beneficiary_id", "centre_id", "created_at"
+        )}
+        if (measurement_fields["beneficiary_id"] != flag_fields["beneficiary_id"]
+                or measurement_fields["centre_id"] != flag_fields["centre_id"]
+                or flag.get("measurement_id") != measurement_fields["measurement_id"]):
+            raise StoreError("Measurement and flag must refer to the same saved record.")
+        measurement_payload, flag_payload = deepcopy(measurement), deepcopy(flag)
+        with self._lock:
+            try:
+                with self._db:
+                    if measurement_fields["source"] == "initial":
+                        existing = self._db.execute(
+                            "SELECT 1 FROM measurements WHERE beneficiary_id=? AND source='initial' LIMIT 1",
+                            (measurement_fields["beneficiary_id"],),
+                        ).fetchone()
+                        if existing:
+                            raise StoreError("An initial measurement already exists for this beneficiary.")
+                    self._db.execute(
+                        "INSERT INTO measurements VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (measurement_fields["measurement_id"], measurement_fields["beneficiary_id"],
+                         measurement_fields["centre_id"], measurement_fields["source"],
+                         measurement_fields["recorded_at"],
+                         str(measurement.get("parent_measurement_id") or "").strip(),
+                         _json(measurement_payload)),
+                    )
+                    self._db.execute(
+                        "INSERT INTO flags VALUES (?, ?, ?, ?, ?)",
+                        (flag_fields["flag_id"], flag_fields["beneficiary_id"],
+                         flag_fields["centre_id"], flag_fields["created_at"], _json(flag_payload)),
+                    )
+            except sqlite3.IntegrityError as exc:
+                raise StoreError("Measurement or flag already exists; saved records are immutable.") from exc
+        return {"measurement": measurement_payload, "flag": flag_payload}
+
     def get_measurement(self, measurement_id):
         with self._lock:
             row = self._db.execute("SELECT payload_json FROM measurements WHERE measurement_id=?", (measurement_id,)).fetchone()

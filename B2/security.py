@@ -16,6 +16,25 @@ class UnsafePayloadError(ValueError):
     """Raised when input contains a prohibited identifier/secret field."""
 
 
+def safe_validation_errors(errors):
+    """Return validation locations/codes without echoing rejected input/context."""
+    if not isinstance(errors, (list, tuple)):
+        return []
+    safe = []
+    for issue in errors:
+        if not isinstance(issue, dict):
+            continue
+        location = issue.get("loc", ())
+        if not isinstance(location, (list, tuple)):
+            location = ()
+        safe.append({
+            "loc": [part for part in location if isinstance(part, (str, int))],
+            "code": str(issue.get("type") or "invalid_value"),
+            "message": "Invalid or missing field.",
+        })
+    return safe
+
+
 def validate_no_sensitive_keys(value, path="payload"):
     """Recursively reject Aadhaar/OTP-like field names in a JSON payload."""
     if isinstance(value, dict):

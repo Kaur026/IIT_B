@@ -3,18 +3,25 @@
 @layer base {
   :root {
     --canvas: #F5F7FB;
-    --ink: #172B4D;
-    --body-text: #172B4D;
-    --muted-text: rgba(23, 43, 77, 0.72);
-    --surface: rgba(255, 255, 255, 0.84);
-    --surface-secondary: rgba(201, 220, 207, 0.42);
-    --surface-highlight: #C9DCCF;
-    --surface-border: rgba(36, 87, 245, 0.22);
+    --ink: #17365D;
+    --body-text: #17365D;
+    --muted-text: #52708F;
+    --surface: #E8F2FC;
+    --surface-secondary: #F8FBFF;
+    --surface-highlight: #BBD5F0;
+    --surface-border: #BBD5F0;
     --accent: #2457F5;
-    --sage: #C9DCCF;
+    --sage: #BBD5F0;
     --cobalt: #2457F5;
-    --navy: #172B4D;
+    --navy: #17365D;
     --pure-white: #FFFFFF;
+
+    /* Poshan Action Layer Light Blue Design Tokens */
+    --pal-box-bg: #E8F2FC;
+    --pal-box-border: #BBD5F0;
+    --pal-inner-bg: #F8FBFF;
+    --pal-text-main: #17365D;
+    --pal-text-secondary: #52708F;
   }
 
   body {
@@ -24,8 +31,27 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3 {
+  h1 {
     font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  h4, h5, h6 {
+    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
   }
 
   /* Tabular numbers for clean numeric alignment */
@@ -68,7 +94,7 @@
 .ambient-orb-mint {
   position: absolute;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(201, 220, 207, 0.65) 0%, rgba(201, 220, 207, 0) 70%);
+  background: radial-gradient(circle, rgba(187, 213, 240, 0.45) 0%, rgba(187, 213, 240, 0) 70%);
   filter: blur(60px);
   animation: ambientDrift1 48s ease-in-out infinite alternate;
   pointer-events: none;
@@ -77,7 +103,7 @@
 .ambient-orb-sky {
   position: absolute;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(201, 220, 207, 0.24) 0%, rgba(201, 220, 207, 0) 70%);
+  background: radial-gradient(circle, rgba(232, 242, 252, 0.6) 0%, rgba(232, 242, 252, 0) 70%);
   filter: blur(64px);
   animation: ambientDrift2 55s ease-in-out infinite alternate;
   pointer-events: none;
@@ -100,7 +126,7 @@
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201, 220, 207, 0.5) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(187, 213, 240, 0.45) 0%, transparent 70%);
   filter: blur(48px);
   pointer-events: none;
   z-index: 0;
@@ -114,7 +140,7 @@
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201, 220, 207, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(232, 242, 252, 0.5) 0%, transparent 70%);
   filter: blur(52px);
   pointer-events: none;
   z-index: 0;
@@ -141,7 +167,7 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--surface-border);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 32px rgba(23, 43, 77, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 32px rgba(23, 54, 93, 0.08);
 }
 
 .frosted-glass-pill {
@@ -149,22 +175,22 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--surface-border);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 2px 10px rgba(23, 43, 77, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 2px 10px rgba(23, 54, 93, 0.06);
 }
 
 /* Three-layer shadow depth */
 .shadow-layered {
-  box-shadow: 0 1px 2px rgba(23, 43, 77, 0.06), 0 8px 24px rgba(23, 43, 77, 0.09), 0 24px 64px rgba(23, 43, 77, 0.11);
+  box-shadow: 0 1px 2px rgba(23, 54, 93, 0.06), 0 8px 24px rgba(23, 54, 93, 0.09), 0 24px 64px rgba(23, 54, 93, 0.11);
 }
 
 .shadow-drawer {
-  box-shadow: -12px 0 48px rgba(23, 43, 77, 0.14);
+  box-shadow: -12px 0 48px rgba(23, 54, 93, 0.14);
 }
 
 /* 32px Radius Panel with Mint-to-Sky gradient and radial top-left light */
 .panel-gradient-mint-sky {
   position: relative;
-  background: linear-gradient(135deg, var(--sage) 0%, var(--canvas) 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-secondary) 100%);
   border-radius: 32px;
   overflow: hidden;
 }
@@ -315,19 +341,22 @@
 }
 
 /* Layered application surfaces: keep cards distinct from form controls and status states. */
+.pal-box,
 [class*="bg-white/90"][class*="rounded-"],
 [class*="bg-white/95"][class*="rounded-"],
 [class~="bg-white"][class*="rounded-[28px]"],
 [class~="bg-white"][class*="rounded-3xl"] {
   background-color: var(--surface) !important;
   border-color: var(--surface-border) !important;
-  box-shadow: 0 8px 24px rgba(23, 43, 77, 0.08);
+  color: var(--ink) !important;
+  box-shadow: 0 4px 16px rgba(23, 54, 93, 0.05);
 }
 
 [class*="bg-white/85"][class*="rounded-2xl"][class*="border-slate"] {
-  background-color: var(--surface-secondary) !important;
+  background-color: var(--surface) !important;
   border-color: var(--surface-border) !important;
-  box-shadow: 0 5px 16px rgba(23, 43, 77, 0.07);
+  color: var(--ink) !important;
+  box-shadow: 0 4px 16px rgba(23, 54, 93, 0.05);
 }
 
 div.grid > [class*="bg-white/85"][class*="rounded-2xl"]:nth-child(4n + 2),
@@ -335,7 +364,23 @@ div.grid > [class*="bg-white/85"][class*="rounded-2xl"]:nth-child(4n + 4) {
   background-color: var(--surface) !important;
 }
 
-[class~="bg-white"][class*="rounded-2xl"][class*="border"]:not(button):not(a):not(input):not(select):not(textarea) {
+/* Parent dashboard sections and containers default to Light Blue main box (#E8F2FC) */
+[class~="bg-white"][class*="rounded-2xl"][class*="border"]:not(button):not(a):not(input):not(select):not(textarea):not(nav):not([role="dialog"]) {
+  background-color: var(--surface) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--ink) !important;
+}
+
+/* Inner cards nested inside main containers default to slightly lighter card background (#F8FBFF) */
+.pal-inner-card,
+[class*="bg-[#E8F2FC]"] [class*="bg-slate-50"],
+[class*="bg-[#E8F2FC]"] [class*="bg-slate-50/70"],
+[class*="bg-[#E8F2FC]"] [class*="bg-slate-50/80"],
+[class*="bg-[#E8F2FC]"] [class*="bg-slate-50/90"],
+[class*="bg-[#E8F2FC]"] .grid > [class*="bg-white"]:not(button):not(a):not(input):not(select):not(textarea),
+section [class*="bg-slate-50"],
+section [class*="bg-slate-50/70"],
+section [class*="bg-slate-50/80"] {
   background-color: var(--surface-secondary) !important;
   border-color: var(--surface-border) !important;
 }
@@ -349,7 +394,7 @@ div.grid > [class*="bg-white/85"][class*="rounded-2xl"]:nth-child(4n + 4) {
 [class*="bg-[#E5EFF6]"],
 [class*="bg-[#D6E6F0]"],
 [class*="bg-[#BBD5E4]"] {
-  background-color: var(--surface-secondary) !important;
+  background-color: var(--surface) !important;
 }
 
 [class*="border-[#A9C6D9]"] {
@@ -358,11 +403,17 @@ div.grid > [class*="bg-white/85"][class*="rounded-2xl"]:nth-child(4n + 4) {
 
 [class*="border-slate-200"],
 [class*="border-slate-100"] {
-  border-color: rgba(36, 87, 245, 0.16);
+  border-color: var(--surface-border) !important;
 }
 
-[class~="bg-[#CFEFD8]"] {
-  background-color: var(--sage) !important;
+[class~="bg-[#CFEFD8]"],
+div[class*="bg-emerald-50"][class*="rounded-"],
+div[class*="bg-green-50"][class*="rounded-"],
+div[class*="bg-teal-50"][class*="rounded-"],
+section[class*="bg-emerald-50"],
+article[class*="bg-emerald-50"] {
+  background-color: var(--surface-secondary) !important;
+  border-color: var(--surface-border) !important;
 }
 
 .frosted-glass-pill:hover {
@@ -379,15 +430,15 @@ table thead th {
 }
 
 table tbody tr {
-  border-color: rgba(36, 87, 245, 0.16);
+  border-color: var(--surface-border);
 }
 
 table tbody tr:nth-child(even) {
-  background-color: rgba(201, 220, 207, 0.18);
+  background-color: rgba(232, 242, 252, 0.45);
 }
 
 table tbody tr:hover {
-  background-color: rgba(201, 220, 207, 0.34);
+  background-color: rgba(187, 213, 240, 0.35);
 }
 
 input:not([type="checkbox"]):not([type="radio"]),
@@ -887,4 +938,17 @@ button:has([class*="bg-[#0F172A]"]) [class*="border-[#0F172A]"] {
     align-self: auto;
     padding-block: 1rem;
   }
+}
+
+/* Typography Enhancement: Global guaranteed bolder headings */
+h1 {
+  font-weight: 700 !important;
+}
+
+h2 {
+  font-weight: 700 !important;
+}
+
+h3 {
+  font-weight: 600 !important;
 }

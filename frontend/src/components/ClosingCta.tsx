@@ -9,7 +9,7 @@ interface ClosingCtaProps {
 export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
   return (
     <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-gradient-to-br from-[#CFEFD8] via-[#E4F4E9] to-[#D8E7FA] p-8 sm:p-12 lg:p-16 border border-white/60 shadow-[0_20px_50px_rgba(20,50,90,0.06)] bg-grain animate-gradient-drift">
+      <div className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-gradient-to-br from-[#E8F2FC] via-[#F8FBFF] to-[#D8E7FA] p-8 sm:p-12 lg:p-16 border border-[#BBD5F0] shadow-[0_20px_50px_rgba(23,54,93,0.06)] bg-grain animate-gradient-drift">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
           {/* Left Column: Heading and Action (7 cols) */}
           <div className="lg:col-span-7 flex flex-col items-start">
@@ -18,7 +18,7 @@ export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
               <span>Interactive Casework Simulation</span>
             </span>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#0F172A] tracking-tight leading-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight leading-tight mb-4">
               See the action layer in action
             </h2>
 
@@ -32,7 +32,7 @@ export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
               onClick={onNavigateDemo}
               className="group inline-flex items-center gap-2.5 bg-[#0F172A] text-white text-sm sm:text-base font-medium px-8 py-4 rounded-full shadow-md hover:bg-slate-800 transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5]"
             >
-              <span>Explore dashboard demo</span>
+              <span>View interactive demo</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>
@@ -69,7 +69,7 @@ export const ClosingCta: React.FC<ClosingCtaProps> = ({ onNavigateDemo }) => {
 
         {/* Small Caption */}
         <div className="mt-8 pt-4 border-t border-slate-900/10 text-center lg:text-left text-[11px] text-slate-500 font-medium">
-          Illustrative imagery • Academic student research prototype • Synthetic demographic models
+          Illustrative imagery • Synthetic demographic examples
         </div>
       </div>
     </section>
