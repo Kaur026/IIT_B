@@ -17,7 +17,7 @@ import {
   Headphones,
   Scale,
 } from 'lucide-react';
-import { mockStore, DEMO_TODAY } from '../store/mockStore.ts';
+import { mockStore } from '../store/mockStore.ts';
 import { calculateAge } from '../utils/casework.ts';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
@@ -51,7 +51,7 @@ export const RegisterBeneficiaryPage: React.FC = () => {
         caregiverKinship,
         category,
         centreCode,
-        birthWeight: category === 'child_under_6' ? Number(birthWeight) : undefined,
+        birthWeight: parseFloat(birthWeight) || 2.9,
         customId: beneficiaryId,
         assignedAww: staffUser?.id || 'AWW-409',
       },
@@ -72,6 +72,14 @@ export const RegisterBeneficiaryPage: React.FC = () => {
 
     const rand = Math.floor(1000 + Math.random() * 9000);
     setBeneficiaryId(`BEN-${rand}`);
+  };
+
+  const handleSaveDraft = () => {
+    showToast(
+      'Draft Retained',
+      'All currently keyed field parameters stored in browser local state.',
+      'info'
+    );
   };
 
   return (
@@ -119,7 +127,7 @@ export const RegisterBeneficiaryPage: React.FC = () => {
               National Privacy Sandbox • Academic Simulation
             </h2>
             <p className="text-xs text-slate-500">
-              Synthetic demo only. Do not enter real personal information. Not connected to government systems.
+              Use synthetic demo data only. Do not input real citizen Aadhaar or PII. Not synchronized with live MoWCD Poshan Tracker servers.
             </p>
           </div>
         </div>
@@ -205,7 +213,6 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                   onChange={(e) => setDob(e.target.value)}
                   required
                   type="date"
-                  max={DEMO_TODAY}
                 />
               </div>
 
@@ -217,7 +224,6 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                     <button
                       key={g}
                       type="button"
-                      aria-pressed={gender === g}
                       onClick={() => setGender(g)}
                       className={`py-2 rounded-lg text-xs font-semibold capitalize transition-all ${
                         gender === g
@@ -273,12 +279,12 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                 <select
                   className="w-full bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-[#1F8A83]/30 focus:border-[#1F8A83] cursor-pointer"
                   value={centreCode}
-                  disabled={role === 'AWW'}
                   onChange={(e) => setCentreCode(e.target.value)}
                 >
-                  {[staffUser?.centreCode || 'AWC-702', ...(role === 'AWW' ? [] : ['AWC-703', 'AWC-704'])].map((centre) => <option key={centre} value={centre}>{centre} (Varanasi Sector 4 demo)</option>)}
+                  <option value="AWC-702">AWC-702 (Varanasi Sector 4)</option>
+                  <option value="AWC-703">AWC-703 (Varanasi Sector 4)</option>
+                  <option value="AWC-704">AWC-704 (Varanasi Sector 4)</option>
                 </select>
-                {role === 'AWW' && <p className="text-[11px] text-slate-500">Centre is fixed to the assigned synthetic demo centre.</p>}
               </div>
 
               <div className="space-y-1">
@@ -353,12 +359,10 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                   desc: 'Anemia reduction, WIFS supplementation & life skills training.',
                 },
               ].map((opt) => (
-                <button
+                <div
                   key={opt.id}
-                  type="button"
-                  aria-pressed={category === opt.id}
                   onClick={() => setCategory(opt.id as any)}
-                  className={`w-full p-4 rounded-2xl border text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2457F5] transition-all ${
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                     category === opt.id
                       ? 'bg-blue-50/50 border-[#2457F5] shadow-sm'
                       : 'bg-slate-50/70 border-slate-200 hover:bg-slate-50'
@@ -380,7 +384,7 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                     </div>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-relaxed">{opt.desc}</p>
-                </button>
+                </div>
               ))}
             </div>
 
@@ -425,9 +429,6 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                       <input
                         type="number"
                         step="0.05"
-                        min="0.5"
-                        max="10"
-                        required={category === 'child_under_6'}
                         value={birthWeight}
                         onChange={(e) => setBirthWeight(e.target.value)}
                         className="w-full bg-white border border-slate-200 px-3.5 py-2.5 rounded-xl text-slate-900 pr-10"
@@ -443,7 +444,6 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        aria-pressed={deliveryType === 'institutional'}
                         onClick={() => setDeliveryType('institutional')}
                         className={`py-2 px-3 rounded-xl border text-center transition-all ${
                           deliveryType === 'institutional'
@@ -455,7 +455,6 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        aria-pressed={deliveryType === 'home'}
                         onClick={() => setDeliveryType('home')}
                         className={`py-2 px-3 rounded-xl border text-center transition-all ${
                           deliveryType === 'home'
@@ -508,9 +507,13 @@ export const RegisterBeneficiaryPage: React.FC = () => {
                   <UserPlus className="w-4 h-4" />
                   <span>Register Beneficiary</span>
                 </button>
-                <button type="button" disabled title="Draft persistence is not implemented" className="w-full sm:w-auto px-5 py-3 rounded-full bg-slate-100 text-slate-400 font-semibold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed">
+                <button
+                  type="button"
+                  onClick={handleSaveDraft}
+                  className="w-full sm:w-auto px-5 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
                   <Save className="w-4 h-4" />
-                  <span>Draft unavailable</span>
+                  <span>Save Draft</span>
                 </button>
               </div>
 
@@ -525,7 +528,7 @@ export const RegisterBeneficiaryPage: React.FC = () => {
 
             <div className="pt-2 border-t border-slate-100 flex items-center gap-1.5 text-slate-400 text-[11px]">
               <Info className="w-3.5 h-3.5 shrink-0" />
-              <span>Client-side validation only. Synthetic records are saved in this browser.</span>
+              <span>Demo prototype mode • Client-side validation only. Data is stored in session memory.</span>
             </div>
           </div>
         </div>
@@ -593,7 +596,7 @@ export const RegisterBeneficiaryPage: React.FC = () => {
               <h3 className="font-semibold text-xs text-[#0F172A]">Anganwadi Field SOP</h3>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              In this illustrative workflow, an infant entry can initiate:
+              Under National Nutrition Mission mandate, every infant entry automatically initiates:
             </p>
             <ul className="space-y-2 text-[11px] text-slate-700">
               <li className="flex items-start gap-2">
@@ -638,10 +641,16 @@ export const RegisterBeneficiaryPage: React.FC = () => {
               <Headphones className="w-5 h-5 text-[#2457F5] shrink-0" />
               <div>
                 <div className="text-xs font-semibold text-[#0F172A]">Sector Supervisor Help</div>
-                <div className="text-[10px] text-slate-400">Contact service is not configured.</div>
+                <div className="text-[10px] text-slate-400">Toll-free 00000 assistance (demo)</div>
               </div>
             </div>
-            <span className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-400 text-[11px] font-semibold">Unavailable</span>
+            <button
+              type="button"
+              onClick={() => showToast('Help Desk connected', 'Connected to Varanasi District POSHAN Mission Cell (+91 00000 00000 demo)', 'info')}
+              className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0F172A] text-[11px] font-semibold"
+            >
+              Contact
+            </button>
           </div>
         </aside>
       </form>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Sliders,
@@ -81,7 +81,7 @@ export const RuleSettingsPage: React.FC = () => {
       return;
     }
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot toggle screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot toggle screening rules. Restricted to CDPO (view-only for other roles).`, 'error');
       return;
     }
     const r = rules.find((x) => x.id === ruleId);
@@ -104,7 +104,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleSaveRuleConfig = () => {
     if (!selectedRule) return;
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Restricted to CDPO.`, 'error');
       return;
     }
     if (ruleThreshold <= 0 || ruleThreshold > 50) {
@@ -117,7 +117,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleConfirmedSave = () => {
     if (!selectedRule) return;
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot edit screening rules. Restricted to CDPO.`, 'error');
       return;
     }
     mockStore.updateRuleThreshold(selectedRule.id, ruleThreshold, { actorId: staffUser?.id, role });
@@ -133,7 +133,7 @@ export const RuleSettingsPage: React.FC = () => {
   const handleCreateNewRule = (e: React.FormEvent) => {
     e.preventDefault();
     if (role && !canPerformAction(role, 'edit_rules')) {
-      showToast('Permission Restricted', `Role ${role} cannot create screening rules. Rule changes are unavailable until an approval workflow is configured.`, 'error');
+      showToast('Permission Restricted', `Role ${role} cannot create screening rules. Restricted to CDPO.`, 'error');
       return;
     }
     if (!newRuleName.trim()) return;
@@ -190,7 +190,7 @@ export const RuleSettingsPage: React.FC = () => {
           {!canEdit && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600">
               <Lock className="w-3.5 h-3.5 text-slate-400" />
-              <span>View only — rule changes are unavailable until submission and approval are configured</span>
+              <span>View Only — Rule editing requires CDPO access</span>
             </div>
           )}
           {canEdit && (

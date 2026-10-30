@@ -15,9 +15,6 @@ import { ReferralsPage } from './pages/ReferralsPage';
 import { RuleSettingsPage } from './pages/RuleSettingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
-import { SyntheticWorkflowPage } from './pages/SyntheticWorkflowPage';
-import { SyntheticOperationsPage } from './pages/SyntheticOperationsPage';
-import { B1ChildExplorerPage } from './pages/B1ChildExplorerPage';
 
 export default function App() {
   return (
@@ -28,9 +25,6 @@ export default function App() {
             {/* Public Landing & Sign In (Role Simulation) */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/signin" element={<SignInPage />} />
-            <Route path="/b1-explorer" element={<B1ChildExplorerPage />} />
-            <Route path="/synthetic-workflow" element={import.meta.env.DEV ? <SyntheticWorkflowPage /> : <Navigate to="/" replace />} />
-            <Route path="/synthetic-operations" element={import.meta.env.DEV ? <SyntheticOperationsPage /> : <Navigate to="/" replace />} />
 
             {/* Dashboard: Public aggregate-only overview or authenticated role briefing */}
             <Route

@@ -19,6 +19,19 @@ export const Hero: React.FC<HeroProps> = ({ onNavigateDemo }) => {
         <div className="welcome-hero-grid relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           {/* Left Column: Typography & CTAs (7 cols) */}
           <div className="hero-photo-content welcome-hero-copy lg:col-span-7 relative flex flex-col items-start">
+            {/* Pill Section Label */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F3F7FA]/85 backdrop-blur-md text-xs font-medium text-[#293F59] shadow-sm border border-[#E7EAF0] mb-6"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#477F9B]" />
+              <span>Supporting India&apos;s Nutrition Mission</span>
+              <span className="text-[#477F9B] font-normal">|</span>
+              <span className="text-[#477F9B] font-mono">Demo Prototype</span>
+            </motion.div>
+
             {/* H1: Inter Tight Light 300 (64/68, tracking -2%) */}
             <h1 className="welcome-hero-title text-4xl sm:text-5xl lg:text-[60px] font-bold text-[#293F59] tracking-[-0.02em] leading-[1.06] mb-6">
               Every child deserves a healthier tomorrow.
@@ -54,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigateDemo }) => {
                 onClick={onNavigateDemo}
                 className="hero-photo-demo-button group inline-flex items-center gap-2.5 bg-[#293F59] text-white text-sm sm:text-base font-medium px-7 py-3.5 rounded-full shadow-layered hover:bg-[#20334A] active:scale-95 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#477F9B]"
               >
-                <span>View interactive demo</span>
+                <span>Explore Dashboard Demo</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
               </button>
 
