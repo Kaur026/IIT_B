@@ -64,7 +64,8 @@ export const SignInPage: React.FC = () => {
       `Active persona: ${isAww ? `AWW (${awwCentreConfig?.workerId} at ${normalizedCentre})` : currentConfig.label}.`,
       'success'
     );
-    navigate(redirectTarget);
+    const target = (location.state as any)?.from || (selectedRole === 'Parent/Family' ? '/family' : '/dashboard');
+    navigate(target);
   };
 
   return (

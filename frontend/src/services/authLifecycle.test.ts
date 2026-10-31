@@ -17,6 +17,10 @@ test('mock role simulation is limited to development or an explicit public demo 
   assert.equal(isMockDemoEnabled({ DEV: false }), false);
   assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: 'false' }), false);
   assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: 'true' }), true);
+  assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: 'TRUE' }), true);
+  assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: 'True' }), true);
+  assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: ' true ' }), true);
+  assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: true }), true);
   assert.equal(isMockDemoEnabled({ DEV: false, VITE_ENABLE_DEMO_MODE: '1' }), false);
 });
 
