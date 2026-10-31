@@ -1,4 +1,4 @@
-Visit SITE: https://iit-b-liard.vercel.app
+Visit SITE: https://iit-b-ev3q.vercel.app
 # Poshan Tracker Action Layer
 
 Prototype workspace for exploring a nutrition action workflow: synthetic beneficiary and measurement data, configurable screening rules, data-quality checks, and follow-up task concepts. The original React screens remain local demos; separate development-only synthetic workflow pages call the B2 FastAPI prototype. Neither the original screens nor B2 are connected to operational data or trusted production identity. All bundled beneficiary data is synthetic.
