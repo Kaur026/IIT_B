@@ -23,6 +23,8 @@ export type DemoScope = {
   sectorCode?: string;
   projectCode?: string;
   actorId?: string;
+  linkedBeneficiaryIds?: string[];
+  familyId?: string;
 };
 
 export const DEMO_SECTOR_CENTRES: Record<string, string[]> = {
@@ -42,6 +44,8 @@ function centresForDemoScope(scope?: DemoScope): string[] | null {
   if (!scope) return null;
   if (!scope.role) return [];
   switch (scope.role) {
+    case 'Parent/Family':
+      return [];
     case 'AWW': {
       const assignedCentre = scope.actorId ? DEMO_AWW_CENTRES[scope.actorId] : undefined;
       if (scope.actorId && !assignedCentre) return [];
@@ -1622,6 +1626,10 @@ class MockStore {
   // BENEFICIARY OPERATIONS WITH ROLE SCOPING
   // =========================================================================
   public getBeneficiaries(scope?: DemoScope): BeneficiaryRecord[] {
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return this.beneficiaries.filter((b) => allowedIds.includes(b.id));
+    }
     const centres = centresForDemoScope(scope);
     if (centres) return this.beneficiaries.filter((beneficiary) => centres.includes(beneficiary.centreCode));
     return [...this.beneficiaries];
@@ -1629,11 +1637,23 @@ class MockStore {
 
   public getBeneficiaryById(id: string, scope?: DemoScope): BeneficiaryRecord | undefined {
     const beneficiary = this.beneficiaries.find((b) => b.id === id);
-    if (!beneficiary || (scope && !scopeAllowsCentre(scope, beneficiary.centreCode))) return undefined;
+    if (!beneficiary) return undefined;
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return allowedIds.includes(id) ? beneficiary : undefined;
+    }
+    if (scope && !scopeAllowsCentre(scope, beneficiary.centreCode)) return undefined;
     return beneficiary;
   }
 
   public getCentres(scope?: DemoScope): DemoCentreRecord[] {
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      const linkedCentres = new Set(
+        this.beneficiaries.filter((b) => allowedIds.includes(b.id)).map((b) => b.centreCode)
+      );
+      return CANONICAL_CENTRES.filter((c) => linkedCentres.has(c.id)).map((c) => ({ ...c }));
+    }
     const centres = centresForDemoScope(scope);
     return CANONICAL_CENTRES
       .filter((centre) => !centres || centres.includes(centre.id))
@@ -1641,6 +1661,13 @@ class MockStore {
   }
 
   public getWorkers(scope?: DemoScope): DemoWorkerRecord[] {
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      const linkedAwws = new Set(
+        this.beneficiaries.filter((b) => allowedIds.includes(b.id)).map((b) => b.assignedAww)
+      );
+      return CANONICAL_WORKERS.filter((w) => linkedAwws.has(w.id)).map((w) => ({ ...w }));
+    }
     const centres = centresForDemoScope(scope);
     return CANONICAL_WORKERS
       .filter((worker) => !centres || (worker.centreCode && centres.includes(worker.centreCode)))
@@ -1666,20 +1693,32 @@ class MockStore {
   }
 
   public getHomeVisits(scope?: DemoScope): DemoHomeVisitRecord[] {
-    const centres = centresForDemoScope(scope);
     const { homeVisits } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return homeVisits.filter((visit) => allowedIds.includes(visit.beneficiaryId));
+    }
+    const centres = centresForDemoScope(scope);
     return homeVisits.filter((visit) => !centres || centres.includes(visit.centreCode));
   }
 
   public getMaternalProfiles(scope?: DemoScope): DemoMaternalProfileRecord[] {
-    const centres = centresForDemoScope(scope);
     const { maternalProfiles } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return maternalProfiles.filter((profile) => allowedIds.includes(profile.beneficiaryId));
+    }
+    const centres = centresForDemoScope(scope);
     return maternalProfiles.filter((profile) => !centres || centres.includes(profile.centreCode));
   }
 
   public getServiceRecords(scope?: DemoScope): DemoServiceRecord[] {
-    const centres = centresForDemoScope(scope);
     const { serviceRecords } = generateSupportRecords(this.beneficiaries, this.cases, this.referrals);
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return serviceRecords.filter((record) => allowedIds.includes(record.beneficiaryId));
+    }
+    const centres = centresForDemoScope(scope);
     return serviceRecords.filter((record) => !centres || centres.includes(record.centreCode));
   }
 
@@ -1785,6 +1824,14 @@ class MockStore {
   // MEASUREMENT & SCREENING INTAKE
   // =========================================================================
   public getMeasurements(beneficiaryId?: string, scope?: DemoScope): MeasurementRecord[] {
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return this.measurements.filter((m) => {
+        if (!allowedIds.includes(m.beneficiaryId)) return false;
+        if (beneficiaryId && m.beneficiaryId !== beneficiaryId) return false;
+        return true;
+      });
+    }
     if (scope) {
       const centres = centresForDemoScope(scope) || [];
       return this.measurements.filter((measurement) => {
@@ -1990,6 +2037,7 @@ class MockStore {
   // ACTION CASES & MULTI-TIER ESCALATION WITH ROLE SCOPING
   // =========================================================================
   public getCases(scope?: DemoScope): BeneficiaryCase[] {
+    if (scope?.role === 'Parent/Family') return [];
     const centres = centresForDemoScope(scope);
     const scopedCases = centres
       ? this.cases.filter((item) => centres.includes(item.centreCode || this.getBeneficiaryById(item.id)?.centreCode || ''))
@@ -2197,13 +2245,23 @@ class MockStore {
   // REFERRALS & FOLLOW-UP WORKFLOW WITH ROLE SCOPING
   // =========================================================================
   public getReferrals(scope?: DemoScope): ReferralRecord[] {
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return this.referrals.filter((referral) => allowedIds.includes(referral.beneficiaryId));
+    }
     const centres = centresForDemoScope(scope);
     if (centres) return this.referrals.filter((referral) => centres.includes(this.getBeneficiaryById(referral.beneficiaryId)?.centreCode || ''));
     return [...this.referrals];
   }
 
-  public getReferralById(id: string): ReferralRecord | undefined {
-    return this.referrals.find((r) => r.id === id);
+  public getReferralById(id: string, scope?: DemoScope): ReferralRecord | undefined {
+    const referral = this.referrals.find((r) => r.id === id);
+    if (!referral) return undefined;
+    if (scope?.role === 'Parent/Family') {
+      const allowedIds = scope.linkedBeneficiaryIds || [];
+      return allowedIds.includes(referral.beneficiaryId) ? referral : undefined;
+    }
+    return referral;
   }
 
   public createReferral(
@@ -2460,7 +2518,7 @@ class MockStore {
   }
 
   public getAuditLog(scope?: DemoScope): AuditLedgerEntry[] {
-    if (scope?.role === 'AWW' || scope?.role === 'DPO' || scope?.role === 'User' || scope?.role === 'System Administrator' || scope?.role === 'Rule Administrator') return [];
+    if (scope?.role === 'AWW' || scope?.role === 'DPO' || scope?.role === 'User' || scope?.role === 'System Administrator' || scope?.role === 'Rule Administrator' || scope?.role === 'Parent/Family') return [];
     const centres = centresForDemoScope(scope);
     if (centres) return this.auditLog.filter((entry) => {
       const caseItem = this.cases.find((item) => item.actionId === entry.actionId || item.id === entry.palId);
@@ -2475,6 +2533,7 @@ class MockStore {
   // AI DECISIONS & AUDIT OPERATIONS
   // =========================================================================
   public getAIDecisions(scope?: DemoScope): AIDecisionRecord[] {
+    if (scope?.role === 'Parent/Family') return [];
     const centres = centresForDemoScope(scope);
     if (!centres) return [...this.aiDecisions];
     return this.aiDecisions.filter((dec) => centres.includes(dec.centreCode));

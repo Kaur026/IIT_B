@@ -60,10 +60,12 @@ export const StaffProfilePage: React.FC = () => {
             <span className="text-slate-800 font-semibold">Staff Profile & Controls</span>
           </nav>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
-            Frontline Staff Profile & System Controls
+            {role === 'Parent/Family' ? 'Family Member Profile & Linked Child' : 'Frontline Staff Profile & System Controls'}
           </h1>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl font-normal leading-relaxed">
-            Active operator credentials, catchment sector administrative configuration, and browser demo state management.
+            {role === 'Parent/Family'
+              ? 'Family member credentials, linked child registration details, and assigned Anganwadi centre information.'
+              : 'Active operator credentials, catchment sector administrative configuration, and browser demo state management.'}
           </p>
         </div>
 
@@ -83,7 +85,7 @@ export const StaffProfilePage: React.FC = () => {
         <article className="lg:col-span-7 bg-[#E8F2FC] rounded-2xl border border-[#BBD5F0] p-6 sm:p-8 shadow-xs space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xl shadow-md">
-              {staffUser?.id ? staffUser.id.replace('AWW-', 'W').replace('LS-', 'S').replace('CDPO-', 'C').replace('DPO-', 'D') : 'OP'}
+              {staffUser?.id ? (role === 'Parent/Family' ? 'FP' : staffUser.id.replace('AWW-', 'W').replace('LS-', 'S').replace('CDPO-', 'C').replace('DPO-', 'D')) : 'OP'}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -118,7 +120,7 @@ export const StaffProfilePage: React.FC = () => {
             <div className="space-y-1">
               <span className="text-slate-400 text-[10px] uppercase font-semibold block">Active Scoped Population</span>
               <span className="font-semibold text-slate-800">
-                {metrics.total} Beneficiaries ({metrics.totalChildren} Children under 6)
+                {role === 'Parent/Family' ? '1 Linked Child (Aarav Sharma · BEN-0142)' : `${metrics.total} Beneficiaries (${metrics.totalChildren} Children under 6)`}
               </span>
             </div>
 

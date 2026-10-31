@@ -10,13 +10,14 @@ export type UserRole =
   | 'CDPO'
   | 'DPO'
   | 'System Administrator'
-  | 'Rule Administrator';
+  | 'Rule Administrator'
+  | 'Parent/Family';
 
 export interface RoleConfig {
   role: UserRole;
   label: string;
   fullTitle: string;
-  scopeLevel: 'Public' | 'Centre' | 'Sector' | 'Project' | 'District' | 'Administrative';
+  scopeLevel: 'Public' | 'Centre' | 'Sector' | 'Project' | 'District' | 'Administrative' | 'Family';
   defaultId: string;
   defaultScope: string;
   description: string;
@@ -58,6 +59,11 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     defaultId: 'RULEADMIN-01', defaultScope: 'Rule-change workflow only',
     description: 'May draft and submit rule changes. Approval is disabled until an authority is designated.',
   },
+  'Parent/Family': {
+    role: 'Parent/Family', label: 'Parent / Family Member', fullTitle: 'Parent & Family Portal', scopeLevel: 'Family',
+    defaultId: 'FAM-0142', defaultScope: 'Linked Child: Aarav Sharma (BEN-0142)',
+    description: 'Family view for growth tracking, developmental milestones, nutrition guidance, and scheduled check-ups.',
+  },
 };
 
 export function isUserRole(value: unknown): value is UserRole {
@@ -73,7 +79,7 @@ export const DEMO_AWW_WORKER_CENTRES: Record<string, string> = {
   'AWW-421': 'AWC-706',
 };
 
-export function isValidDemoPersona(value: unknown): value is { id: string; role: UserRole; roleLabel: string; signedInAt: string; centreCode?: string } {
+export function isValidDemoPersona(value: unknown): value is { id: string; role: UserRole; roleLabel: string; signedInAt: string; centreCode?: string; linkedBeneficiaryIds?: string[]; familyId?: string } {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as Record<string, unknown>;
   if (!isUserRole(candidate.role) || typeof candidate.id !== 'string' || typeof candidate.signedInAt !== 'string') return false;
@@ -81,6 +87,9 @@ export function isValidDemoPersona(value: unknown): value is { id: string; role:
   if (candidate.roleLabel !== config.label || !Number.isFinite(Date.parse(candidate.signedInAt))) return false;
   if (candidate.role === 'AWW') {
     return Object.prototype.hasOwnProperty.call(DEMO_AWW_WORKER_CENTRES, candidate.id);
+  }
+  if (candidate.role === 'Parent/Family') {
+    return candidate.id === config.defaultId || candidate.id.startsWith('FAM-');
   }
   return candidate.id === config.defaultId;
 }
@@ -179,6 +188,15 @@ export function getNavItemsForRole(role: UserRole | null | undefined): PortalNav
     { id: 'profile', name: 'Staff Profile', href: '/profile' },
   ];
 
+  if (role === 'Parent/Family') return [
+    { id: 'dashboard', name: 'My Dashboard', href: '/dashboard' },
+    { id: 'child-profile', name: 'My Child', href: '/dashboard#child-profile' },
+    { id: 'growth-tracking', name: 'Growth Tracking', href: '/dashboard#growth-tracking' },
+    { id: 'nutrition-care', name: 'Nutrition & Care', href: '/dashboard#nutrition-care' },
+    { id: 'history', name: 'History', href: '/dashboard#history' },
+    { id: 'profile', name: 'Family Profile', href: '/profile' },
+  ];
+
   return [{ id: 'dashboard', name: 'Overview', href: '/dashboard' }];
 }
 
@@ -193,9 +211,18 @@ export function canAccessPath(role: UserRole | null | undefined, path: string): 
       ? { allowed: true }
       : { allowed: false, reason: 'Public access is limited to aggregate pages.' };
   }
+  if (role === 'Parent/Family') {
+    if (cleanPath === '/' || cleanPath === '/signin' || cleanPath === '/dashboard' || cleanPath === '/family' || cleanPath === '/profile') {
+      return { allowed: true };
+    }
+    return {
+      allowed: false,
+      reason: 'This route is restricted to authorized field staff. Family members can view their linked child in the Family Portal.',
+    };
+  }
   if (cleanPath === '/' || cleanPath === '/signin' || cleanPath === '/dashboard') return { allowed: true };
   if (cleanPath.startsWith('/profile')) {
-    return role === 'AWW' || role === 'LS' || role === 'CDPO' || role === 'DPO' || role === 'System Administrator' || role === 'Rule Administrator'
+    return role === 'AWW' || role === 'LS' || role === 'CDPO' || role === 'DPO' || role === 'System Administrator' || role === 'Rule Administrator' || role === 'Parent/Family'
       ? { allowed: true }
       : { allowed: false, reason: 'Profile access is limited to authenticated staff roles.' };
   }

@@ -37,12 +37,17 @@ import { useAuth } from '../context/AuthContext';
 import { CategoryIllustration, CategoryType } from '../components/portal/CategoryIllustrations';
 import { canPerformAction, ROLE_CONFIGS } from '../utils/permissions';
 import { calculateAge, getDaysUntilDate, getTodayISODate } from '../utils/casework';
+import { FamilyDashboardPage } from './FamilyDashboardPage';
 
 export const MockDashboardView: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
   const { isReadOnlyDemo, requireStaffAction, role, staffUser } = useAuth();
+
+  if (role === 'Parent/Family') {
+    return <FamilyDashboardPage />;
+  }
   const canVerifyCases = canPerformAction(role, 're_measure');
   const demoScope = {
     role,

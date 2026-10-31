@@ -116,10 +116,17 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       case 'rule-test-results':
       case 'system-settings':
         return Sliders;
+      case 'child-profile':
       case 'profile':
       case 'staff-roles':
       case 'user-access':
         return UserIcon;
+      case 'growth-tracking':
+        return Scale;
+      case 'nutrition-care':
+        return HeartHandshake;
+      case 'history':
+        return FileBarChart2;
       default:
         return LayoutDashboard;
     }

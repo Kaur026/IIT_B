@@ -15,6 +15,7 @@ import { ReferralsPage } from './pages/ReferralsPage';
 import { RuleSettingsPage } from './pages/RuleSettingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
+import { FamilyDashboardPage } from './pages/FamilyDashboardPage';
 import { SyntheticWorkflowPage } from './pages/SyntheticWorkflowPage';
 import { SyntheticOperationsPage } from './pages/SyntheticOperationsPage';
 
@@ -37,6 +38,18 @@ export default function App() {
                 <PortalLayout>
                   <DashboardPage />
                 </PortalLayout>
+              }
+            />
+
+            {/* Dedicated Parent & Family Portal route */}
+            <Route
+              path="/family"
+              element={
+                <RoleRoute>
+                  <PortalLayout>
+                    <FamilyDashboardPage />
+                  </PortalLayout>
+                </RoleRoute>
               }
             />
 

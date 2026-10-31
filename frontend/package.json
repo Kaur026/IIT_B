@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "node --test src/utils/casework.test.ts src/utils/beneficiaryDirectory.test.ts src/store/mockStore.test.ts src/services/b2Api.test.ts src/services/authLifecycle.test.ts src/services/b1CsvDataSource.test.ts src/services/preparedDataApi.test.ts src/services/preparedRecordsApi.test.ts src/services/preparedDashboard.test.ts src/services/aiScreening.test.ts"
+    "test": "node --test src/utils/casework.test.ts src/utils/beneficiaryDirectory.test.ts src/store/mockStore.test.ts src/services/b2Api.test.ts src/services/authLifecycle.test.ts src/services/b1CsvDataSource.test.ts src/services/preparedDataApi.test.ts src/services/preparedRecordsApi.test.ts src/services/preparedDashboard.test.ts src/services/aiScreening.test.ts src/utils/familyPortal.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

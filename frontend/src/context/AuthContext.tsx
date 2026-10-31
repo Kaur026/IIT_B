@@ -10,12 +10,14 @@ import { getSupabaseBrowserClient } from '../services/supabaseClient';
 import { isMockDemoEnabled } from '../utils/demoMode';
 
 export interface StaffUser {
-  id: string; // e.g. 'AWW-409', 'LS-01', 'CDPO-01', 'DPO-01'
+  id: string; // e.g. 'AWW-409', 'LS-01', 'CDPO-01', 'DPO-01', 'FAM-0142'
   role: UserRole;
   roleLabel: string;
   centreCode?: string; // 'AWC-702'
   sectorCode?: string; // 'Sector-4'
   projectCode?: string; // 'Project-Central'
+  familyId?: string; // 'FAM-0142'
+  linkedBeneficiaryIds?: string[]; // ['BEN-0142']
   signedInAt: string;
   name?: string; // Legacy compatibility getter
 }
@@ -49,6 +51,7 @@ export const createDemoPersona = (
   signedInAt = new Date().toISOString(),
   centreCode?: string,
   workerId?: string,
+  linkedBeneficiaryIds?: string[],
 ): StaffUser => {
   const config = ROLE_CONFIGS[role];
   let id = config.defaultId;
@@ -62,6 +65,19 @@ export const createDemoPersona = (
       const match = Object.entries(DEMO_AWW_WORKER_CENTRES).find(([, centre]) => centre === assignedCentre);
       id = match ? match[0] : config.defaultId;
     }
+  }
+
+  if (role === 'Parent/Family') {
+    return {
+      id: workerId || config.defaultId,
+      role,
+      roleLabel: config.label,
+      centreCode: 'AWC-702',
+      familyId: workerId || config.defaultId,
+      linkedBeneficiaryIds: linkedBeneficiaryIds || ['BEN-0142'],
+      signedInAt,
+      name: 'Family of Priya Sharma',
+    };
   }
 
   return {
@@ -100,6 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             candidate.signedInAt as string,
             typeof candidate.centreCode === 'string' ? candidate.centreCode : undefined,
             typeof candidate.id === 'string' ? candidate.id : undefined,
+            Array.isArray(candidate.linkedBeneficiaryIds) ? (candidate.linkedBeneficiaryIds as string[]) : undefined,
           );
         }
         localStorage.removeItem(STORAGE_KEY);
@@ -219,7 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     applySupabaseSession(null);
-    const cleanUser = createDemoPersona(user.role, user.signedInAt, user.centreCode, user.id);
+    const cleanUser = createDemoPersona(user.role, user.signedInAt, user.centreCode, user.id, user.linkedBeneficiaryIds);
     setStaffUser(cleanUser);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanUser));

@@ -51,6 +51,8 @@ export const SignInPage: React.FC = () => {
     if (isAww) {
       if (!awwCentreConfig) return;
       persona = createDemoPersona('AWW', undefined, normalizedCentre, awwCentreConfig.workerId);
+    } else if (selectedRole === 'Parent/Family') {
+      persona = createDemoPersona('Parent/Family', undefined, 'AWC-702', 'FAM-0142', ['BEN-0142']);
     } else {
       persona = createDemoPersona(selectedRole);
     }
@@ -142,6 +144,7 @@ export const SignInPage: React.FC = () => {
                   <option value="DPO">District Programme Officer (DPO) — District Level</option>
                   <option value="System Administrator">System Administrator — Administrative Functions</option>
                   <option value="Rule Administrator">Rule Administrator — Rule Management</option>
+                  <option value="Parent/Family">Parent / Family Member — Family Portal (Aarav Sharma · BEN-0142)</option>
                 </select>
                 <p className="text-[11px] text-[#5B6B7C] mt-1.5 leading-relaxed">
                   {currentConfig.description}
@@ -181,6 +184,28 @@ export const SignInPage: React.FC = () => {
                 </div>
               )}
 
+              {/* Family portal child link card */}
+              {selectedRole === 'Parent/Family' && (
+                <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 text-xs text-slate-700 space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">Family Account:</span>
+                    <span className="font-mono font-semibold text-blue-900">FAM-0142 (Sharma Family)</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">Linked Child:</span>
+                    <span className="font-semibold text-blue-900">Aarav Sharma · BEN-0142</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">Caregiver / Kinship:</span>
+                    <span className="text-slate-800">Mother (Priya Sharma)</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">Anganwadi Centre:</span>
+                    <span className="text-slate-800">AWC-702 · Frontline Worker AWW-409</span>
+                  </div>
+                </div>
+              )}
+
               {/* Selected Worker and Centre Display */}
               <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700 space-y-1">
                 <div className="flex justify-between items-center">
@@ -209,7 +234,7 @@ export const SignInPage: React.FC = () => {
                 disabled={!isAwwValid}
                 className="w-full mt-2 py-3 px-6 rounded-full bg-[#0E1B2B] hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8A83]"
               >
-                <span>Start Demo Persona ({currentConfig.label})</span>
+                <span>{selectedRole === 'Parent/Family' ? 'Enter Parent / Family Portal' : `Start Demo Persona (${currentConfig.label})`}</span>
                 <ArrowRight className="w-4 h-4" />
               </motion.button>
 
