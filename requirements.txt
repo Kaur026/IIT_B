@@ -1,0 +1,3 @@
+# Runtime dependencies for the B2 FastAPI function on Vercel (api/index.py).
+fastapi>=0.110,<1.0
+pandas>=1.5

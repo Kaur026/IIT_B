@@ -1,0 +1,5 @@
+member3_data_simulation/
+docs/
+contracts/
+*.patch
+**/node_modules

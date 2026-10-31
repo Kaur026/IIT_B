@@ -17,3 +17,5 @@ B2/.offline/
 
 B2/.verification-uvicorn-20261030.err.log
 B2/.verification-uvicorn-20261030.out.log
+# Vercel
+.vercel/
